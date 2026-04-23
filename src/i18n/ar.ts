@@ -124,6 +124,6 @@ export const ar = {
     home: "الرئيسية",
     loading: "جارِ التحميل…",
   },
-} as const;
+};
 
 export type Dict = typeof ar;
