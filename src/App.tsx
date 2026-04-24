@@ -9,6 +9,11 @@ import { Layout } from "@/components/layout/Layout";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import StubPage from "./pages/StubPage.tsx";
+import Programs from "./pages/Programs.tsx";
+import Governance from "./pages/Governance.tsx";
+import Media from "./pages/Media.tsx";
+import SurveysPage from "./pages/Surveys.tsx";
+import AdminDashboard from "./pages/AdminDashboard.tsx";
 
 const queryClient = new QueryClient();
 
@@ -47,11 +52,11 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/about" element={<Stub titleKey="about" pageKey="about" />} />
-                <Route path="/programs" element={<Stub titleKey="programs" pageKey="programs" />} />
-                <Route path="/governance" element={<Stub titleKey="governance" pageKey="governance" />} />
-                <Route path="/media" element={<Stub titleKey="media" pageKey="media" />} />
+                <Route path="/programs" element={<Programs />} />
+                <Route path="/governance" element={<Governance />} />
+                <Route path="/media" element={<Media />} />
                 <Route path="/volunteer" element={<Stub titleKey="volunteer" pageKey="volunteer" />} />
-                <Route path="/surveys" element={<Stub titleKey="surveys" pageKey="surveys" />} />
+                <Route path="/surveys" element={<SurveysPage />} />
                 <Route path="/contact" element={<Stub titleKey="contact" pageKey="contact" />} />
                 <Route path="/donate" element={<Stub titleKey="donate" pageKey="donate" />} />
                 <Route path="/search" element={<Stub titleKey="search" pageKey="search" />} />
@@ -60,7 +65,7 @@ const App = () => (
                 <Route path="/cookie-policy" element={<Stub titleKey="cookies" pageKey="cookies" />} />
                 <Route path="/accessibility-statement" element={<Stub titleKey="accessibility" pageKey="accessibility" />} />
                 <Route path="/sitemap" element={<Stub titleKey="sitemap" pageKey="sitemap" />} />
-                <Route path="/admin" element={<Stub titleKey="admin" pageKey="admin" />} />
+                <Route path="/admin" element={<AdminDashboard />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

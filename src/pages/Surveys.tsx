@@ -1,0 +1,237 @@
+import { useState } from "react";
+import { ArrowLeft, ArrowRight, CheckCircle2, ClipboardList, Star, Users } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { Progress } from "@/components/ui/progress";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { surveys } from "@/data";
+import { PageHero } from "@/components/layout/PageHero";
+import { PageFeedback } from "@/components/layout/PageFeedback";
+import type { Survey } from "@/types";
+import { cn } from "@/lib/utils";
+
+const SurveysPage = () => {
+  const { t, tx, lang, dir } = useLanguage();
+  const [selected, setSelected] = useState<Survey | null>(null);
+
+  if (selected) return <SurveyTaker survey={selected} onBack={() => setSelected(null)} />;
+
+  return (
+    <>
+      <PageHero
+        eyebrow={t.nav.surveys}
+        title={t.pages.surveys.heading}
+        lead={t.pages.surveys.lead}
+        breadcrumb={[{ label: t.nav.surveys }]}
+      />
+      <section className="container py-12 md:py-16">
+        <div className="grid md:grid-cols-2 gap-6">
+          {surveys.map((s) => {
+            const isActive = s.status === "active";
+            return (
+              <Card key={s.id} className="p-6 hover:shadow-card transition-smooth border-border flex flex-col">
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <div className="h-12 w-12 rounded-2xl bg-gradient-primary text-primary-foreground grid place-items-center shadow-soft">
+                    <ClipboardList className="h-6 w-6" />
+                  </div>
+                  <Badge
+                    className={cn(
+                      "border-0 font-bold",
+                      isActive ? "bg-success text-success-foreground" : "bg-muted text-muted-foreground",
+                    )}
+                  >
+                    {isActive ? t.pages.surveys.active : t.pages.surveys.closed}
+                  </Badge>
+                </div>
+                <h3 className="text-lg font-bold text-primary mb-2">{tx(s.title)}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-5 flex-1">{tx(s.description)}</p>
+                <div className="flex flex-wrap gap-4 text-xs text-muted-foreground mb-5">
+                  <span className="inline-flex items-center gap-1.5">
+                    <Users className="h-3.5 w-3.5" />
+                    {s.participants.toLocaleString()} {t.pages.surveys.participants}
+                  </span>
+                  <span>
+                    {t.pages.surveys.endsAt}:{" "}
+                    <span className="font-semibold text-foreground">
+                      {new Date(s.endsAt).toLocaleDateString(lang === "ar" ? "ar-SA" : "en-US")}
+                    </span>
+                  </span>
+                </div>
+                {isActive ? (
+                  <Button onClick={() => setSelected(s)} className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold shadow-gold">
+                    {t.pages.surveys.take}
+                    <ArrowLeft className={dir === "rtl" ? "h-4 w-4" : "h-4 w-4 rotate-180"} />
+                  </Button>
+                ) : (
+                  <Button variant="outline" className="border-primary text-primary">
+                    <Star className="h-4 w-4" fill="currentColor" />
+                    {t.pages.surveys.viewResults}{s.results?.avgRating ? ` · ${s.results.avgRating}/5` : ""}
+                  </Button>
+                )}
+              </Card>
+            );
+          })}
+        </div>
+      </section>
+      <PageFeedback pageKey="surveys" />
+    </>
+  );
+};
+
+// واجهة تعبئة الاستبيان
+const SurveyTaker = ({ survey, onBack }: { survey: Survey; onBack: () => void }) => {
+  const { t, tx, dir } = useLanguage();
+  const [step, setStep] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, unknown>>({});
+  const [done, setDone] = useState(false);
+
+  const total = survey.questions.length;
+  const q = survey.questions[step];
+  const progress = ((step + (done ? 1 : 0)) / Math.max(1, total)) * 100;
+
+  if (done) {
+    return (
+      <>
+        <PageHero
+          title={t.pages.surveys.heading}
+          breadcrumb={[{ label: t.nav.surveys, to: "/surveys" }, { label: tx(survey.title) }]}
+        />
+        <section className="container py-16 md:py-20">
+          <Card className="max-w-xl mx-auto p-10 text-center">
+            <div className="mx-auto h-20 w-20 rounded-full bg-success/15 text-success grid place-items-center mb-5">
+              <CheckCircle2 className="h-10 w-10" />
+            </div>
+            <h2 className="text-2xl font-extrabold text-primary mb-3">{t.pages.surveys.submitted}</h2>
+            <p className="text-muted-foreground mb-6">{tx(survey.title)}</p>
+            <Button onClick={onBack} className="bg-primary text-primary-foreground">{t.pages.surveys.back}</Button>
+          </Card>
+        </section>
+      </>
+    );
+  }
+
+  const setAnswer = (val: unknown) => setAnswers((a) => ({ ...a, [q.id]: val }));
+  const canNext = !q.required || answers[q.id] !== undefined && answers[q.id] !== "";
+
+  return (
+    <>
+      <PageHero
+        title={tx(survey.title)}
+        lead={tx(survey.description)}
+        breadcrumb={[{ label: t.nav.surveys, to: "/surveys" }, { label: tx(survey.title) }]}
+      />
+      <section className="container py-12 md:py-16">
+        <Card className="max-w-2xl mx-auto p-6 md:p-10">
+          <div className="flex items-center justify-between text-sm text-muted-foreground mb-3">
+            <span className="font-bold text-primary">
+              {t.pages.surveys.step} {step + 1} {t.pages.surveys.of} {total}
+            </span>
+            <button onClick={onBack} className="hover:text-primary inline-flex items-center gap-1 font-semibold">
+              {t.pages.surveys.back}
+            </button>
+          </div>
+          <Progress value={progress} className="mb-7 h-2" />
+
+          <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">{tx(q.question)}</h2>
+          {q.required && <p className="text-xs text-destructive mb-5">{t.pages.surveys.requiredHint}</p>}
+
+          <div className="my-6">
+            {q.type === "rating" && (
+              <div className="flex gap-2 justify-center" role="radiogroup">
+                {[1, 2, 3, 4, 5].map((n) => {
+                  const sel = answers[q.id] === n;
+                  return (
+                    <button
+                      key={n}
+                      role="radio"
+                      aria-checked={sel}
+                      onClick={() => setAnswer(n)}
+                      className={cn(
+                        "h-14 w-14 rounded-2xl border-2 font-bold text-lg transition-smooth",
+                        sel ? "bg-accent text-accent-foreground border-accent shadow-gold scale-110"
+                            : "bg-card text-foreground border-border hover:border-accent",
+                      )}
+                    >
+                      {n}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            {(q.type === "single" || q.type === "multiple") && (
+              <div className="grid gap-2">
+                {q.options?.map((opt, i) => {
+                  const label = tx(opt);
+                  const cur = answers[q.id];
+                  const sel = q.type === "single" ? cur === label : Array.isArray(cur) && cur.includes(label);
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => {
+                        if (q.type === "single") setAnswer(label);
+                        else {
+                          const arr = Array.isArray(cur) ? [...cur] : [];
+                          const idx = arr.indexOf(label);
+                          if (idx >= 0) arr.splice(idx, 1); else arr.push(label);
+                          setAnswer(arr);
+                        }
+                      }}
+                      className={cn(
+                        "px-5 py-4 rounded-xl border-2 text-start font-semibold transition-smooth min-h-[56px]",
+                        sel ? "bg-primary/5 border-primary text-primary"
+                            : "bg-card border-border hover:border-primary/50",
+                      )}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            {q.type === "text" && (
+              <Textarea
+                value={(answers[q.id] as string) ?? ""}
+                onChange={(e) => setAnswer(e.target.value)}
+                placeholder={t.pages.surveys.writeHere}
+                rows={5}
+              />
+            )}
+          </div>
+
+          <div className="flex items-center justify-between gap-3 pt-5 border-t border-border">
+            <Button
+              variant="outline"
+              disabled={step === 0}
+              onClick={() => setStep((s) => s - 1)}
+            >
+              <ArrowRight className={dir === "rtl" ? "h-4 w-4" : "h-4 w-4 rotate-180"} />
+              {t.pages.surveys.prev}
+            </Button>
+            {step < total - 1 ? (
+              <Button
+                disabled={!canNext}
+                onClick={() => setStep((s) => s + 1)}
+                className="bg-primary text-primary-foreground"
+              >
+                {t.pages.surveys.next}
+                <ArrowLeft className={dir === "rtl" ? "h-4 w-4" : "h-4 w-4 rotate-180"} />
+              </Button>
+            ) : (
+              <Button
+                disabled={!canNext}
+                onClick={() => setDone(true)}
+                className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold shadow-gold"
+              >
+                {t.pages.surveys.submit}
+              </Button>
+            )}
+          </div>
+        </Card>
+      </section>
+    </>
+  );
+};
+
+export default SurveysPage;
