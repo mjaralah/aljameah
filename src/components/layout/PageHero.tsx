@@ -1,11 +1,11 @@
 import { ReactNode } from "react";
-import { Breadcrumbs } from "./Breadcrumb";
+import { Breadcrumbs, type Crumb } from "./Breadcrumb";
 
 interface Props {
   eyebrow?: string;
   title: string;
   lead?: string;
-  breadcrumb?: { label: string; href?: string }[];
+  breadcrumb?: Crumb[];
   actions?: ReactNode;
 }
 
