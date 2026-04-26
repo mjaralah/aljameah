@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, ArrowRight, BarChart3, CheckCircle2, ClipboardList, Star, Users } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, ClipboardList, Star, Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +36,8 @@ const SurveysPage = () => {
             <div className="grid md:grid-cols-2 gap-6">
           {surveys.map((s) => {
             const isActive = s.status === "active";
+             const hasResults = s.showPublicResults || s.results;
+             const metrics = hasResults ? getSurveyMetrics(s) : null;
             return (
               <Card key={s.id} className="p-6 hover:shadow-card transition-smooth border-border flex flex-col">
                 <div className="flex items-start justify-between gap-3 mb-4">
@@ -78,37 +80,22 @@ const SurveysPage = () => {
                     </Link>
                   </Button>
                 )}
-              </Card>
-            );
-          })}
-            </div>
-          </div>
-
-          <div>
-            <h2 className="text-2xl font-extrabold text-primary mb-6">{lang === "ar" ? "النتائج والتقارير" : "Results & Insights"}</h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              {surveys.filter((s) => s.showPublicResults || s.results).map((s) => {
-                const metrics = getSurveyMetrics(s);
-                return (
-                  <Card key={s.id} className="p-6 border-border hover:shadow-card transition-smooth">
-                    <div className="flex items-start justify-between gap-4 mb-5">
-                      <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary grid place-items-center">
-                        <BarChart3 className="h-6 w-6" />
-                      </div>
+                {metrics && (
+                  <div className="mt-5 border-t border-border pt-5">
+                    <div className="mb-3 flex items-center justify-between gap-3">
+                      <p className="text-sm font-extrabold text-primary">{lang === "ar" ? "نتائج التقييم" : "Survey results"}</p>
                       <Badge className="border-0 bg-success/15 text-success font-bold">{metrics.satisfaction}%</Badge>
                     </div>
-                    <h3 className="text-lg font-bold text-primary mb-4">{tx(s.title)}</h3>
-                    <div className="grid grid-cols-3 gap-3 mb-5 text-center">
+                    <div className="grid grid-cols-3 gap-3 text-center">
                       <Metric label={t.pages.surveys.participants} value={metrics.participants.toLocaleString()} />
                       <Metric label={lang === "ar" ? "متوسط الرضا" : "Avg. rating"} value={metrics.averageRating.toFixed(1)} />
                       <Metric label={lang === "ar" ? "نسبة الرضا" : "Satisfaction"} value={`${metrics.satisfaction}%`} />
                     </div>
-                    <Button asChild className="w-full bg-primary text-primary-foreground">
-                      <Link to={`/surveys/${s.id}/results`}>{t.pages.surveys.viewResults}</Link>
-                    </Button>
-                  </Card>
-                );
-              })}
+                  </div>
+                )}
+              </Card>
+            );
+          })}
             </div>
           </div>
         </div>
