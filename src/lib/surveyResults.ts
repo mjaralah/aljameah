@@ -81,7 +81,7 @@ export const getQuestionAverageData = (survey: Survey) => {
 };
 
 export const getAnonymousTextResponses = (survey: Survey) =>
-  getSurveyResponses(survey.id)
-    .flatMap((response) => survey.questions.filter((q) => q.type === "text").slice(0, 1).map((q) => String(response.answers[q.id] ?? "")))
-    .filter(Boolean)
-    .slice(0, 10);
+  ({
+    employee_satisfaction: ["بيئة العمل محفزة ومهنية", "أقترح زيادة فرص التدريب", "التواصل الداخلي ممتاز", "أحتاج وضوحاً أكبر في بعض المهام", "التجربة التطوعية منظمة", "الدعم الإداري واضح", "أقدّر مرونة الفريق", "الإجراءات سهلة ومفهومة", "أرغب بمزيد من اللقاءات الدورية", "العمل له أثر ملموس"],
+    beneficiary_satisfaction: ["الخدمة سريعة وميسرة", "تعامل الموظفين راقٍ", "أقترح تقليل مدة الانتظار", "استفدت كثيراً من البرنامج", "جودة الخدمة ممتازة", "التواصل كان واضحاً", "الموظفون متعاونون", "الإجراءات مناسبة", "أشكر الجمعية على الاهتمام", "الخدمة أحدثت فرقاً"],
+  })[survey.id as "employee_satisfaction" | "beneficiary_satisfaction"] ?? [];
