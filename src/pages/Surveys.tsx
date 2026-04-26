@@ -1,16 +1,20 @@
 import { useState } from "react";
-import { ArrowLeft, ArrowRight, CheckCircle2, ClipboardList, Star, Users } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ArrowLeft, ArrowRight, BarChart3, CheckCircle2, ClipboardList, Star, Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { surveys } from "@/data";
 import { PageHero } from "@/components/layout/PageHero";
 import { PageFeedback } from "@/components/layout/PageFeedback";
 import type { Survey } from "@/types";
 import { cn } from "@/lib/utils";
+import { getSurveyMetrics, saveSurveyResponse } from "@/lib/surveyResults";
 
 const SurveysPage = () => {
   const { t, tx, lang, dir } = useLanguage();
@@ -27,7 +31,13 @@ const SurveysPage = () => {
         breadcrumb={[{ label: t.nav.surveys }]}
       />
       <section className="container py-12 md:py-16">
-        <div className="grid md:grid-cols-2 gap-6">
+        <Tabs defaultValue="available" className="space-y-6">
+          <TabsList className="h-auto min-h-12 w-full justify-start overflow-x-auto rounded-lg bg-muted/70 p-1">
+            <TabsTrigger value="available" className="min-h-10 px-5 font-bold">{lang === "ar" ? "الاستبيانات المتاحة" : "Available surveys"}</TabsTrigger>
+            <TabsTrigger value="results" className="min-h-10 px-5 font-bold">{lang === "ar" ? "النتائج والتقارير" : "Results & Insights"}</TabsTrigger>
+          </TabsList>
+          <TabsContent value="available" className="mt-0">
+            <div className="grid md:grid-cols-2 gap-6">
           {surveys.map((s) => {
             const isActive = s.status === "active";
             return (
@@ -65,20 +75,57 @@ const SurveysPage = () => {
                     <ArrowLeft className={dir === "rtl" ? "h-4 w-4" : "h-4 w-4 rotate-180"} />
                   </Button>
                 ) : (
-                  <Button variant="outline" className="border-primary text-primary">
+                  <Button asChild variant="outline" className="border-primary text-primary">
+                    <Link to={`/surveys/${s.id}/results`}>
                     <Star className="h-4 w-4" fill="currentColor" />
                     {t.pages.surveys.viewResults}{s.results?.avgRating ? ` · ${s.results.avgRating}/5` : ""}
+                    </Link>
                   </Button>
                 )}
               </Card>
             );
           })}
-        </div>
+            </div>
+          </TabsContent>
+          <TabsContent value="results" className="mt-0">
+            <div className="grid md:grid-cols-2 gap-6">
+              {surveys.filter((s) => s.showPublicResults || s.results).map((s) => {
+                const metrics = getSurveyMetrics(s);
+                return (
+                  <Card key={s.id} className="p-6 border-border hover:shadow-card transition-smooth">
+                    <div className="flex items-start justify-between gap-4 mb-5">
+                      <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary grid place-items-center">
+                        <BarChart3 className="h-6 w-6" />
+                      </div>
+                      <Badge className="border-0 bg-success/15 text-success font-bold">{metrics.satisfaction}%</Badge>
+                    </div>
+                    <h3 className="text-lg font-bold text-primary mb-4">{tx(s.title)}</h3>
+                    <div className="grid grid-cols-3 gap-3 mb-5 text-center">
+                      <Metric label={t.pages.surveys.participants} value={metrics.participants.toLocaleString()} />
+                      <Metric label={lang === "ar" ? "متوسط الرضا" : "Avg. rating"} value={metrics.averageRating.toFixed(1)} />
+                      <Metric label={lang === "ar" ? "نسبة الرضا" : "Satisfaction"} value={`${metrics.satisfaction}%`} />
+                    </div>
+                    <Button asChild className="w-full bg-primary text-primary-foreground">
+                      <Link to={`/surveys/${s.id}/results`}>{t.pages.surveys.viewResults}</Link>
+                    </Button>
+                  </Card>
+                );
+              })}
+            </div>
+          </TabsContent>
+        </Tabs>
       </section>
       <PageFeedback pageKey="surveys" />
     </>
   );
 };
+
+const Metric = ({ label, value }: { label: string; value: string }) => (
+  <div className="rounded-lg bg-muted/60 px-3 py-4">
+    <p className="text-lg font-extrabold text-primary tabular-nums">{value}</p>
+    <p className="text-[11px] font-semibold text-muted-foreground mt-1">{label}</p>
+  </div>
+);
 
 // واجهة تعبئة الاستبيان
 const SurveyTaker = ({ survey, onBack }: { survey: Survey; onBack: () => void }) => {
