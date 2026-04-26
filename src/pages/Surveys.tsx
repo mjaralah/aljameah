@@ -207,7 +207,7 @@ const SurveyTaker = ({ survey, onBack }: { survey: Survey; onBack: () => void })
                 })}
               </div>
             )}
-            {(q.type === "single" || q.type === "multiple") && (
+            {(q.type === "single" || q.type === "single_choice" || q.type === "multiple") && (
               <div className="grid gap-2">
                 {q.options?.map((opt, i) => {
                   const label = tx(opt);
@@ -232,6 +232,38 @@ const SurveyTaker = ({ survey, onBack }: { survey: Survey; onBack: () => void })
                       )}
                     >
                       {label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            {q.type === "dropdown" && (
+              <Select value={(answers[q.id] as string) ?? ""} onValueChange={setAnswer}>
+                <SelectTrigger className="min-h-[56px] text-start text-base font-semibold">
+                  <SelectValue placeholder={t.pages.surveys.writeHere} />
+                </SelectTrigger>
+                <SelectContent>
+                  {q.options?.map((opt, i) => <SelectItem key={i} value={tx(opt)}>{tx(opt)}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            )}
+            {q.type === "likert" && (
+              <div className="grid gap-2" role="radiogroup">
+                {q.scale?.map((opt, i) => {
+                  const value = 5 - i;
+                  const sel = answers[q.id] === value;
+                  return (
+                    <button
+                      key={i}
+                      role="radio"
+                      aria-checked={sel}
+                      onClick={() => setAnswer(value)}
+                      className={cn(
+                        "min-h-[56px] px-5 py-4 rounded-xl border-2 text-start font-semibold transition-smooth",
+                        sel ? "bg-accent text-accent-foreground border-accent shadow-gold" : "bg-card border-border hover:border-accent/70",
+                      )}
+                    >
+                      {tx(opt)}
                     </button>
                   );
                 })}
@@ -268,7 +300,10 @@ const SurveyTaker = ({ survey, onBack }: { survey: Survey; onBack: () => void })
             ) : (
               <Button
                 disabled={!canNext}
-                onClick={() => setDone(true)}
+                onClick={() => {
+                  saveSurveyResponse({ id: `${survey.id}_${Date.now()}`, surveyId: survey.id, submittedAt: new Date().toISOString(), answers: answers as Record<string, string | number> });
+                  setDone(true);
+                }}
                 className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold shadow-gold"
               >
                 {t.pages.surveys.submit}
