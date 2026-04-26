@@ -13,6 +13,7 @@ import Programs from "./pages/Programs.tsx";
 import Governance from "./pages/Governance.tsx";
 import Media from "./pages/Media.tsx";
 import SurveysPage from "./pages/Surveys.tsx";
+import SurveyResults from "./pages/SurveyResults.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
 
 const queryClient = new QueryClient();
@@ -57,6 +58,7 @@ const App = () => (
                 <Route path="/media" element={<Media />} />
                 <Route path="/volunteer" element={<Stub titleKey="volunteer" pageKey="volunteer" />} />
                 <Route path="/surveys" element={<SurveysPage />} />
+                <Route path="/surveys/:surveyId/results" element={<SurveyResults />} />
                 <Route path="/contact" element={<Stub titleKey="contact" pageKey="contact" />} />
                 <Route path="/donate" element={<Stub titleKey="donate" pageKey="donate" />} />
                 <Route path="/search" element={<Stub titleKey="search" pageKey="search" />} />
