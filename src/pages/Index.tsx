@@ -5,6 +5,7 @@ import { AboutPreview } from "@/components/home/AboutPreview";
 import { ProgramsGrid } from "@/components/home/ProgramsGrid";
 import { NewsPreview } from "@/components/home/NewsPreview";
 import { PartnersCarousel } from "@/components/home/PartnersCarousel";
+import { SatisfactionIndicators } from "@/components/home/SatisfactionIndicators";
 import { VolunteerCta } from "@/components/home/VolunteerCta";
 import { PageFeedback } from "@/components/layout/PageFeedback";
 
@@ -14,6 +15,7 @@ const Index = () => (
     <StatsCounters />
     <AboutPreview />
     <ProgramsGrid />
+    <SatisfactionIndicators />
     <NewsPreview />
     <PartnersCarousel />
     <VolunteerCta />

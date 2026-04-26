@@ -61,9 +61,11 @@ export interface ContactMessage {
 
 export type SurveyQuestionType =
   | "single"
+  | "single_choice"
   | "multiple"
   | "rating"
   | "likert"
+  | "dropdown"
   | "text";
 
 export interface SurveyQuestion {
@@ -71,6 +73,7 @@ export interface SurveyQuestion {
   type: SurveyQuestionType;
   question: LocalizedText;
   options?: LocalizedText[];
+  scale?: LocalizedText[];
   required?: boolean;
 }
 
@@ -82,7 +85,15 @@ export interface Survey {
   endsAt: string;
   participants: number;
   questions: SurveyQuestion[];
+  showPublicResults?: boolean;
   results?: Record<string, unknown>;
+}
+
+export interface SurveyResponse {
+  id: string;
+  surveyId: string;
+  submittedAt: string;
+  answers: Record<string, string | number>;
 }
 
 export interface PolicyDoc {

@@ -1,9 +1,12 @@
-import { CheckCircle2, ClipboardList, FileText, HandCoins, Inbox, Newspaper, Plus, ShieldAlert, UserPlus, Users, XCircle } from "lucide-react";
+import { Link } from "react-router-dom";
+import { BarChart3, CheckCircle2, ClipboardList, FileText, HandCoins, Inbox, Newspaper, Plus, ShieldAlert, UserPlus, Users, XCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { PageHero } from "@/components/layout/PageHero";
+import { surveys } from "@/data";
+import { getSurveyMetrics } from "@/lib/surveyResults";
 
 const Admin = () => {
   const { t, lang } = useLanguage();
@@ -141,9 +144,50 @@ const Admin = () => {
           </div>
         </Card>
       </section>
+
+      <section className="container pb-12">
+        <Card className="p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+            <div>
+              <h2 className="text-lg font-bold text-primary">{lang === "ar" ? "إدارة الاستبيانات" : "Surveys Manager"}</h2>
+              <p className="text-sm text-muted-foreground mt-1">{lang === "ar" ? "متابعة الاستبيانات النشطة ونتائج الرضا." : "Monitor active surveys and satisfaction results."}</p>
+            </div>
+            <Button asChild variant="outline" className="border-primary text-primary"><Link to="/surveys">{t.pages.admin.view}</Link></Button>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            {surveys.filter((s) => s.showPublicResults).map((survey) => {
+              const metrics = getSurveyMetrics(survey);
+              return (
+                <div key={survey.id} className="rounded-xl border border-border p-5 hover:border-primary/40 transition-smooth">
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary grid place-items-center"><ClipboardList className="h-5 w-5" /></div>
+                    <Badge className="border-0 bg-success/15 text-success font-bold">{lang === "ar" ? "نشط" : "Active"}</Badge>
+                  </div>
+                  <h3 className="font-bold text-primary mb-4">{lang === "ar" ? survey.title.ar : survey.title.en}</h3>
+                  <div className="grid grid-cols-3 gap-2 text-center mb-4">
+                    <AdminSurveyMetric label={lang === "ar" ? "مشارك" : "Participants"} value={metrics.participants.toLocaleString()} />
+                    <AdminSurveyMetric label={lang === "ar" ? "المتوسط" : "Average"} value={metrics.averageRating.toFixed(1)} />
+                    <AdminSurveyMetric label={lang === "ar" ? "الرضا" : "Satisfaction"} value={`${metrics.satisfaction}%`} />
+                  </div>
+                  <Button asChild className="w-full bg-primary text-primary-foreground">
+                    <Link to={`/surveys/${survey.id}/results`}><BarChart3 className="h-4 w-4" />{lang === "ar" ? "عرض التقرير" : "View report"}</Link>
+                  </Button>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      </section>
     </>
   );
 };
+
+const AdminSurveyMetric = ({ label, value }: { label: string; value: string }) => (
+  <div className="rounded-lg bg-muted/60 px-2 py-3">
+    <p className="text-base font-extrabold text-primary tabular-nums">{value}</p>
+    <p className="text-[10px] font-semibold text-muted-foreground mt-1">{label}</p>
+  </div>
+);
 
 const ActionBtn = ({ Icon, label }: { Icon: React.FC<{ className?: string }>; label: string }) => (
   <Button variant="outline" className="border-border h-auto py-3 px-4 hover:border-primary hover:text-primary group">
