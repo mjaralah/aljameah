@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { surveys } from "@/data";
@@ -31,12 +30,9 @@ const SurveysPage = () => {
         breadcrumb={[{ label: t.nav.surveys }]}
       />
       <section className="container py-12 md:py-16">
-        <Tabs defaultValue="available" className="space-y-6">
-          <TabsList className="h-auto min-h-12 w-full justify-start overflow-x-auto rounded-lg bg-muted/70 p-1">
-            <TabsTrigger value="available" className="min-h-10 px-5 font-bold">{lang === "ar" ? "الاستبيانات المتاحة" : "Available surveys"}</TabsTrigger>
-            <TabsTrigger value="results" className="min-h-10 px-5 font-bold">{lang === "ar" ? "النتائج والتقارير" : "Results & Insights"}</TabsTrigger>
-          </TabsList>
-          <TabsContent value="available" className="mt-0">
+        <div className="space-y-10">
+          <div>
+            <h2 className="text-2xl font-extrabold text-primary mb-6">{lang === "ar" ? "الاستبيانات المتاحة" : "Available surveys"}</h2>
             <div className="grid md:grid-cols-2 gap-6">
           {surveys.map((s) => {
             const isActive = s.status === "active";
@@ -86,8 +82,10 @@ const SurveysPage = () => {
             );
           })}
             </div>
-          </TabsContent>
-          <TabsContent value="results" className="mt-0">
+          </div>
+
+          <div>
+            <h2 className="text-2xl font-extrabold text-primary mb-6">{lang === "ar" ? "النتائج والتقارير" : "Results & Insights"}</h2>
             <div className="grid md:grid-cols-2 gap-6">
               {surveys.filter((s) => s.showPublicResults || s.results).map((s) => {
                 const metrics = getSurveyMetrics(s);
@@ -112,8 +110,8 @@ const SurveysPage = () => {
                 );
               })}
             </div>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       </section>
       <PageFeedback pageKey="surveys" />
     </>
