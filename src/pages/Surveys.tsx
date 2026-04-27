@@ -13,7 +13,7 @@ import { PageHero } from "@/components/layout/PageHero";
 import { PageFeedback } from "@/components/layout/PageFeedback";
 import type { Survey } from "@/types";
 import { cn } from "@/lib/utils";
-import { getSurveyMetrics, saveSurveyResponse } from "@/lib/surveyResults";
+import { getAnonymousTextResponses, getSurveyMetrics, saveSurveyResponse } from "@/lib/surveyResults";
 
 const SurveysPage = () => {
   const { t, tx, lang, dir } = useLanguage();
@@ -96,6 +96,60 @@ const SurveysPage = () => {
               </Card>
             );
           })}
+            </div>
+          </div>
+          <div className="border-t border-border pt-10">
+            <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+              <div>
+                <h2 className="text-2xl font-extrabold text-primary">{lang === "ar" ? "النتائج والتقارير" : "Results & reports"}</h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {lang === "ar" ? "ملخص مؤشرات الرضا وآخر الردود النصية للاستبيانات المنشورة." : "A summary of satisfaction indicators and recent anonymous text responses."}
+                </p>
+              </div>
+              <Button variant="outline" className="border-primary text-primary font-bold">
+                {lang === "ar" ? "تصدير التقرير" : "Export report"}
+              </Button>
+            </div>
+            <div className="grid gap-6">
+              {surveys.filter((s) => s.showPublicResults || s.results).map((s) => {
+                const metrics = getSurveyMetrics(s);
+                const responses = getAnonymousTextResponses(s).slice(0, 10);
+                return (
+                  <Card key={`${s.id}-report`} className="p-6 border-border shadow-soft">
+                    <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                      <div>
+                        <h3 className="text-lg font-extrabold text-primary">{tx(s.title)}</h3>
+                        <p className="mt-1 text-sm text-muted-foreground">{tx(s.description)}</p>
+                      </div>
+                      <Badge className="w-fit border-0 bg-success/15 text-success font-bold">{metrics.satisfaction}%</Badge>
+                    </div>
+                    <div className="grid gap-3 md:grid-cols-3 mb-6">
+                      <Metric label={t.pages.surveys.participants} value={metrics.participants.toLocaleString()} />
+                      <Metric label={lang === "ar" ? "متوسط الرضا" : "Avg. rating"} value={metrics.averageRating.toFixed(1)} />
+                      <Metric label={lang === "ar" ? "نسبة الرضا" : "Satisfaction"} value={`${metrics.satisfaction}%`} />
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between text-sm font-bold text-primary">
+                        <span>{lang === "ar" ? "مؤشر الرضا" : "Satisfaction indicator"}</span>
+                        <span>{metrics.satisfaction}%</span>
+                      </div>
+                      <Progress value={metrics.satisfaction} className="h-2" />
+                    </div>
+                    {responses.length > 0 && (
+                      <div className="mt-6">
+                        <h4 className="mb-3 text-sm font-extrabold text-primary">{lang === "ar" ? "آخر 10 ردود نصية مجهولة" : "Last 10 anonymous text responses"}</h4>
+                        <div className="grid gap-2 md:grid-cols-2">
+                          {responses.map((response, index) => (
+                            <div key={index} className="rounded-lg bg-muted/60 px-4 py-3 text-sm font-semibold text-foreground">
+                              {response}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </Card>
+                );
+              })}
             </div>
           </div>
         </div>
