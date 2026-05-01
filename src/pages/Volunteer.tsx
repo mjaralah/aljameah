@@ -532,6 +532,8 @@ export default function Volunteer() {
           </form>
         </div>
       </section>
+
+      <MembershipSection />
     </>
   );
 }
