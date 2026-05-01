@@ -63,8 +63,8 @@ const channels = [
   {
     icon: Phone,
     label: "اتصل بنا",
-    primary: "0559360000",
-    secondary: "0568691941",
+    primary: "055593****",
+    secondary: "056869****",
     href: "tel:+966555936241",
     accent: "primary" as const,
   },
