@@ -25,6 +25,14 @@ import {
   HandHeart,
   Clock,
   Users,
+  IdCard,
+  Mail,
+  Phone,
+  BadgeCheck,
+  Send,
+  Award,
+  Gift,
+  TrendingUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
