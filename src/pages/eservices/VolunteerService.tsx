@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { PageHero } from "@/components/layout/PageHero";
 import { Button } from "@/components/ui/button";
@@ -110,7 +111,7 @@ export default function VolunteerService() {
   const next = () => { if (validateStep(step)) setStep((s) => Math.min(s + 1, steps.length - 1)); };
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = volunteerSchema.safeParse(data);
     if (!result.success) {
@@ -120,6 +121,31 @@ export default function VolunteerService() {
       const firstErrorStep = steps.findIndex((s) => s.fields.some((f) => errs[f as keyof VolunteerForm]));
       if (firstErrorStep >= 0) setStep(firstErrorStep);
       toast({ title: "تحقق من البيانات", description: "يوجد بعض الحقول التي تحتاج إلى مراجعة", variant: "destructive" });
+      return;
+    }
+    const { error } = await supabase.from("volunteer_requests").insert({
+      full_name: data.fullName,
+      id_number: data.idNumber,
+      gender: data.gender,
+      nationality: data.nationality,
+      city: data.city,
+      birth_date: data.birthDate || null,
+      marital_status: data.maritalStatus,
+      phone: data.phone,
+      education: data.education,
+      skills: data.skills,
+      has_prior_experience: data.hasPriorExperience,
+      previous_org: data.previousOrg || null,
+      job: data.job || null,
+      employer: data.employer || null,
+      preferred_activities: data.preferredActivities,
+      volunteer_location: data.volunteerLocation,
+      other_location: data.otherLocation || null,
+      availability: data.availability,
+      referral_source: data.referralSource,
+    });
+    if (error) {
+      toast({ title: "تعذّر إرسال الطلب", description: error.message, variant: "destructive" });
       return;
     }
     setSubmitted(true);

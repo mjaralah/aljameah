@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { z } from "zod";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { PageHero } from "@/components/layout/PageHero";
 import { Button } from "@/components/ui/button";
@@ -67,7 +68,7 @@ export default function MembershipService() {
     if (errors[k]) setErrors((e) => ({ ...e, [k]: undefined }));
   };
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const res = membershipSchema.safeParse(form);
     if (!res.success) {
@@ -78,6 +79,20 @@ export default function MembershipService() {
       });
       setErrors(fieldErrors);
       toast({ title: "تحقق من البيانات", description: "يرجى تصحيح الحقول المظللة", variant: "destructive" });
+      return;
+    }
+    const { error } = await supabase.from("membership_requests").insert({
+      full_name: form.fullName,
+      phone: form.phone,
+      gender: form.gender,
+      email: form.email,
+      national_id: form.nationalId,
+      education: form.education,
+      job_title: form.jobTitle || null,
+      employer: form.employer || null,
+    });
+    if (error) {
+      toast({ title: "تعذّر إرسال الطلب", description: error.message, variant: "destructive" });
       return;
     }
     setSubmitted(true);
