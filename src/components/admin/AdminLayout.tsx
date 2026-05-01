@@ -133,6 +133,13 @@ function AdminSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
+        <SidebarGroup>
+          {!collapsed && <SidebarGroupLabel>الطلبات والتفاعل</SidebarGroupLabel>}
+          <SidebarGroupContent>
+            <SidebarMenu>{requestsItems.map(renderItem)}</SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
         {role === "admin" && (
           <SidebarGroup>
             {!collapsed && <SidebarGroupLabel>الإعدادات</SidebarGroupLabel>}
