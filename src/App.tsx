@@ -30,6 +30,12 @@ import AdminPartnersPage from "./pages/admin/AdminPartnersPage.tsx";
 import AdminHeroPage from "./pages/admin/AdminHeroPage.tsx";
 import AdminSettingsPage from "./pages/admin/AdminSettingsPage.tsx";
 import AdminUsersPage from "./pages/admin/AdminUsersPage.tsx";
+import AdminPagesPage from "./pages/admin/AdminPagesPage.tsx";
+import AdminGovernancePage from "./pages/admin/AdminGovernancePage.tsx";
+import AdminVolunteerRequestsPage from "./pages/admin/AdminVolunteerRequestsPage.tsx";
+import AdminMembershipRequestsPage from "./pages/admin/AdminMembershipRequestsPage.tsx";
+import AdminContactMessagesPage from "./pages/admin/AdminContactMessagesPage.tsx";
+import AdminFeedbackPage from "./pages/admin/AdminFeedbackPage.tsx";
 import { ProtectedAdminRoute } from "./components/admin/ProtectedAdminRoute.tsx";
 
 const queryClient = new QueryClient();
@@ -154,6 +160,54 @@ const App = () => (
                 element={
                   <ProtectedAdminRoute requireAdmin>
                     <AdminUsersPage />
+                  </ProtectedAdminRoute>
+                }
+              />
+              <Route
+                path="/admin/pages"
+                element={
+                  <ProtectedAdminRoute>
+                    <AdminPagesPage />
+                  </ProtectedAdminRoute>
+                }
+              />
+              <Route
+                path="/admin/governance"
+                element={
+                  <ProtectedAdminRoute>
+                    <AdminGovernancePage />
+                  </ProtectedAdminRoute>
+                }
+              />
+              <Route
+                path="/admin/volunteer-requests"
+                element={
+                  <ProtectedAdminRoute>
+                    <AdminVolunteerRequestsPage />
+                  </ProtectedAdminRoute>
+                }
+              />
+              <Route
+                path="/admin/membership-requests"
+                element={
+                  <ProtectedAdminRoute>
+                    <AdminMembershipRequestsPage />
+                  </ProtectedAdminRoute>
+                }
+              />
+              <Route
+                path="/admin/contact-messages"
+                element={
+                  <ProtectedAdminRoute>
+                    <AdminContactMessagesPage />
+                  </ProtectedAdminRoute>
+                }
+              />
+              <Route
+                path="/admin/feedback"
+                element={
+                  <ProtectedAdminRoute>
+                    <AdminFeedbackPage />
                   </ProtectedAdminRoute>
                 }
               />
