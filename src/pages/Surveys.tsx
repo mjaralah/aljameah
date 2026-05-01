@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, ArrowRight, CheckCircle2, ClipboardList, Star, Users } from "lucide-react";
+import { ArrowLeft, ArrowRight, BarChart3, CheckCircle2, ClipboardList, Star, Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +22,9 @@ const SurveysPage = () => {
 
   if (selected) return <SurveyTaker survey={selected} onBack={() => setSelected(null)} />;
 
+  const surveysCount = surveys.length;
+  const reportsCount = surveys.filter((s) => s.showPublicResults || s.results).length;
+
   return (
     <>
       <PageHero
@@ -32,14 +35,56 @@ const SurveysPage = () => {
       />
       <section className="container py-12 md:py-16">
         <Tabs defaultValue="surveys" className="w-full">
-          <TabsList className="mb-8 h-auto flex-wrap gap-2 bg-muted/60 p-1">
-            <TabsTrigger value="surveys" className="px-5 py-2 font-bold">
-              {lang === "ar" ? "الاستبيانات المتاحة" : "Available surveys"}
-            </TabsTrigger>
-            <TabsTrigger value="reports" className="px-5 py-2 font-bold">
-              {lang === "ar" ? "النتائج والتقارير" : "Results & reports"}
-            </TabsTrigger>
-          </TabsList>
+          <div className="mb-8 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+            <TabsList
+              className={cn(
+                "h-auto w-full md:w-auto inline-flex gap-1 rounded-2xl border border-border bg-card/80 p-1.5 shadow-soft backdrop-blur",
+              )}
+            >
+              <TabsTrigger
+                value="surveys"
+                className={cn(
+                  "group flex-1 md:flex-none gap-2 rounded-xl px-4 md:px-6 py-2.5 text-sm font-bold text-muted-foreground transition-all",
+                  "data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-card",
+                  "hover:text-primary",
+                )}
+              >
+                <ClipboardList className="h-4 w-4" />
+                <span className="whitespace-nowrap">
+                  {lang === "ar" ? "الاستبيانات المتاحة" : "Available surveys"}
+                </span>
+                <Badge
+                  className={cn(
+                    "ms-1 border-0 bg-muted text-foreground font-bold tabular-nums",
+                    "group-data-[state=active]:bg-primary-foreground/20 group-data-[state=active]:text-primary-foreground",
+                  )}
+                >
+                  {surveysCount}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger
+                value="reports"
+                className={cn(
+                  "group flex-1 md:flex-none gap-2 rounded-xl px-4 md:px-6 py-2.5 text-sm font-bold text-muted-foreground transition-all",
+                  "data-[state=active]:bg-gradient-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-card",
+                  "hover:text-primary",
+                )}
+              >
+                <BarChart3 className="h-4 w-4" />
+                <span className="whitespace-nowrap">
+                  {lang === "ar" ? "النتائج والتقارير" : "Results & reports"}
+                </span>
+                <Badge
+                  className={cn(
+                    "ms-1 border-0 bg-muted text-foreground font-bold tabular-nums",
+                    "group-data-[state=active]:bg-primary-foreground/20 group-data-[state=active]:text-primary-foreground",
+                  )}
+                >
+                  {reportsCount}
+                </Badge>
+              </TabsTrigger>
+            </TabsList>
+          </div>
           <TabsContent value="surveys" className="mt-0">
             <div className="grid md:grid-cols-2 gap-6">
           {surveys.map((s) => {
