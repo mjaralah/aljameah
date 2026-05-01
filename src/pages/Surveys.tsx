@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { surveys } from "@/data";
 import { PageHero } from "@/components/layout/PageHero";
@@ -30,9 +31,16 @@ const SurveysPage = () => {
         breadcrumb={[{ label: t.nav.surveys }]}
       />
       <section className="container py-12 md:py-16">
-        <div className="space-y-10">
-          <div>
-            <h2 className="text-2xl font-extrabold text-primary mb-6">{lang === "ar" ? "الاستبيانات المتاحة" : "Available surveys"}</h2>
+        <Tabs defaultValue="surveys" className="w-full">
+          <TabsList className="mb-8 h-auto flex-wrap gap-2 bg-muted/60 p-1">
+            <TabsTrigger value="surveys" className="px-5 py-2 font-bold">
+              {lang === "ar" ? "الاستبيانات المتاحة" : "Available surveys"}
+            </TabsTrigger>
+            <TabsTrigger value="reports" className="px-5 py-2 font-bold">
+              {lang === "ar" ? "النتائج والتقارير" : "Results & reports"}
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="surveys" className="mt-0">
             <div className="grid md:grid-cols-2 gap-6">
           {surveys.map((s) => {
             const isActive = s.status === "active";
@@ -97,8 +105,8 @@ const SurveysPage = () => {
             );
           })}
             </div>
-          </div>
-          <div className="border-t border-border pt-10">
+          </TabsContent>
+          <TabsContent value="reports" className="mt-0">
             <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
               <div>
                 <h2 className="text-2xl font-extrabold text-primary">{lang === "ar" ? "النتائج والتقارير" : "Results & reports"}</h2>
@@ -151,8 +159,8 @@ const SurveysPage = () => {
                 );
               })}
             </div>
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </section>
       <PageFeedback pageKey="surveys" />
     </>
