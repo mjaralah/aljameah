@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { board } from "@/data/board";
 import { useLanguage } from "@/contexts/LanguageContext";
+import ceoPortrait from "@/assets/ceo-portrait.jpg";
 
 type Section = {
   id: string;
