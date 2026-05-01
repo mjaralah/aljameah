@@ -16,7 +16,9 @@ import SurveysPage from "./pages/Surveys.tsx";
 import SurveyResults from "./pages/SurveyResults.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
 import About from "./pages/About.tsx";
-import Volunteer from "./pages/Volunteer.tsx";
+import EServicesIndex from "./pages/eservices/EServicesIndex.tsx";
+import VolunteerService from "./pages/eservices/VolunteerService.tsx";
+import MembershipService from "./pages/eservices/MembershipService.tsx";
 
 const queryClient = new QueryClient();
 
@@ -58,7 +60,9 @@ const App = () => (
                 <Route path="/programs" element={<Programs />} />
                 <Route path="/governance" element={<Governance />} />
                 <Route path="/media" element={<Media />} />
-                <Route path="/volunteer" element={<Volunteer />} />
+                <Route path="/e-services" element={<EServicesIndex />} />
+                <Route path="/e-services/volunteer" element={<VolunteerService />} />
+                <Route path="/e-services/membership" element={<MembershipService />} />
                 <Route path="/surveys" element={<SurveysPage />} />
                 <Route path="/surveys/:surveyId/results" element={<SurveyResults />} />
                 <Route path="/contact" element={<Stub titleKey="contact" pageKey="contact" />} />
