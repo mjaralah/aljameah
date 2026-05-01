@@ -78,7 +78,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
       .select("*")
       .order(orderBy.column, { ascending: orderBy.ascending ?? true });
     if (error) toast.error(error.message);
-    setRows((data ?? []) as T[]);
+    setRows((data ?? []) as unknown as T[]);
     setLoading(false);
   }
 
