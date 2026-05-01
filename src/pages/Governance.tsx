@@ -356,13 +356,13 @@ const DocCard = ({
   downloadLabel: string;
 }) => (
   <Card className="p-4 group hover:shadow-soft hover:border-accent/50 transition-smooth flex items-start gap-3">
-    <div className="h-12 w-12 rounded-xl bg-primary/8 text-primary grid place-items-center shrink-0 group-hover:bg-primary group-hover:text-primary-foreground transition-smooth">
+    <div className="h-12 w-12 rounded-xl bg-primary/15 text-primary grid place-items-center shrink-0 group-hover:bg-primary group-hover:text-primary-foreground transition-smooth">
       <FileText className="h-5 w-5" />
     </div>
     <div className="flex-1 min-w-0">
       <h3 className="font-bold text-foreground text-sm leading-snug line-clamp-2">{title}</h3>
       <div className="flex items-center gap-2 mt-2 flex-wrap">
-        <Badge variant="secondary" className="bg-accent/15 text-accent-foreground border border-accent/30 font-bold text-[10px]">
+        <Badge className="bg-accent text-accent-foreground border-0 font-bold text-[10px]">
           {year}
         </Badge>
         <span className="text-[11px] text-muted-foreground truncate">{fileName}</span>
@@ -370,7 +370,7 @@ const DocCard = ({
       <Button
         variant="ghost"
         size="sm"
-        className="mt-3 -ms-2 h-8 text-primary hover:text-accent-foreground hover:bg-accent"
+        className="mt-3 -ms-2 h-8 text-primary hover:text-primary-foreground hover:bg-primary"
       >
         <Download className="h-3.5 w-3.5" />
         <span className="text-xs font-semibold">{downloadLabel}</span>
