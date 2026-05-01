@@ -14,7 +14,7 @@ import { PageHero } from "@/components/layout/PageHero";
 import { PageFeedback } from "@/components/layout/PageFeedback";
 import type { Survey } from "@/types";
 import { cn } from "@/lib/utils";
-import { getAnonymousTextResponses, getSurveyMetrics, saveSurveyResponse } from "@/lib/surveyResults";
+import { getSurveyMetrics, saveSurveyResponse } from "@/lib/surveyResults";
 
 const SurveysPage = () => {
   const { t, tx, lang, dir } = useLanguage();
@@ -121,7 +121,6 @@ const SurveysPage = () => {
             <div className="grid gap-6">
               {surveys.filter((s) => s.showPublicResults || s.results).map((s) => {
                 const metrics = getSurveyMetrics(s);
-                const responses = getAnonymousTextResponses(s).slice(0, 10);
                 return (
                   <Card key={`${s.id}-report`} className="p-6 border-border shadow-soft">
                     <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
@@ -143,18 +142,6 @@ const SurveysPage = () => {
                       </div>
                       <Progress value={metrics.satisfaction} className="h-2" />
                     </div>
-                    {responses.length > 0 && (
-                      <div className="mt-6">
-                        <h4 className="mb-3 text-sm font-extrabold text-primary">{lang === "ar" ? "آخر 10 ردود نصية مجهولة" : "Last 10 anonymous text responses"}</h4>
-                        <div className="grid gap-2 md:grid-cols-2">
-                          {responses.map((response, index) => (
-                            <div key={index} className="rounded-lg bg-muted/60 px-4 py-3 text-sm font-semibold text-foreground">
-                              {response}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                   </Card>
                 );
               })}
