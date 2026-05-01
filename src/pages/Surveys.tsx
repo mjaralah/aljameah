@@ -14,7 +14,7 @@ import { PageHero } from "@/components/layout/PageHero";
 import { PageFeedback } from "@/components/layout/PageFeedback";
 import type { Survey } from "@/types";
 import { cn } from "@/lib/utils";
-import { getAnonymousTextResponses, getSurveyMetrics, saveSurveyResponse } from "@/lib/surveyResults";
+import { getSurveyMetrics, saveSurveyResponse } from "@/lib/surveyResults";
 
 const SurveysPage = () => {
   const { t, tx, lang, dir } = useLanguage();
