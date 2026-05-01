@@ -57,44 +57,61 @@ const SurveyResults = () => {
 
         <div className="grid lg:grid-cols-2 gap-6">
           <ChartCard title={lang === "ar" ? "توزيع المشاركين" : "Participant distribution"}>
-            <ChartContainer config={{ value: { label: lang === "ar" ? "العدد" : "Count" } }} className="h-72 w-full">
-              <PieChart>
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={58} outerRadius={92} paddingAngle={2}>
-                  {pieData.map((_, index) => <Cell key={index} fill={chartColors[index % chartColors.length]} />)}
-                </Pie>
-              </PieChart>
-            </ChartContainer>
+            <div className="-mx-2 overflow-x-auto pb-2">
+              <div className="min-w-[320px] px-2">
+                <ChartContainer config={{ value: { label: lang === "ar" ? "العدد" : "Count" } }} className="h-72 w-full">
+                  <PieChart>
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={50} outerRadius={88} paddingAngle={2}>
+                      {pieData.map((_, index) => <Cell key={index} fill={chartColors[index % chartColors.length]} />)}
+                    </Pie>
+                    <Legend content={<ChartLegendContent />} verticalAlign="bottom" />
+                  </PieChart>
+                </ChartContainer>
+              </div>
+            </div>
           </ChartCard>
 
           <ChartCard title={lang === "ar" ? "متوسط التقييم لكل محور" : "Average rating by item"}>
-            <ChartContainer config={{ average: { label: lang === "ar" ? "المتوسط" : "Average", color: "hsl(var(--primary))" } }} className="h-72 w-full">
-              <BarChart data={averages} margin={{ top: 10, right: 12, left: 12, bottom: 0 }}>
-                <CartesianGrid vertical={false} />
-                <XAxis dataKey="name" tickLine={false} axisLine={false} />
-                <YAxis domain={[0, 5]} tickLine={false} axisLine={false} />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="average" fill="var(--color-average)" radius={[6, 6, 0, 0]} />
-              </BarChart>
-            </ChartContainer>
+            <div className="-mx-2 overflow-x-auto pb-2">
+              <div className="px-2" style={{ minWidth: Math.max(320, averages.length * 90) }}>
+                <ChartContainer config={{ average: { label: lang === "ar" ? "المتوسط" : "Average", color: "hsl(var(--primary))" } }} className="h-72 w-full">
+                  <BarChart data={averages} margin={{ top: 10, right: 12, left: 12, bottom: 24 }}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis dataKey="name" tickLine={false} axisLine={false} interval={0} tick={{ fontSize: 11 }} angle={-15} textAnchor="end" height={50} />
+                    <YAxis domain={[0, 5]} tickLine={false} axisLine={false} width={28} tick={{ fontSize: 11 }} />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey="average" fill="var(--color-average)" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ChartContainer>
+              </div>
+            </div>
           </ChartCard>
         </div>
 
         <ChartCard title={lang === "ar" ? "تحليل مقياس ليكرت" : "Likert stacked analysis"}>
-          <ChartContainer config={{ five: { label: "5", color: chartColors[0] }, four: { label: "4", color: chartColors[1] }, three: { label: "3", color: chartColors[2] }, two: { label: "2", color: chartColors[3] }, one: { label: "1", color: chartColors[4] } }} className="h-80 w-full">
-            <BarChart data={likert} layout="vertical" margin={{ top: 12, right: 16, left: 16, bottom: 12 }}>
-              <CartesianGrid horizontal={false} />
-              <XAxis type="number" hide />
-              <YAxis dataKey="question" type="category" tickLine={false} axisLine={false} width={48} />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Legend content={<ChartLegendContent />} />
-              <Bar dataKey="five" stackId="a" fill="var(--color-five)" radius={[0, 6, 6, 0]} />
-              <Bar dataKey="four" stackId="a" fill="var(--color-four)" />
-              <Bar dataKey="three" stackId="a" fill="var(--color-three)" />
-              <Bar dataKey="two" stackId="a" fill="var(--color-two)" />
-              <Bar dataKey="one" stackId="a" fill="var(--color-one)" radius={[6, 0, 0, 6]} />
-            </BarChart>
-          </ChartContainer>
+          <div className="-mx-2 overflow-x-auto pb-2">
+            <div className="px-2" style={{ minWidth: 640 }}>
+              <ChartContainer
+                config={{ five: { label: "5", color: chartColors[0] }, four: { label: "4", color: chartColors[1] }, three: { label: "3", color: chartColors[2] }, two: { label: "2", color: chartColors[3] }, one: { label: "1", color: chartColors[4] } }}
+                className="w-full"
+                style={{ height: Math.max(280, likert.length * 56 + 80) }}
+              >
+                <BarChart data={likert} layout="vertical" margin={{ top: 12, right: 16, left: 8, bottom: 12 }}>
+                  <CartesianGrid horizontal={false} />
+                  <XAxis type="number" hide />
+                  <YAxis dataKey="question" type="category" tickLine={false} axisLine={false} width={120} tick={{ fontSize: 11 }} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Legend content={<ChartLegendContent />} />
+                  <Bar dataKey="five" stackId="a" fill="var(--color-five)" radius={[0, 6, 6, 0]} />
+                  <Bar dataKey="four" stackId="a" fill="var(--color-four)" />
+                  <Bar dataKey="three" stackId="a" fill="var(--color-three)" />
+                  <Bar dataKey="two" stackId="a" fill="var(--color-two)" />
+                  <Bar dataKey="one" stackId="a" fill="var(--color-one)" radius={[6, 0, 0, 6]} />
+                </BarChart>
+              </ChartContainer>
+            </div>
+          </div>
         </ChartCard>
 
         <Card className="p-6">
