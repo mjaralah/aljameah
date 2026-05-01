@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { board } from "@/data/board";
 import { useLanguage } from "@/contexts/LanguageContext";
+import ceoPortrait from "@/assets/ceo-portrait.jpg";
 
 type Section = {
   id: string;
@@ -286,8 +287,15 @@ const About = () => {
             <SectionBlock id="ceo" icon={UserCog} title="المدير التنفيذي">
               <div className="bg-gradient-to-br from-secondary to-card border border-border rounded-2xl p-6 md:p-8">
                 <div className="flex flex-col md:flex-row gap-6 items-start">
-                  <div className="h-24 w-24 shrink-0 rounded-2xl bg-gradient-primary text-primary-foreground grid place-items-center font-bold text-3xl shadow-card">
-                    ف.أ
+                  <div className="h-24 w-24 md:h-28 md:w-28 shrink-0 rounded-2xl overflow-hidden ring-2 ring-accent/40 shadow-card">
+                    <img
+                      src={ceoPortrait}
+                      alt="صورة المدير التنفيذي أ. فيصل عبدالعزيز"
+                      width={256}
+                      height={256}
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
                   </div>
                   <div className="min-w-0">
                     <h3 className="text-xl font-bold text-primary">أ. فيصل عبدالعزيز</h3>
