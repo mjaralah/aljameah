@@ -20,7 +20,7 @@ export const VolunteerCta = () => {
             <p className="text-base md:text-lg opacity-95 max-w-xl">{t.volunteerCta.body}</p>
           </div>
           <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold shadow-gold">
-            <Link to="/volunteer">
+            <Link to="/e-services/volunteer">
               <HandHeart className="h-5 w-5" fill="currentColor" />
               {t.volunteerCta.cta}
             </Link>
