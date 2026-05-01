@@ -1,9 +1,8 @@
-import { Download, FileText, ShieldCheck, Users, Wallet, FileBarChart } from "lucide-react";
+import { Download, FileText, ShieldCheck, Wallet, FileBarChart } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { board } from "@/data";
 import { policies, reports, financials } from "@/data/governance";
 import { PageHero } from "@/components/layout/PageHero";
 import { PageFeedback } from "@/components/layout/PageFeedback";
@@ -67,26 +66,6 @@ const Governance = () => {
           </div>
         </Card>
       </section>
-
-      {/* مجلس الإدارة */}
-      <section className="bg-secondary/40 py-12 md:py-16">
-        <div className="container">
-          <SectionHeader icon={Users} title={t.pages.governance.board} />
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {board.map((m) => (
-              <Card key={m.id} className="p-6 text-center hover:shadow-card transition-smooth">
-                <div className="h-20 w-20 mx-auto mb-4 rounded-full bg-gradient-primary text-primary-foreground grid place-items-center text-2xl font-extrabold shadow-soft">
-                  {tx(m.name).split(" ").slice(0, 2).map((s) => s[0]).join("")}
-                </div>
-                <h3 className="font-bold text-primary text-base">{tx(m.name)}</h3>
-                <p className="text-xs font-semibold text-accent mt-1 mb-3">{tx(m.role)}</p>
-                <p className="text-xs text-muted-foreground leading-relaxed">{tx(m.bio)}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* السياسات والتقارير */}
       <section className="container py-12 md:py-16 grid lg:grid-cols-2 gap-10">
         <div>
