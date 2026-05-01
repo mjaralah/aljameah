@@ -1,14 +1,8 @@
 import { useState } from "react";
-import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { ChevronDown, Heart, Menu, Search } from "lucide-react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Heart, Menu, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 
@@ -17,12 +11,6 @@ export const Header = () => {
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const eServiceLinks = [
-    { to: "/e-services/volunteer", label: t.nav.eservicesVolunteer },
-    { to: "/e-services/membership", label: t.nav.eservicesMembership },
-  ];
 
   const links = [
     { to: "/", label: t.nav.home },
@@ -30,11 +18,10 @@ export const Header = () => {
     { to: "/programs", label: t.nav.programs },
     { to: "/governance", label: t.nav.governance },
     { to: "/media", label: t.nav.media },
+    { to: "/e-services", label: t.nav.eservices },
     { to: "/surveys", label: t.nav.surveys },
     { to: "/contact", label: t.nav.contact },
   ];
-
-  const isEServicesActive = location.pathname.startsWith("/e-services");
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
@@ -60,43 +47,8 @@ export const Header = () => {
 
         {/* التنقل لسطح المكتب */}
         <nav className="hidden xl:flex items-center gap-0.5" aria-label="Main">
-          {links.slice(0, 5).map((l) => (
+          {links.map((l) => (
             <NavLink key={l.to} to={l.to} end={l.to === "/"} className={linkClass}>
-              {l.label}
-            </NavLink>
-          ))}
-
-          {/* قائمة الخدمات الإلكترونية المنسدلة */}
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              className={cn(
-                "px-3 py-2 rounded-md text-sm font-semibold transition-smooth whitespace-nowrap inline-flex items-center gap-1 outline-none",
-                isEServicesActive
-                  ? "bg-primary/10 text-primary"
-                  : "text-foreground/80 hover:text-primary hover:bg-primary/5",
-              )}
-            >
-              {t.nav.eservices}
-              <ChevronDown className="h-4 w-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem asChild>
-                <Link to="/e-services" className="cursor-pointer font-semibold">
-                  {t.nav.eservices}
-                </Link>
-              </DropdownMenuItem>
-              {eServiceLinks.map((l) => (
-                <DropdownMenuItem key={l.to} asChild>
-                  <Link to={l.to} className="cursor-pointer">
-                    {l.label}
-                  </Link>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {links.slice(5).map((l) => (
-            <NavLink key={l.to} to={l.to} className={linkClass}>
               {l.label}
             </NavLink>
           ))}
@@ -129,7 +81,7 @@ export const Header = () => {
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[360px]">
               <div className="flex flex-col gap-1 mt-6">
-                {links.slice(0, 5).map((l) => (
+                {links.map((l) => (
                   <NavLink
                     key={l.to}
                     to={l.to}
@@ -138,57 +90,6 @@ export const Header = () => {
                     className={({ isActive }) =>
                       cn(
                         "px-4 py-3 rounded-lg font-semibold transition-smooth",
-                        isActive ? "bg-primary text-primary-foreground" : "hover:bg-muted",
-                      )
-                    }
-                  >
-                    {l.label}
-                  </NavLink>
-                ))}
-
-                {/* قسم الخدمات الإلكترونية في قائمة الجوال */}
-                <div className="mt-2 px-4 py-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  {t.nav.eservices}
-                </div>
-                <NavLink
-                  to="/e-services"
-                  end
-                  onClick={() => setOpen(false)}
-                  className={({ isActive }) =>
-                    cn(
-                      "px-4 py-2.5 rounded-lg text-sm font-medium transition-smooth",
-                      isActive ? "bg-primary/10 text-primary" : "hover:bg-muted",
-                    )
-                  }
-                >
-                  جميع الخدمات
-                </NavLink>
-                {eServiceLinks.map((l) => (
-                  <NavLink
-                    key={l.to}
-                    to={l.to}
-                    onClick={() => setOpen(false)}
-                    className={({ isActive }) =>
-                      cn(
-                        "px-4 py-2.5 mr-3 border-r-2 rounded-lg text-sm transition-smooth",
-                        isActive
-                          ? "border-primary bg-primary/10 text-primary font-semibold"
-                          : "border-border hover:bg-muted",
-                      )
-                    }
-                  >
-                    {l.label}
-                  </NavLink>
-                ))}
-
-                {links.slice(5).map((l) => (
-                  <NavLink
-                    key={l.to}
-                    to={l.to}
-                    onClick={() => setOpen(false)}
-                    className={({ isActive }) =>
-                      cn(
-                        "px-4 py-3 rounded-lg font-semibold transition-smooth mt-1",
                         isActive ? "bg-primary text-primary-foreground" : "hover:bg-muted",
                       )
                     }
