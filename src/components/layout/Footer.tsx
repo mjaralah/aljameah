@@ -11,8 +11,12 @@ export const Footer = () => {
     { to: "/programs", label: t.nav.programs },
     { to: "/governance", label: t.nav.governance },
     { to: "/media", label: t.nav.media },
-    { to: "/volunteer", label: t.nav.volunteer },
     { to: "/surveys", label: t.nav.surveys },
+  ];
+  const eservices = [
+    { to: "/e-services", label: t.nav.eservices },
+    { to: "/e-services/volunteer", label: t.nav.eservicesVolunteer },
+    { to: "/e-services/membership", label: t.nav.eservicesMembership },
   ];
   const legal = [
     { to: "/privacy-policy", label: t.footer.privacy },
