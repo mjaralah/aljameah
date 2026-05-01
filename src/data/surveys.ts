@@ -12,16 +12,6 @@ const serviceScale = {
 
 export const surveys: Survey[] = [
   {
-    id: "s2",
-    title: { ar: "رأي المتطوعين 2024", en: "Volunteers feedback 2024" },
-    description: { ar: "نتائج مغلقة — متاحة للعرض.", en: "Closed survey — results available." },
-    status: "closed",
-    endsAt: "2024-12-01",
-    participants: 412,
-    questions: [],
-    results: { avgRating: 4.6 },
-  },
-  {
     id: "employee_satisfaction",
     title: { ar: "استبيان قياس رضا الموظفين والمتطوعين", en: "Employee & Volunteer Satisfaction Survey" },
     description: { ar: "قياس تجربة فريق العمل والمتطوعين لتحسين بيئة العطاء.", en: "Measuring staff and volunteer experience to improve the giving environment." },
