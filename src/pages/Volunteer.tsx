@@ -157,7 +157,7 @@ export default function Volunteer() {
   if (submitted) {
     return (
       <>
-        <PageHero title="طلب التطوع" subtitle="انضم إلى أسرة المتطوعين معنا" />
+        <PageHero title="طلب التطوع" lead="انضم إلى أسرة المتطوعين معنا" />
         <section className="container py-20">
           <div className="mx-auto max-w-2xl text-center">
             <div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-primary shadow-card">
@@ -205,7 +205,7 @@ export default function Volunteer() {
     <>
       <PageHero
         title="انضم لفريق المتطوعين"
-        subtitle="كن جزءاً من رسالتنا في خدمة المجتمع — املأ النموذج وسنتواصل معك"
+        lead="كن جزءاً من رسالتنا في خدمة المجتمع — املأ النموذج وسنتواصل معك"
       />
 
       <section className="container py-12 lg:py-16">
