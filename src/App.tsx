@@ -19,6 +19,7 @@ import About from "./pages/About.tsx";
 import EServicesIndex from "./pages/eservices/EServicesIndex.tsx";
 import VolunteerService from "./pages/eservices/VolunteerService.tsx";
 import MembershipService from "./pages/eservices/MembershipService.tsx";
+import Contact from "./pages/Contact.tsx";
 
 const queryClient = new QueryClient();
 
