@@ -28,8 +28,8 @@ export const Footer = () => {
 
   return (
     <footer className="bg-primary text-primary-foreground mt-16">
-      <div className="container py-14 grid gap-10 md:grid-cols-2 lg:grid-cols-4">
-        <div>
+      <div className="container py-14 grid gap-10 md:grid-cols-2 lg:grid-cols-5">
+        <div className="lg:col-span-2">
           <div className="flex items-center gap-2.5 mb-4">
             <div className="h-11 w-11 rounded-xl bg-accent grid place-items-center">
               <Heart className="h-5 w-5 text-accent-foreground" fill="currentColor" />
@@ -61,6 +61,19 @@ export const Footer = () => {
           <h3 className="font-bold mb-4 text-accent">{t.footer.quickLinks}</h3>
           <ul className="space-y-2 text-sm">
             {quick.map((l) => (
+              <li key={l.to}>
+                <Link to={l.to} className="opacity-90 hover:opacity-100 hover:text-accent transition-smooth">
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="font-bold mb-4 text-accent">{t.nav.eservices}</h3>
+          <ul className="space-y-2 text-sm">
+            {eservices.map((l) => (
               <li key={l.to}>
                 <Link to={l.to} className="opacity-90 hover:opacity-100 hover:text-accent transition-smooth">
                   {l.label}
