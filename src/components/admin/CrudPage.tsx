@@ -150,7 +150,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
   }
 
   function setValue<K extends keyof T>(key: K, value: T[K]) {
-    setEditing((prev) => ({ ...(prev ?? {}), [key]: value }));
+    setEditing((prev) => ({ ...(prev ?? {}), [key]: value }) as Partial<T>);
   }
 
   return (
