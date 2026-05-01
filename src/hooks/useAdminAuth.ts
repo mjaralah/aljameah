@@ -37,18 +37,13 @@ export function useAdminAuth() {
   }, []);
 
   async function fetchRole(userId: string) {
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId);
-    if (!data || data.length === 0) {
-      setRole(null);
-      return;
-    }
-    // prefer admin > editor
-    const roles = data.map((r) => r.role);
-    if (roles.includes("admin")) setRole("admin");
-    else if (roles.includes("editor")) setRole("editor");
+    // Use RPC (SECURITY DEFINER) to bypass any RLS recursion issues
+    const [{ data: isAdmin }, { data: isEditor }] = await Promise.all([
+      supabase.rpc("has_role", { _user_id: userId, _role: "admin" }),
+      supabase.rpc("has_role", { _user_id: userId, _role: "editor" }),
+    ]);
+    if (isAdmin) setRole("admin");
+    else if (isEditor) setRole("editor");
     else setRole(null);
   }
 
