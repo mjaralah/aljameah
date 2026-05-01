@@ -66,7 +66,7 @@ const App = () => (
                 <Route path="/e-services/membership" element={<MembershipService />} />
                 <Route path="/surveys" element={<SurveysPage />} />
                 <Route path="/surveys/:surveyId/results" element={<SurveyResults />} />
-                <Route path="/contact" element={<Stub titleKey="contact" pageKey="contact" />} />
+                <Route path="/contact" element={<Contact />} />
                 <Route path="/donate" element={<Stub titleKey="donate" pageKey="donate" />} />
                 <Route path="/search" element={<Stub titleKey="search" pageKey="search" />} />
                 <Route path="/privacy-policy" element={<Stub titleKey="privacy" pageKey="privacy" />} />
