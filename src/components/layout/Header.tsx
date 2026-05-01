@@ -81,7 +81,7 @@ export const Header = () => {
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[360px]">
               <div className="flex flex-col gap-1 mt-6">
-                {links.slice(0, 5).map((l) => (
+                {links.map((l) => (
                   <NavLink
                     key={l.to}
                     to={l.to}
@@ -90,57 +90,6 @@ export const Header = () => {
                     className={({ isActive }) =>
                       cn(
                         "px-4 py-3 rounded-lg font-semibold transition-smooth",
-                        isActive ? "bg-primary text-primary-foreground" : "hover:bg-muted",
-                      )
-                    }
-                  >
-                    {l.label}
-                  </NavLink>
-                ))}
-
-                {/* قسم الخدمات الإلكترونية في قائمة الجوال */}
-                <div className="mt-2 px-4 py-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  {t.nav.eservices}
-                </div>
-                <NavLink
-                  to="/e-services"
-                  end
-                  onClick={() => setOpen(false)}
-                  className={({ isActive }) =>
-                    cn(
-                      "px-4 py-2.5 rounded-lg text-sm font-medium transition-smooth",
-                      isActive ? "bg-primary/10 text-primary" : "hover:bg-muted",
-                    )
-                  }
-                >
-                  جميع الخدمات
-                </NavLink>
-                {eServiceLinks.map((l) => (
-                  <NavLink
-                    key={l.to}
-                    to={l.to}
-                    onClick={() => setOpen(false)}
-                    className={({ isActive }) =>
-                      cn(
-                        "px-4 py-2.5 mr-3 border-r-2 rounded-lg text-sm transition-smooth",
-                        isActive
-                          ? "border-primary bg-primary/10 text-primary font-semibold"
-                          : "border-border hover:bg-muted",
-                      )
-                    }
-                  >
-                    {l.label}
-                  </NavLink>
-                ))}
-
-                {links.slice(5).map((l) => (
-                  <NavLink
-                    key={l.to}
-                    to={l.to}
-                    onClick={() => setOpen(false)}
-                    className={({ isActive }) =>
-                      cn(
-                        "px-4 py-3 rounded-lg font-semibold transition-smooth mt-1",
                         isActive ? "bg-primary text-primary-foreground" : "hover:bg-muted",
                       )
                     }
