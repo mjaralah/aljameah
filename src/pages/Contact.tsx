@@ -86,7 +86,7 @@ const channels = [
   {
     icon: MapPin,
     label: "عنواننا",
-    primary: "مركز الطرفية الغربية",
+    primary: "حي العوالي الغربي",
     secondary: "الرياض، المملكة العربية السعودية",
     accent: "accent" as const,
   },
@@ -423,7 +423,7 @@ export default function Contact() {
             </div>
             <div>
               <p className="text-xs text-muted-foreground">موقع الجمعية على الخريطة</p>
-              <p className="font-bold text-foreground">مركز الطرفية الغربية</p>
+              <p className="font-bold text-foreground">حي العوالي الغربي</p>
             </div>
           </div>
           <div className="aspect-[16/8] w-full bg-muted">
