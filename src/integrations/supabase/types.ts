@@ -50,6 +50,126 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_messages: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          message: string
+          phone: string
+          purpose: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          message: string
+          phone: string
+          purpose?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          message?: string
+          phone?: string
+          purpose?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      custom_pages: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          meta_description: string | null
+          parent_slug: string | null
+          published: boolean
+          show_in_menu: boolean
+          slug: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          meta_description?: string | null
+          parent_slug?: string | null
+          published?: boolean
+          show_in_menu?: boolean
+          slug: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          meta_description?: string | null
+          parent_slug?: string | null
+          published?: boolean
+          show_in_menu?: boolean
+          slug?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      governance_documents: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          file_size: number | null
+          file_url: string
+          id: string
+          published: boolean
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          file_size?: number | null
+          file_url: string
+          id?: string
+          published?: boolean
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          file_size?: number | null
+          file_url?: string
+          id?: string
+          published?: boolean
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       hero_slides: {
         Row: {
           created_at: string
@@ -85,6 +205,54 @@ export type Database = {
           sort_order?: number
           subtitle?: string | null
           title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      membership_requests: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          education: string | null
+          email: string
+          employer: string | null
+          full_name: string
+          gender: string | null
+          id: string
+          job_title: string | null
+          national_id: string
+          phone: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          education?: string | null
+          email: string
+          employer?: string | null
+          full_name: string
+          gender?: string | null
+          id?: string
+          job_title?: string | null
+          national_id: string
+          phone: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          education?: string | null
+          email?: string
+          employer?: string | null
+          full_name?: string
+          gender?: string | null
+          id?: string
+          job_title?: string | null
+          national_id?: string
+          phone?: string
+          status?: string
           updated_at?: string
         }
         Relationships: []
@@ -131,6 +299,30 @@ export type Database = {
           sort_order?: number
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      page_feedback: {
+        Row: {
+          comment: string | null
+          created_at: string
+          helpful: boolean
+          id: string
+          page_path: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          helpful: boolean
+          id?: string
+          page_path: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          helpful?: boolean
+          id?: string
+          page_path?: string
         }
         Relationships: []
       }
@@ -308,6 +500,87 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      volunteer_requests: {
+        Row: {
+          admin_notes: string | null
+          availability: string | null
+          birth_date: string | null
+          city: string | null
+          created_at: string
+          education: string | null
+          employer: string | null
+          full_name: string
+          gender: string | null
+          has_prior_experience: string | null
+          id: string
+          id_number: string
+          job: string | null
+          marital_status: string | null
+          nationality: string | null
+          other_location: string | null
+          phone: string
+          preferred_activities: string | null
+          previous_org: string | null
+          referral_source: string | null
+          skills: string | null
+          status: string
+          updated_at: string
+          volunteer_location: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          availability?: string | null
+          birth_date?: string | null
+          city?: string | null
+          created_at?: string
+          education?: string | null
+          employer?: string | null
+          full_name: string
+          gender?: string | null
+          has_prior_experience?: string | null
+          id?: string
+          id_number: string
+          job?: string | null
+          marital_status?: string | null
+          nationality?: string | null
+          other_location?: string | null
+          phone: string
+          preferred_activities?: string | null
+          previous_org?: string | null
+          referral_source?: string | null
+          skills?: string | null
+          status?: string
+          updated_at?: string
+          volunteer_location?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          availability?: string | null
+          birth_date?: string | null
+          city?: string | null
+          created_at?: string
+          education?: string | null
+          employer?: string | null
+          full_name?: string
+          gender?: string | null
+          has_prior_experience?: string | null
+          id?: string
+          id_number?: string
+          job?: string | null
+          marital_status?: string | null
+          nationality?: string | null
+          other_location?: string | null
+          phone?: string
+          preferred_activities?: string | null
+          previous_org?: string | null
+          referral_source?: string | null
+          skills?: string | null
+          status?: string
+          updated_at?: string
+          volunteer_location?: string | null
         }
         Relationships: []
       }
