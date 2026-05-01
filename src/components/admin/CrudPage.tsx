@@ -34,7 +34,7 @@ export type Column<T> = {
 };
 
 export type CrudPageProps<T extends { id: string; published?: boolean }> = {
-  table: "news" | "programs" | "board_members" | "partners" | "hero_slides";
+  table: "news" | "programs" | "board_members" | "partners" | "hero_slides" | "custom_pages" | "governance_documents";
   title: string;
   description?: string;
   columns: Column<T>[];
