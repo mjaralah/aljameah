@@ -147,7 +147,7 @@ export const en: Dict = {
       empty: "No programs match this filter.",
     },
     governance: {
-      heading: "Governance & transparency",
+      heading: "Governance",
       lead: "We adhere to the highest disclosure standards and openly publish our documents and figures.",
       board: "Board of directors",
       policies: "Policies & bylaws",
