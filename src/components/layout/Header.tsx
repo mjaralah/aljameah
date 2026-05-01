@@ -11,12 +11,6 @@ export const Header = () => {
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const eServiceLinks = [
-    { to: "/e-services/volunteer", label: t.nav.eservicesVolunteer },
-    { to: "/e-services/membership", label: t.nav.eservicesMembership },
-  ];
 
   const links = [
     { to: "/", label: t.nav.home },
@@ -24,11 +18,10 @@ export const Header = () => {
     { to: "/programs", label: t.nav.programs },
     { to: "/governance", label: t.nav.governance },
     { to: "/media", label: t.nav.media },
+    { to: "/e-services", label: t.nav.eservices },
     { to: "/surveys", label: t.nav.surveys },
     { to: "/contact", label: t.nav.contact },
   ];
-
-  const isEServicesActive = location.pathname.startsWith("/e-services");
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
@@ -54,43 +47,8 @@ export const Header = () => {
 
         {/* التنقل لسطح المكتب */}
         <nav className="hidden xl:flex items-center gap-0.5" aria-label="Main">
-          {links.slice(0, 5).map((l) => (
+          {links.map((l) => (
             <NavLink key={l.to} to={l.to} end={l.to === "/"} className={linkClass}>
-              {l.label}
-            </NavLink>
-          ))}
-
-          {/* قائمة الخدمات الإلكترونية المنسدلة */}
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              className={cn(
-                "px-3 py-2 rounded-md text-sm font-semibold transition-smooth whitespace-nowrap inline-flex items-center gap-1 outline-none",
-                isEServicesActive
-                  ? "bg-primary/10 text-primary"
-                  : "text-foreground/80 hover:text-primary hover:bg-primary/5",
-              )}
-            >
-              {t.nav.eservices}
-              <ChevronDown className="h-4 w-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem asChild>
-                <Link to="/e-services" className="cursor-pointer font-semibold">
-                  {t.nav.eservices}
-                </Link>
-              </DropdownMenuItem>
-              {eServiceLinks.map((l) => (
-                <DropdownMenuItem key={l.to} asChild>
-                  <Link to={l.to} className="cursor-pointer">
-                    {l.label}
-                  </Link>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {links.slice(5).map((l) => (
-            <NavLink key={l.to} to={l.to} className={linkClass}>
               {l.label}
             </NavLink>
           ))}
