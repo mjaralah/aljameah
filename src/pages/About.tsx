@@ -358,7 +358,7 @@ const About = () => {
                   </h3>
                   <dl className="grid sm:grid-cols-2 gap-4 text-sm">
                     <InfoRow label="رقم التسجيل" value="1234/2020" />
-                    <InfoRow label="جهة الإصدار" value="الوزارة المختصة" />
+                    <InfoRow label="جهة الإصدار" value="المركز الوطني لتنمية القطاع غير الربحي" />
                     <InfoRow label="تاريخ التأسيس" value="1442/05/15هـ" />
                     <InfoRow label="حالة الترخيص" value="ساري" valueClass="text-success" />
                     <InfoRow label="نوع النشاط" value="جمعية خيرية متعددة الأغراض" />
