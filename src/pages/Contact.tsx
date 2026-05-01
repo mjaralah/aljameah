@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { z } from "zod";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { PageHero } from "@/components/layout/PageHero";
 import { Button } from "@/components/ui/button";

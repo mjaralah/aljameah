@@ -1,12 +1,15 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { ThumbsDown, ThumbsUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
 
-// أداة تقييم الصفحة — تخزّن الردود في localStorage
+// أداة تقييم الصفحة — تُرسل التقييم إلى قاعدة البيانات
 export const PageFeedback = ({ pageKey }: { pageKey: string }) => {
   const { t } = useLanguage();
+  const location = useLocation();
   const [vote, setVote] = useState<"yes" | "no" | null>(null);
   const [comment, setComment] = useState("");
   const [done, setDone] = useState(false);
@@ -19,12 +22,13 @@ export const PageFeedback = ({ pageKey }: { pageKey: string }) => {
     }
   };
 
-  const persist = (val: "yes" | "no", c: string) => {
+  const persist = async (val: "yes" | "no", c: string) => {
     try {
-      const raw = localStorage.getItem("app:feedback");
-      const list = raw ? JSON.parse(raw) : [];
-      list.push({ page: pageKey, vote: val, comment: c, at: new Date().toISOString() });
-      localStorage.setItem("app:feedback", JSON.stringify(list));
+      await supabase.from("page_feedback").insert({
+        page_path: location.pathname || `/${pageKey}`,
+        helpful: val === "yes",
+        comment: c || null,
+      });
     } catch {
       /* تجاهل */
     }

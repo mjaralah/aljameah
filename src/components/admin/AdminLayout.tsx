@@ -12,6 +12,12 @@ import {
   LogOut,
   Shield,
   Menu,
+  HandHeart,
+  IdCard,
+  MessageSquare,
+  ThumbsUp,
+  FileText,
+  ScrollText,
 } from "lucide-react";
 import {
   Sidebar,
@@ -44,9 +50,18 @@ const contentItems: NavItem[] = [
   { to: "/admin", label: "الرئيسية", icon: LayoutDashboard },
   { to: "/admin/news", label: "الأخبار", icon: Newspaper },
   { to: "/admin/programs", label: "البرامج", icon: FolderKanban },
+  { to: "/admin/pages", label: "الصفحات", icon: FileText },
   { to: "/admin/board", label: "مجلس الإدارة", icon: Users },
   { to: "/admin/partners", label: "الشركاء", icon: Handshake },
   { to: "/admin/hero", label: "شريط البطل", icon: ImageIcon },
+  { to: "/admin/governance", label: "ملفات الحوكمة", icon: ScrollText },
+];
+
+const requestsItems: NavItem[] = [
+  { to: "/admin/volunteer-requests", label: "طلبات التطوع", icon: HandHeart },
+  { to: "/admin/membership-requests", label: "طلبات العضوية", icon: IdCard },
+  { to: "/admin/contact-messages", label: "رسائل التواصل", icon: MessageSquare },
+  { to: "/admin/feedback", label: "تقييمات الصفحات", icon: ThumbsUp },
 ];
 
 const settingsItems: NavItem[] = [
@@ -115,6 +130,13 @@ function AdminSidebar() {
           {!collapsed && <SidebarGroupLabel>المحتوى</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>{contentItems.map(renderItem)}</SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          {!collapsed && <SidebarGroupLabel>الطلبات والتفاعل</SidebarGroupLabel>}
+          <SidebarGroupContent>
+            <SidebarMenu>{requestsItems.map(renderItem)}</SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
