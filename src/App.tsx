@@ -37,6 +37,9 @@ import AdminVolunteerRequestsPage from "./pages/admin/AdminVolunteerRequestsPage
 import AdminMembershipRequestsPage from "./pages/admin/AdminMembershipRequestsPage.tsx";
 import AdminContactMessagesPage from "./pages/admin/AdminContactMessagesPage.tsx";
 import AdminFeedbackPage from "./pages/admin/AdminFeedbackPage.tsx";
+import AdminAboutPage from "./pages/admin/AdminAboutPage.tsx";
+import AdminSurveysPage from "./pages/admin/AdminSurveysPage.tsx";
+import AdminLegalPagesPage from "./pages/admin/AdminLegalPagesPage.tsx";
 import { ProtectedAdminRoute } from "./components/admin/ProtectedAdminRoute.tsx";
 
 const queryClient = new QueryClient();
@@ -210,6 +213,30 @@ const App = () => (
                 element={
                   <ProtectedAdminRoute>
                     <AdminFeedbackPage />
+                  </ProtectedAdminRoute>
+                }
+              />
+              <Route
+                path="/admin/about"
+                element={
+                  <ProtectedAdminRoute>
+                    <AdminAboutPage />
+                  </ProtectedAdminRoute>
+                }
+              />
+              <Route
+                path="/admin/surveys"
+                element={
+                  <ProtectedAdminRoute>
+                    <AdminSurveysPage />
+                  </ProtectedAdminRoute>
+                }
+              />
+              <Route
+                path="/admin/legal-pages"
+                element={
+                  <ProtectedAdminRoute>
+                    <AdminLegalPagesPage />
                   </ProtectedAdminRoute>
                 }
               />
