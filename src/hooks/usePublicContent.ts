@@ -193,3 +193,84 @@ export function useSiteSettings() {
     },
   });
 }
+
+export type DBAboutSection = {
+  id: string;
+  section_key: string;
+  title: string | null;
+  content: string | null;
+  data: any;
+  sort_order: number;
+};
+
+export function useAboutContent() {
+  return useQuery({
+    queryKey: ["public", "about_content"],
+    staleTime: STALE,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("about_content")
+        .select("*")
+        .eq("published", true)
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as DBAboutSection[];
+    },
+  });
+}
+
+export type DBSurvey = {
+  id: string;
+  slug: string;
+  title: string;
+  description: string | null;
+  status: string;
+  ends_at: string | null;
+  show_public_results: boolean;
+  participants: number;
+  sort_order: number;
+};
+
+export type DBSurveyQuestion = {
+  id: string;
+  survey_id: string;
+  question: string;
+  type: string;
+  options: any;
+  scale: any;
+  required: boolean;
+  sort_order: number;
+};
+
+export function useSurveys() {
+  return useQuery({
+    queryKey: ["public", "surveys"],
+    staleTime: STALE,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("surveys")
+        .select("*, survey_questions(*)")
+        .eq("published", true)
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as (DBSurvey & { survey_questions: DBSurveyQuestion[] })[];
+    },
+  });
+}
+
+export function useLegalPage(slug: string) {
+  return useQuery({
+    queryKey: ["public", "legal_pages", slug],
+    staleTime: STALE,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("legal_pages")
+        .select("*")
+        .eq("slug", slug)
+        .eq("published", true)
+        .maybeSingle();
+      if (error) throw error;
+      return data as { id: string; slug: string; title: string; content: string | null } | null;
+    },
+  });
+}
