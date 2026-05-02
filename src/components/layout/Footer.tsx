@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
-import { Facebook, Heart, Instagram, Mail, MapPin, Phone, Twitter, Youtube } from "lucide-react";
+import { Facebook, Heart, Instagram, Linkedin, Mail, MapPin, Phone, Twitter, Youtube } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useSiteSettings } from "@/hooks/usePublicContent";
 
 // تذييل الموقع الكامل
 export const Footer = () => {
   const { t } = useLanguage();
+  const { data: settings } = useSiteSettings();
 
   const quick = [
     { to: "/about", label: t.nav.about },
@@ -43,16 +45,26 @@ export const Footer = () => {
           <div className="mt-5">
             <div className="text-sm font-semibold mb-2">{t.footer.follow}</div>
             <div className="flex items-center gap-2">
-              {[Twitter, Facebook, Instagram, Youtube].map((Icon, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  aria-label="social"
-                  className="h-9 w-9 rounded-full bg-primary-foreground/10 hover:bg-accent hover:text-accent-foreground grid place-items-center transition-smooth"
-                >
-                  <Icon className="h-4 w-4" />
-                </a>
-              ))}
+              {[
+                { Icon: Twitter, href: settings?.social_twitter },
+                { Icon: Instagram, href: settings?.social_instagram },
+                { Icon: Linkedin, href: settings?.social_linkedin },
+                { Icon: Youtube, href: settings?.social_youtube },
+                { Icon: Facebook, href: undefined as string | null | undefined },
+              ]
+                .filter((s, _, arr) => arr.some((a) => a.href) ? !!s.href : true)
+                .map(({ Icon, href }, i) => (
+                  <a
+                    key={i}
+                    href={href || "#"}
+                    target={href ? "_blank" : undefined}
+                    rel={href ? "noopener noreferrer" : undefined}
+                    aria-label="social"
+                    className="h-9 w-9 rounded-full bg-primary-foreground/10 hover:bg-accent hover:text-accent-foreground grid place-items-center transition-smooth"
+                  >
+                    <Icon className="h-4 w-4" />
+                  </a>
+                ))}
             </div>
           </div>
         </div>
@@ -99,9 +111,9 @@ export const Footer = () => {
         <div>
           <h3 className="font-bold mb-4 text-accent">{t.footer.contact}</h3>
           <ul className="space-y-3 text-sm">
-            <li className="flex items-start gap-2"><MapPin className="h-4 w-4 mt-0.5 text-accent shrink-0" /> {t.footer.address}</li>
-            <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-accent shrink-0" /> <span dir="ltr">+966 11 000 0000</span></li>
-            <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-accent shrink-0" /> info@al-ataa.org</li>
+            <li className="flex items-start gap-2"><MapPin className="h-4 w-4 mt-0.5 text-accent shrink-0" /> {settings?.contact_address || t.footer.address}</li>
+            <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-accent shrink-0" /> <span dir="ltr">{settings?.contact_phone || "+966 11 000 0000"}</span></li>
+            <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-accent shrink-0" /> {settings?.contact_email || "info@al-ataa.org"}</li>
           </ul>
         </div>
       </div>
