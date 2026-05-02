@@ -1,13 +1,36 @@
-// صفحة بديلة للأقسام التي ستُبنى في المراحل اللاحقة
-import { Link } from "react-router-dom";
+// صفحة بديلة — تعرض المحتوى من قاعدة البيانات للصفحات القانونية إن وُجد
+import { Link, useLocation } from "react-router-dom";
 import { Construction } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Breadcrumbs } from "@/components/layout/Breadcrumb";
 import { PageFeedback } from "@/components/layout/PageFeedback";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useLegalPage } from "@/hooks/usePublicContent";
+
+const LEGAL_SLUGS = ["privacy-policy", "terms-of-use", "cookie-policy", "accessibility-statement"];
 
 export const StubPage = ({ titleKey, pageKey }: { titleKey: string; pageKey: string }) => {
   const { t } = useLanguage();
+  const { pathname } = useLocation();
+  const slug = pathname.replace(/^\//, "");
+  const isLegal = LEGAL_SLUGS.includes(slug);
+  const { data: legal } = useLegalPage(isLegal ? slug : "");
+
+  if (isLegal && legal) {
+    return (
+      <>
+        <Breadcrumbs items={[{ label: legal.title }]} />
+        <section className="container py-12 md:py-16 max-w-3xl">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-primary mb-6">{legal.title}</h1>
+          <div className="prose prose-sm md:prose-base max-w-none whitespace-pre-wrap leading-loose text-foreground/90">
+            {legal.content}
+          </div>
+        </section>
+        <PageFeedback pageKey={pageKey} />
+      </>
+    );
+  }
+
   return (
     <>
       <Breadcrumbs items={[{ label: titleKey }]} />

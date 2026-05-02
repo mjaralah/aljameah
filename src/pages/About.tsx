@@ -24,7 +24,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { board as fallbackBoard } from "@/data/board";
-import { useBoardMembers } from "@/hooks/usePublicContent";
+import { useBoardMembers, useAboutContent, type DBAboutSection } from "@/hooks/usePublicContent";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ceoPortrait from "@/assets/ceo-portrait.jpg";
 
@@ -76,6 +76,29 @@ const About = () => {
   const { t } = useLanguage();
   const [active, setActive] = useState<string>("founding");
   const { data: dbBoard } = useBoardMembers();
+  const { data: dbAbout } = useAboutContent();
+
+  // Map about_content rows by section_key for easy access
+  const aboutMap = (dbAbout ?? []).reduce<Record<string, DBAboutSection>>((acc, s) => {
+    acc[s.section_key] = s;
+    return acc;
+  }, {});
+  const get = (key: string, fallback: string) => aboutMap[key]?.content ?? fallback;
+  const getTitle = (key: string, fallback: string) => aboutMap[key]?.title ?? fallback;
+  const getData = <T,>(key: string, fallback: T): T => {
+    const d = aboutMap[key]?.data;
+    return (d ?? fallback) as T;
+  };
+
+  const dbStrategicGoals = getData<{ title: string; desc: string }[]>("strategic", []).length
+    ? getData<{ goals: { title: string; desc: string }[] }>("strategic", { goals: [] }).goals
+    : strategicGoals.map((g) => ({ title: g.t, desc: g.d }));
+  const dbOperationalGoals = getData<{ items: string[] }>("operational", { items: operationalGoals }).items;
+  const dbValues = getData<{ values: { icon: string; title: string; desc: string }[] }>("mission", { values: [] }).values;
+  const valuesIconMap: Record<string, React.ComponentType<{ className?: string }>> = { Heart, ShieldCheck, Handshake, Lightbulb };
+  const dbAssemblyCards = getData<{ cards: { title: string; body: string }[] }>("assembly", { cards: [] }).cards;
+  const dbFoundingStats = getData<{ stats: { value: string; label: string }[] }>("founding", { stats: [] }).stats;
+  const ceoData = getData<{ name: string; title: string; photo_url: string | null }>("ceo", { name: "أ. فيصل عبدالعزيز", title: "المدير التنفيذي", photo_url: null });
 
   // مزج بيانات قاعدة البيانات مع الاحتياطية
   const boardItems = (dbBoard && dbBoard.length > 0)
@@ -163,48 +186,50 @@ const About = () => {
           {/* المحتوى */}
           <div className="space-y-10 md:space-y-14 min-w-0">
             {/* النشأة والتأسيس */}
-            <SectionBlock id="founding" icon={Sparkles} title="النشأة والتأسيس">
-              <p>
-                تأسست <strong>جمعية العطاء الخيرية</strong> عام <strong>2020م</strong> بقرار من
-                <strong> المركز الوطني لتنمية القطاع الغير ربحي</strong>، تحت السجل رقم <strong>1234/2020</strong>، استجابةً لحاجة
-                مجتمعية متنامية إلى عملٍ خيري مؤسسي يُوازن بين الإغاثة العاجلة والتنمية
-                المستدامة.
-              </p>
-              <p>
-                بدأت رحلتنا بفريقٍ صغير من المؤمنين بقيمة العطاء، ونمت لتصبح اليوم منصةً
-                وطنيةً تخدم آلاف الأسر سنوياً عبر شبكةٍ من المتطوعين والشركاء، مستلهمةً
-                مسارها من رؤية المملكة 2030 في تمكين القطاع غير الربحي.
-              </p>
+            <SectionBlock id="founding" icon={Sparkles} title={getTitle("founding", "النشأة والتأسيس")}>
+              {(get("founding", "").split("\n\n").filter(Boolean).length
+                ? get("founding", "").split("\n\n").filter(Boolean)
+                : [
+                    "تأسست جمعية العطاء الخيرية عام 2020م بقرار من المركز الوطني لتنمية القطاع الغير ربحي، تحت السجل رقم 1234/2020.",
+                    "بدأت رحلتنا بفريقٍ صغير من المؤمنين بقيمة العطاء، ونمت لتصبح اليوم منصةً وطنيةً تخدم آلاف الأسر سنوياً.",
+                  ]
+              ).map((para, i) => (
+                <p key={i}>{para}</p>
+              ))}
               <div className="grid sm:grid-cols-3 gap-4 mt-6">
-                <Stat value="2020" label="سنة التأسيس" />
-                <Stat value="+5" label="سنوات من العطاء" />
-                <Stat value="+50K" label="مستفيد ومستفيدة" />
+                {(dbFoundingStats.length > 0 ? dbFoundingStats : [
+                  { value: "2020", label: "سنة التأسيس" },
+                  { value: "+5", label: "سنوات من العطاء" },
+                  { value: "+50K", label: "مستفيد ومستفيدة" },
+                ]).map((s) => (
+                  <Stat key={s.label} value={s.value} label={s.label} />
+                ))}
               </div>
             </SectionBlock>
 
             {/* الرؤية */}
-            <SectionBlock id="vision" icon={Eye} title="الرؤية" accent="gold">
+            <SectionBlock id="vision" icon={Eye} title={getTitle("vision", "الرؤية")} accent="gold">
               <div className="bg-gradient-to-br from-accent-soft to-card border-r-4 border-accent rounded-2xl p-6 md:p-8">
                 <p className="text-lg md:text-xl font-semibold leading-loose text-primary">
-                  "أن نكون جمعيةً رائدةً في العمل الخيري المؤسسي، نُلهم العطاء ونصنع أثراً
-                  مستداماً في حياة الإنسان والمجتمع."
+                  "{get("vision", "أن نكون جمعيةً رائدةً في العمل الخيري المؤسسي، نُلهم العطاء ونصنع أثراً مستداماً في حياة الإنسان والمجتمع.")}"
                 </p>
               </div>
             </SectionBlock>
 
             {/* الرسالة */}
-            <SectionBlock id="mission" icon={Target} title="الرسالة">
+            <SectionBlock id="mission" icon={Target} title={getTitle("mission", "الرسالة")}>
               <div className="bg-gradient-to-br from-secondary to-card border-r-4 border-primary rounded-2xl p-6 md:p-8">
                 <p className="text-base md:text-lg leading-loose">
-                  تقديم برامج وخدمات نوعية للفئات المحتاجة في مجالات التعليم والصحة
-                  والإغاثة والتنمية، عبر فريقٍ مؤهَّل وشراكاتٍ فاعلة، وبأعلى معايير الجودة
-                  والحوكمة.
+                  {get("mission", "تقديم برامج وخدمات نوعية للفئات المحتاجة في مجالات التعليم والصحة والإغاثة والتنمية، عبر فريقٍ مؤهَّل وشراكاتٍ فاعلة، وبأعلى معايير الجودة والحوكمة.")}
                 </p>
               </div>
 
               <h3 className="text-lg font-bold text-primary mt-8 mb-4">قيمنا الجوهرية</h3>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {values.map((v) => {
+                {(dbValues.length > 0
+                  ? dbValues.map((v) => ({ icon: valuesIconMap[v.icon] ?? Heart, t: v.title, d: v.desc }))
+                  : values
+                ).map((v) => {
                   const Icon = v.icon;
                   return (
                     <div
@@ -223,29 +248,29 @@ const About = () => {
             </SectionBlock>
 
             {/* الأهداف الاستراتيجية */}
-            <SectionBlock id="strategic" icon={Crosshair} title="الأهداف الاستراتيجية">
-              <p>أهدافٌ بعيدة المدى تُشكّل بوصلة عمل الجمعية للسنوات القادمة:</p>
+            <SectionBlock id="strategic" icon={Crosshair} title={getTitle("strategic", "الأهداف الاستراتيجية")}>
+              <p>{get("strategic", "أهدافٌ بعيدة المدى تُشكّل بوصلة عمل الجمعية للسنوات القادمة:")}</p>
               <div className="grid sm:grid-cols-2 gap-4 mt-4">
-                {strategicGoals.map((g, i) => (
+                {dbStrategicGoals.map((g, i) => (
                   <div
-                    key={g.t}
+                    key={g.title + i}
                     className="relative bg-card border border-border rounded-xl p-5 hover:border-accent hover:shadow-soft transition-smooth"
                   >
                     <span className="absolute -top-3 -right-3 h-9 w-9 rounded-full bg-gradient-gold text-accent-foreground grid place-items-center font-bold text-sm shadow-gold">
                       {i + 1}
                     </span>
-                    <h4 className="font-bold text-primary mb-1.5 mt-1">{g.t}</h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{g.d}</p>
+                    <h4 className="font-bold text-primary mb-1.5 mt-1">{g.title}</h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{g.desc}</p>
                   </div>
                 ))}
               </div>
             </SectionBlock>
 
             {/* الأهداف التشغيلية */}
-            <SectionBlock id="operational" icon={ListChecks} title="الأهداف التشغيلية">
-              <p>مؤشرات أداء سنوية قابلة للقياس، نَعمل عليها بشكلٍ مباشر:</p>
+            <SectionBlock id="operational" icon={ListChecks} title={getTitle("operational", "الأهداف التشغيلية")}>
+              <p>{get("operational", "مؤشرات أداء سنوية قابلة للقياس، نَعمل عليها بشكلٍ مباشر:")}</p>
               <ul className="grid sm:grid-cols-2 gap-3 mt-4">
-                {operationalGoals.map((g, i) => (
+                {dbOperationalGoals.map((g, i) => (
                   <li
                     key={i}
                     className="flex items-start gap-3 bg-secondary/40 border border-border rounded-lg p-4"
@@ -260,15 +285,16 @@ const About = () => {
             </SectionBlock>
 
             {/* الجمعية العمومية */}
-            <SectionBlock id="assembly" icon={Users} title="الجمعية العمومية">
-              <p>
-                الجمعية العمومية هي السلطة العليا في الجمعية، وتتألف من جميع الأعضاء
-                المؤسسين والعاملين الذين أوفوا بالتزاماتهم وفق النظام الأساسي.
-              </p>
+            <SectionBlock id="assembly" icon={Users} title={getTitle("assembly", "الجمعية العمومية")}>
+              <p>{get("assembly", "الجمعية العمومية هي السلطة العليا في الجمعية، وتتألف من جميع الأعضاء المؤسسين والعاملين الذين أوفوا بالتزاماتهم وفق النظام الأساسي.")}</p>
               <div className="grid md:grid-cols-3 gap-4 mt-6">
-                <InfoCard title="الاختصاصات" body="إقرار الخطط والسياسات، اعتماد التقارير المالية والإدارية، انتخاب مجلس الإدارة." />
-                <InfoCard title="الاجتماعات" body="اجتماع عادي سنوي، واجتماعات غير عادية عند الحاجة وفق نظام الجمعيات." />
-                <InfoCard title="الأعضاء" body="عضويةٌ مفتوحة وفق الشروط النظامية، مع حقوق متساوية في التصويت." />
+                {(dbAssemblyCards.length > 0 ? dbAssemblyCards : [
+                  { title: "الاختصاصات", body: "إقرار الخطط والسياسات، اعتماد التقارير المالية والإدارية، انتخاب مجلس الإدارة." },
+                  { title: "الاجتماعات", body: "اجتماع عادي سنوي، واجتماعات غير عادية عند الحاجة وفق نظام الجمعيات." },
+                  { title: "الأعضاء", body: "عضويةٌ مفتوحة وفق الشروط النظامية، مع حقوق متساوية في التصويت." },
+                ]).map((c) => (
+                  <InfoCard key={c.title} title={c.title} body={c.body} />
+                ))}
               </div>
             </SectionBlock>
 
@@ -306,13 +332,13 @@ const About = () => {
             </SectionBlock>
 
             {/* المدير التنفيذي */}
-            <SectionBlock id="ceo" icon={UserCog} title="المدير التنفيذي">
+            <SectionBlock id="ceo" icon={UserCog} title={getTitle("ceo", "المدير التنفيذي")}>
               <div className="bg-gradient-to-br from-secondary to-card border border-border rounded-2xl p-6 md:p-8">
                 <div className="flex flex-col md:flex-row gap-6 items-start">
                   <div className="h-24 w-24 md:h-28 md:w-28 shrink-0 rounded-2xl overflow-hidden ring-2 ring-accent/40 shadow-card">
                     <img
-                      src={ceoPortrait}
-                      alt="صورة المدير التنفيذي أ. فيصل عبدالعزيز"
+                      src={ceoData.photo_url || ceoPortrait}
+                      alt={`صورة المدير التنفيذي ${ceoData.name}`}
                       width={256}
                       height={256}
                       loading="lazy"
@@ -320,15 +346,12 @@ const About = () => {
                     />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-xl font-bold text-primary">أ. فيصل عبدالعزيز</h3>
+                    <h3 className="text-xl font-bold text-primary">{ceoData.name}</h3>
                     <Badge className="bg-accent text-accent-foreground hover:bg-accent/90 mt-2 mb-3">
-                      المدير التنفيذي
+                      {ceoData.title}
                     </Badge>
                     <p className="leading-loose text-sm md:text-base">
-                      يقود المدير التنفيذي العمل اليومي للجمعية وفق توجيهات مجلس الإدارة،
-                      ويُشرف على تنفيذ الخطط الاستراتيجية والتشغيلية، ويُمثّل الجمعية في
-                      الشراكات والمحافل الوطنية. يحمل خبرةً تتجاوز <strong>15 عاماً</strong>{" "}
-                      في إدارة المنظمات غير الربحية وتطوير البرامج التنموية.
+                      {get("ceo", "يقود المدير التنفيذي العمل اليومي للجمعية وفق توجيهات مجلس الإدارة، ويُشرف على تنفيذ الخطط الاستراتيجية والتشغيلية، ويُمثّل الجمعية في الشراكات والمحافل الوطنية.")}
                     </p>
                   </div>
                 </div>

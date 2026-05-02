@@ -18,6 +18,9 @@ import {
   ThumbsUp,
   FileText,
   ScrollText,
+  Info,
+  ClipboardList,
+  Scale,
 } from "lucide-react";
 import {
   Sidebar,
@@ -50,7 +53,10 @@ const contentItems: NavItem[] = [
   { to: "/admin", label: "الرئيسية", icon: LayoutDashboard },
   { to: "/admin/news", label: "الأخبار", icon: Newspaper },
   { to: "/admin/programs", label: "البرامج", icon: FolderKanban },
-  { to: "/admin/pages", label: "الصفحات", icon: FileText },
+  { to: "/admin/about", label: "محتوى من نحن", icon: Info },
+  { to: "/admin/surveys", label: "الاستبيانات", icon: ClipboardList },
+  { to: "/admin/pages", label: "الصفحات المخصصة", icon: FileText },
+  { to: "/admin/legal-pages", label: "الصفحات القانونية", icon: Scale },
   { to: "/admin/board", label: "مجلس الإدارة", icon: Users },
   { to: "/admin/partners", label: "الشركاء", icon: Handshake },
   { to: "/admin/hero", label: "شريط البطل", icon: ImageIcon },
