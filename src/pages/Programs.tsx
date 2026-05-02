@@ -41,6 +41,7 @@ const Programs = () => {
         description: p.description ?? "",
         icon: p.icon || "Heart",
         beneficiaries: 0,
+        featured: !!p.featured,
       }));
     }
     return fallbackPrograms.map((p) => ({
