@@ -96,17 +96,15 @@ export default function AdminSurveysPage() {
 
   async function saveQuestion() {
     if (!editQ?.question || !editQ.type || !editQ.survey_id) { toast.error("الحقول مطلوبة"); return; }
-    let opts = editQ.options;
-    let scl = editQ.scale;
-    if (typeof opts === "string") {
-      try { opts = JSON.parse(opts as string); } catch { toast.error("صيغة الخيارات غير صحيحة"); return; }
-    }
-    if (typeof scl === "string") {
-      try { scl = JSON.parse(scl as string); } catch { toast.error("صيغة المقياس غير صحيحة"); return; }
-    }
+    const opts = Array.isArray(editQ.options) ? editQ.options.filter((o) => (o.ar ?? "").trim() || (o.en ?? "").trim()) : null;
+    const scl = Array.isArray(editQ.scale) ? editQ.scale.filter((o) => (o.ar ?? "").trim() || (o.en ?? "").trim()) : null;
+    const needsOptions = ["single", "single_choice", "multiple", "dropdown"].includes(editQ.type);
+    if (needsOptions && (!opts || opts.length === 0)) { toast.error("أضف خياراً واحداً على الأقل"); return; }
+    if (editQ.type === "likert" && (!scl || scl.length === 0)) { toast.error("أضف عنصراً واحداً على الأقل في المقياس"); return; }
     const payload = {
       survey_id: editQ.survey_id, question: editQ.question, type: editQ.type,
-      options: opts ?? null, scale: scl ?? null,
+      options: opts && opts.length ? opts : null,
+      scale: scl && scl.length ? scl : null,
       required: editQ.required ?? false, sort_order: editQ.sort_order ?? 0,
     };
     const { error } = editQ.id
