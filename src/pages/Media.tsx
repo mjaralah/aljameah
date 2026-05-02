@@ -25,6 +25,8 @@ const Media = () => {
   const [filter, setFilter] = useState<string>("all");
   const [q, setQ] = useState("");
   const { data: dbNews } = useNews();
+  const { data: pageSections } = usePageContent("media");
+  const intro = (pageSections ?? []).find((s) => s.section_key === "intro");
 
   // مزج بيانات قاعدة البيانات مع الاحتياطية
   const items: Item[] = useMemo(() => {
