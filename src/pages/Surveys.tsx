@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { surveys as fallbackSurveys } from "@/data";
 import { useSurveys, usePageContent } from "@/hooks/usePublicContent";
-import { supabase } from "@/integrations/supabase/client";
+
 import { PageHero } from "@/components/layout/PageHero";
 import { PageFeedback } from "@/components/layout/PageFeedback";
 import type { Survey, SurveyQuestion, SurveyQuestionType, LocalizedText } from "@/types";
