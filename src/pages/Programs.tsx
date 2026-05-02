@@ -21,6 +21,7 @@ type ViewItem = {
   icon: string;
   category?: Program["category"];
   beneficiaries: number;
+  featured?: boolean;
 };
 
 const Programs = () => {
