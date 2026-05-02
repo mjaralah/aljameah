@@ -451,14 +451,14 @@ export default function Contact() {
               <MapPin className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">موقع الجمعية على الخريطة</p>
-              <p className="font-bold text-foreground">حي العوالي الغربي</p>
+              <p className="text-xs text-muted-foreground">{mapSec?.title || "موقع الجمعية على الخريطة"}</p>
+              <p className="font-bold text-foreground">{mapSec?.data?.address || "حي العوالي الغربي"}</p>
             </div>
           </div>
           <div className="aspect-[16/8] w-full bg-muted">
             <iframe
               title="موقع الجمعية"
-              src="https://www.openstreetmap.org/export/embed.html?bbox=46.5,24.6,46.9,24.85&layer=mapnik"
+              src={mapSec?.data?.embed_url || "https://www.openstreetmap.org/export/embed.html?bbox=46.5,24.6,46.9,24.85&layer=mapnik"}
               className="w-full h-full border-0"
               loading="lazy"
             />
