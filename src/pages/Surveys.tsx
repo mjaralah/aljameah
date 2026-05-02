@@ -59,6 +59,13 @@ function mapDbSurvey(row: any): Survey {
 const SurveysPage = () => {
   const { t, tx, lang, dir } = useLanguage();
   const [selected, setSelected] = useState<Survey | null>(null);
+  const { data: dbRows } = useSurveys();
+  const { data: pageSections } = usePageContent("surveys");
+  const intro = (pageSections ?? []).find((s) => s.section_key === "intro");
+
+  const surveys: Survey[] = (dbRows && dbRows.length > 0)
+    ? dbRows.map(mapDbSurvey)
+    : fallbackSurveys;
 
   if (selected) return <SurveyTaker survey={selected} onBack={() => setSelected(null)} />;
 
@@ -69,9 +76,9 @@ const SurveysPage = () => {
     <>
       <PageHero
         eyebrow={t.nav.surveys}
-        title={t.pages.surveys.heading}
-        lead={t.pages.surveys.lead}
-        breadcrumb={[{ label: t.nav.surveys }]}
+        title={intro?.title || t.pages.surveys.heading}
+        lead={intro?.content || t.pages.surveys.lead}
+        breadcrumb={[{ label: intro?.title || t.nav.surveys }]}
       />
       <section className="container py-12 md:py-16">
         <Tabs defaultValue="surveys" className="w-full">
