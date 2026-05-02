@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { usePageContent } from "@/hooks/usePublicContent";
 import { cn } from "@/lib/utils";
 
 type Audience = "all" | "individuals" | "entities" | "inquiries";
@@ -161,6 +162,8 @@ export default function EServicesIndex() {
   const isAr = lang === "ar";
   const [tab, setTab] = useState<Audience>("all");
   const [query, setQuery] = useState("");
+  const { data: pageSections } = usePageContent("eservices");
+  const intro = (pageSections ?? []).find((s) => s.section_key === "intro");
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -186,13 +189,14 @@ export default function EServicesIndex() {
     <>
       <PageHero
         eyebrow={isAr ? "بوّابة الخدمات" : "Services Portal"}
-        title={isAr ? "الخدمات الإلكترونية" : "E-Services"}
+        title={intro?.title || (isAr ? "الخدمات الإلكترونية" : "E-Services")}
         lead={
-          isAr
+          intro?.content ||
+          (isAr
             ? "منصة موحّدة لتقديم طلباتك إلى الجمعية بكل سهولة ويسر — اختر الخدمة المناسبة وابدأ التقديم الآن."
-            : "A unified platform to submit your requests easily — choose a service and start now."
+            : "A unified platform to submit your requests easily — choose a service and start now.")
         }
-        breadcrumb={[{ label: isAr ? "الخدمات الإلكترونية" : "E-Services" }]}
+        breadcrumb={[{ label: intro?.title || (isAr ? "الخدمات الإلكترونية" : "E-Services") }]}
       />
 
       <section className="container py-10 md:py-14">

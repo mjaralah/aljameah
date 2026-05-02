@@ -21,6 +21,7 @@ import {
   Info,
   ClipboardList,
   Scale,
+  LayoutTemplate,
 } from "lucide-react";
 import {
   Sidebar,
@@ -55,6 +56,7 @@ const contentItems: NavItem[] = [
   { to: "/admin/programs", label: "البرامج", icon: FolderKanban },
   { to: "/admin/about", label: "محتوى من نحن", icon: Info },
   { to: "/admin/surveys", label: "الاستبيانات", icon: ClipboardList },
+  { to: "/admin/page-content", label: "محتوى الصفحات", icon: LayoutTemplate },
   { to: "/admin/pages", label: "الصفحات المخصصة", icon: FileText },
   { to: "/admin/legal-pages", label: "الصفحات القانونية", icon: Scale },
   { to: "/admin/board", label: "مجلس الإدارة", icon: Users },

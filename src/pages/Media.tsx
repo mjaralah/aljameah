@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { news as fallbackNews } from "@/data";
-import { useNews } from "@/hooks/usePublicContent";
+import { useNews, usePageContent } from "@/hooks/usePublicContent";
 import { PageHero } from "@/components/layout/PageHero";
 import { PageFeedback } from "@/components/layout/PageFeedback";
 import { cn } from "@/lib/utils";
@@ -25,6 +25,8 @@ const Media = () => {
   const [filter, setFilter] = useState<string>("all");
   const [q, setQ] = useState("");
   const { data: dbNews } = useNews();
+  const { data: pageSections } = usePageContent("media");
+  const intro = (pageSections ?? []).find((s) => s.section_key === "intro");
 
   // مزج بيانات قاعدة البيانات مع الاحتياطية
   const items: Item[] = useMemo(() => {
@@ -64,9 +66,9 @@ const Media = () => {
     <>
       <PageHero
         eyebrow={t.nav.media}
-        title={t.pages.media.heading}
-        lead={t.pages.media.lead}
-        breadcrumb={[{ label: t.nav.media }]}
+        title={intro?.title || t.pages.media.heading}
+        lead={intro?.content || t.pages.media.lead}
+        breadcrumb={[{ label: intro?.title || t.nav.media }]}
       />
 
       <section className="container py-12 md:py-16">

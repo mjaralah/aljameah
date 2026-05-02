@@ -40,6 +40,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { IconField } from "@/components/eservices/FormFields";
+import { usePageContent } from "@/hooks/usePublicContent";
 
 const contactSchema = z.object({
   fullName: z.string().trim().min(3, "الاسم يجب أن يكون 3 أحرف على الأقل").max(100),
@@ -103,6 +104,15 @@ const socials = [
 
 export default function Contact() {
   const { toast } = useToast();
+  const { data: pageSections } = usePageContent("contact");
+  const sectionMap = (pageSections ?? []).reduce<Record<string, any>>(
+    (acc, s) => ({ ...acc, [s.section_key]: s }),
+    {},
+  );
+  const intro = sectionMap.intro;
+  const hours = sectionMap.hours;
+  const mapSec = sectionMap.map;
+
   const [form, setForm] = useState<ContactForm>({
     fullName: "",
     phone: "",
@@ -158,9 +168,9 @@ export default function Contact() {
     <>
       <PageHero
         eyebrow="نحن هنا لخدمتك"
-        title="تواصل معنا"
-        lead="نُرحب بأسئلتكم وملاحظاتكم ومقترحاتكم — اختر الطريقة الأنسب للتواصل وسنردّ عليك بأسرع وقت."
-        breadcrumb={[{ label: "تواصل معنا" }]}
+        title={intro?.title || "تواصل معنا"}
+        lead={intro?.content || "نُرحب بأسئلتكم وملاحظاتكم ومقترحاتكم — اختر الطريقة الأنسب للتواصل وسنردّ عليك بأسرع وقت."}
+        breadcrumb={[{ label: intro?.title || "تواصل معنا" }]}
       />
 
       {/* قسم قنوات التواصل السريعة - شريط أفقي */}
@@ -441,14 +451,14 @@ export default function Contact() {
               <MapPin className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">موقع الجمعية على الخريطة</p>
-              <p className="font-bold text-foreground">حي العوالي الغربي</p>
+              <p className="text-xs text-muted-foreground">{mapSec?.title || "موقع الجمعية على الخريطة"}</p>
+              <p className="font-bold text-foreground">{mapSec?.data?.address || "حي العوالي الغربي"}</p>
             </div>
           </div>
           <div className="aspect-[16/8] w-full bg-muted">
             <iframe
               title="موقع الجمعية"
-              src="https://www.openstreetmap.org/export/embed.html?bbox=46.5,24.6,46.9,24.85&layer=mapnik"
+              src={mapSec?.data?.embed_url || "https://www.openstreetmap.org/export/embed.html?bbox=46.5,24.6,46.9,24.85&layer=mapnik"}
               className="w-full h-full border-0"
               loading="lazy"
             />
