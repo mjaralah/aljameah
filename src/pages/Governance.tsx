@@ -31,11 +31,12 @@ import {
   eventsReports,
   financials,
 } from "@/data/governance";
+import { useGovernanceDocs } from "@/hooks/usePublicContent";
 import { PageHero } from "@/components/layout/PageHero";
 import { PageFeedback } from "@/components/layout/PageFeedback";
 import { cn } from "@/lib/utils";
 
-type DocItem = { id: string; year: number; title: { ar: string; en: string }; fileName: string };
+type DocItem = { id: string; year: number; title: { ar: string; en: string } | string; fileName: string; fileUrl?: string };
 
 type Section = {
   key: string;
@@ -47,19 +48,38 @@ type Section = {
 const Governance = () => {
   const { t, tx, lang } = useLanguage();
   const [activeKey, setActiveKey] = useState<string>("overview");
+  const { data: dbDocs } = useGovernanceDocs();
+
+  // وثائق قاعدة البيانات مجمّعة حسب التصنيف
+  const dbByCategory = useMemo(() => {
+    const map: Record<string, DocItem[]> = {};
+    (dbDocs ?? []).forEach((d) => {
+      const cat = d.category || "policies";
+      const fileName = d.file_url ? d.file_url.split("/").pop() || "document.pdf" : "document.pdf";
+      const item: DocItem = {
+        id: d.id,
+        year: new Date().getFullYear(),
+        title: d.title,
+        fileName,
+        fileUrl: d.file_url,
+      };
+      (map[cat] ||= []).push(item);
+    });
+    return map;
+  }, [dbDocs]);
 
   const sections: Section[] = useMemo(
     () => [
-      { key: "policies", labelKey: "policies", icon: ShieldCheck, docs: policies },
-      { key: "regulations", labelKey: "regulations", icon: ScrollText, docs: regulations },
-      { key: "plans", labelKey: "plans", icon: Target, docs: plans },
-      { key: "investments", labelKey: "investments", icon: TrendingUp, docs: investmentDecisions },
-      { key: "aid", labelKey: "aid", icon: HandCoins, docs: aidReports },
-      { key: "financialReports", labelKey: "financialReports", icon: Wallet, docs: financialReports },
-      { key: "annualReport", labelKey: "annualReport", icon: FileBarChart, docs: annualReports },
-      { key: "events", labelKey: "events", icon: CalendarDays, docs: eventsReports },
+      { key: "policies", labelKey: "policies", icon: ShieldCheck, docs: dbByCategory.policies?.length ? dbByCategory.policies : policies },
+      { key: "regulations", labelKey: "regulations", icon: ScrollText, docs: dbByCategory.regulations?.length ? dbByCategory.regulations : regulations },
+      { key: "plans", labelKey: "plans", icon: Target, docs: dbByCategory.plans?.length ? dbByCategory.plans : plans },
+      { key: "investments", labelKey: "investments", icon: TrendingUp, docs: dbByCategory.investments?.length ? dbByCategory.investments : investmentDecisions },
+      { key: "aid", labelKey: "aid", icon: HandCoins, docs: dbByCategory.aid?.length ? dbByCategory.aid : aidReports },
+      { key: "financialReports", labelKey: "financialReports", icon: Wallet, docs: dbByCategory.financialReports?.length ? dbByCategory.financialReports : financialReports },
+      { key: "annualReport", labelKey: "annualReport", icon: FileBarChart, docs: dbByCategory.annualReport?.length ? dbByCategory.annualReport : annualReports },
+      { key: "events", labelKey: "events", icon: CalendarDays, docs: dbByCategory.events?.length ? dbByCategory.events : eventsReports },
     ],
-    []
+    [dbByCategory]
   );
 
   const active = sections.find((s) => s.key === activeKey);
