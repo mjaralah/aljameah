@@ -241,6 +241,14 @@ const App = () => (
                   </ProtectedAdminRoute>
                 }
               />
+              <Route
+                path="/admin/page-content"
+                element={
+                  <ProtectedAdminRoute>
+                    <AdminPageContentPage />
+                  </ProtectedAdminRoute>
+                }
+              />
 
               {/* Public site (catch-all) */}
               <Route path="/*" element={<PublicRoutes />} />
