@@ -96,17 +96,15 @@ export default function AdminSurveysPage() {
 
   async function saveQuestion() {
     if (!editQ?.question || !editQ.type || !editQ.survey_id) { toast.error("الحقول مطلوبة"); return; }
-    let opts = editQ.options;
-    let scl = editQ.scale;
-    if (typeof opts === "string") {
-      try { opts = JSON.parse(opts as string); } catch { toast.error("صيغة الخيارات غير صحيحة"); return; }
-    }
-    if (typeof scl === "string") {
-      try { scl = JSON.parse(scl as string); } catch { toast.error("صيغة المقياس غير صحيحة"); return; }
-    }
+    const opts = Array.isArray(editQ.options) ? editQ.options.filter((o) => (o.ar ?? "").trim() || (o.en ?? "").trim()) : null;
+    const scl = Array.isArray(editQ.scale) ? editQ.scale.filter((o) => (o.ar ?? "").trim() || (o.en ?? "").trim()) : null;
+    const needsOptions = ["single", "single_choice", "multiple", "dropdown"].includes(editQ.type);
+    if (needsOptions && (!opts || opts.length === 0)) { toast.error("أضف خياراً واحداً على الأقل"); return; }
+    if (editQ.type === "likert" && (!scl || scl.length === 0)) { toast.error("أضف عنصراً واحداً على الأقل في المقياس"); return; }
     const payload = {
       survey_id: editQ.survey_id, question: editQ.question, type: editQ.type,
-      options: opts ?? null, scale: scl ?? null,
+      options: opts && opts.length ? opts : null,
+      scale: scl && scl.length ? scl : null,
       required: editQ.required ?? false, sort_order: editQ.sort_order ?? 0,
     };
     const { error } = editQ.id
@@ -275,27 +273,79 @@ export default function AdminSurveysPage() {
                 </Select>
               </div>
               {(editQ.type === "single" || editQ.type === "single_choice" || editQ.type === "multiple" || editQ.type === "dropdown") && (
-                <div>
-                  <label className="text-sm font-medium">الخيارات (JSON)</label>
-                  <Textarea
-                    rows={4}
-                    className="font-mono text-xs"
-                    value={typeof editQ.options === "string" ? editQ.options : JSON.stringify(editQ.options ?? [], null, 2)}
-                    onChange={(e) => setEditQ({ ...editQ, options: e.target.value as unknown as Question["options"] })}
-                    placeholder='[{"ar":"ذكر","en":"Male"},{"ar":"أنثى","en":"Female"}]'
-                  />
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium">الخيارات</label>
+                    <Button type="button" size="sm" variant="outline"
+                      onClick={() => {
+                        const arr = Array.isArray(editQ.options) ? editQ.options : [];
+                        setEditQ({ ...editQ, options: [...arr, { ar: "", en: "" }] });
+                      }}>
+                      <Plus className="w-3.5 h-3.5 ml-1" /> إضافة خيار
+                    </Button>
+                  </div>
+                  {(Array.isArray(editQ.options) ? editQ.options : []).map((op, i) => (
+                    <div key={i} className="flex gap-2 items-center">
+                      <span className="text-xs text-muted-foreground tabular-nums w-6">{i + 1}.</span>
+                      <Input placeholder="بالعربية" value={op.ar ?? ""}
+                        onChange={(e) => {
+                          const arr = [...(editQ.options as { ar?: string; en?: string }[])];
+                          arr[i] = { ...arr[i], ar: e.target.value };
+                          setEditQ({ ...editQ, options: arr });
+                        }} />
+                      <Input placeholder="English (optional)" value={op.en ?? ""}
+                        onChange={(e) => {
+                          const arr = [...(editQ.options as { ar?: string; en?: string }[])];
+                          arr[i] = { ...arr[i], en: e.target.value };
+                          setEditQ({ ...editQ, options: arr });
+                        }} />
+                      <Button type="button" size="icon" variant="ghost" className="h-8 w-8 text-destructive"
+                        onClick={() => {
+                          const arr = (editQ.options as { ar?: string; en?: string }[]).filter((_, j) => j !== i);
+                          setEditQ({ ...editQ, options: arr });
+                        }}>
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
                 </div>
               )}
               {editQ.type === "likert" && (
-                <div>
-                  <label className="text-sm font-medium">المقياس (JSON)</label>
-                  <Textarea
-                    rows={4}
-                    className="font-mono text-xs"
-                    value={typeof editQ.scale === "string" ? editQ.scale : JSON.stringify(editQ.scale ?? [], null, 2)}
-                    onChange={(e) => setEditQ({ ...editQ, scale: e.target.value as unknown as Question["scale"] })}
-                    placeholder='[{"ar":"5/5: راضي جداً","en":"Very satisfied"}]'
-                  />
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium">مقياس ليكرت (من الأقل إلى الأعلى)</label>
+                    <Button type="button" size="sm" variant="outline"
+                      onClick={() => {
+                        const arr = Array.isArray(editQ.scale) ? editQ.scale : [];
+                        setEditQ({ ...editQ, scale: [...arr, { ar: "", en: "" }] });
+                      }}>
+                      <Plus className="w-3.5 h-3.5 ml-1" /> إضافة عنصر
+                    </Button>
+                  </div>
+                  {(Array.isArray(editQ.scale) ? editQ.scale : []).map((op, i) => (
+                    <div key={i} className="flex gap-2 items-center">
+                      <span className="text-xs text-muted-foreground tabular-nums w-6">{i + 1}.</span>
+                      <Input placeholder="مثال: راضٍ جداً" value={op.ar ?? ""}
+                        onChange={(e) => {
+                          const arr = [...(editQ.scale as { ar?: string; en?: string }[])];
+                          arr[i] = { ...arr[i], ar: e.target.value };
+                          setEditQ({ ...editQ, scale: arr });
+                        }} />
+                      <Input placeholder="Very satisfied (optional)" value={op.en ?? ""}
+                        onChange={(e) => {
+                          const arr = [...(editQ.scale as { ar?: string; en?: string }[])];
+                          arr[i] = { ...arr[i], en: e.target.value };
+                          setEditQ({ ...editQ, scale: arr });
+                        }} />
+                      <Button type="button" size="icon" variant="ghost" className="h-8 w-8 text-destructive"
+                        onClick={() => {
+                          const arr = (editQ.scale as { ar?: string; en?: string }[]).filter((_, j) => j !== i);
+                          setEditQ({ ...editQ, scale: arr });
+                        }}>
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
                 </div>
               )}
               <div className="grid grid-cols-2 gap-3">

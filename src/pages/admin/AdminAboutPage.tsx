@@ -1,20 +1,22 @@
-// لوحة تحرير محتوى صفحة "من نحن" — كل قسم في بطاقة قابلة للتعديل
+// لوحة تحرير محتوى صفحة "من نحن" — حقول هيكلية لكل قسم بدون JSON
 import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Save } from "lucide-react";
+import { Loader2, Save, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+type AnyData = Record<string, unknown> | null;
 
 type Section = {
   id: string;
   section_key: string;
   title: string | null;
   content: string | null;
-  data: unknown;
+  data: AnyData;
   sort_order: number;
   published: boolean;
 };
@@ -29,6 +31,26 @@ const KEY_LABELS: Record<string, string> = {
   assembly: "الجمعية العمومية",
 };
 
+// مكوّن صف قابل للحذف لإطار موحّد
+const RowFrame = ({ children, onRemove, index }: { children: React.ReactNode; onRemove: () => void; index: number }) => (
+  <div className="rounded-md border border-border bg-muted/30 p-3 space-y-2 relative">
+    <div className="flex items-center justify-between">
+      <span className="text-xs text-muted-foreground font-medium">عنصر #{index + 1}</span>
+      <Button type="button" size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={onRemove}>
+        <Trash2 className="w-3.5 h-3.5" />
+      </Button>
+    </div>
+    {children}
+  </div>
+);
+
+const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
+  <div>
+    <label className="text-xs font-medium mb-1 block">{label}</label>
+    {children}
+  </div>
+);
+
 export default function AdminAboutPage() {
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,10 +58,7 @@ export default function AdminAboutPage() {
 
   async function load() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("about_content")
-      .select("*")
-      .order("sort_order");
+    const { data, error } = await supabase.from("about_content").select("*").order("sort_order");
     if (error) toast.error(error.message);
     setSections((data ?? []) as Section[]);
     setLoading(false);
@@ -49,19 +68,193 @@ export default function AdminAboutPage() {
   function update(id: string, patch: Partial<Section>) {
     setSections((s) => s.map((x) => x.id === id ? { ...x, ...patch } : x));
   }
+  function updateData(id: string, key: string, value: unknown) {
+    setSections((s) => s.map((x) => {
+      if (x.id !== id) return x;
+      const base = (x.data && typeof x.data === "object" ? x.data : {}) as Record<string, unknown>;
+      return { ...x, data: { ...base, [key]: value } };
+    }));
+  }
 
   async function save(s: Section) {
     setSavingId(s.id);
-    let parsedData = s.data;
-    if (typeof s.data === "string") {
-      try { parsedData = s.data ? JSON.parse(s.data as string) : null; }
-      catch { toast.error("خطأ في صيغة JSON للبيانات الإضافية"); setSavingId(null); return; }
-    }
     const { error } = await supabase.from("about_content").update({
-      title: s.title, content: s.content, data: parsedData as never, published: s.published,
+      title: s.title, content: s.content,
+      data: s.data as never,
+      published: s.published,
     }).eq("id", s.id);
     setSavingId(null);
-    if (error) toast.error(error.message); else { toast.success("تم الحفظ"); load(); }
+    if (error) toast.error(error.message);
+    else { toast.success("تم الحفظ"); load(); }
+  }
+
+  // عناصر التحرير الهيكلية حسب نوع القسم
+  function renderStructured(s: Section) {
+    const data = (s.data && typeof s.data === "object" ? s.data : {}) as Record<string, unknown>;
+
+    switch (s.section_key) {
+      case "founding": {
+        const stats = (Array.isArray(data.stats) ? data.stats : []) as { label?: string; value?: string }[];
+        return (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium">الإحصائيات</label>
+              <Button type="button" size="sm" variant="outline"
+                onClick={() => updateData(s.id, "stats", [...stats, { label: "", value: "" }])}>
+                <Plus className="w-3.5 h-3.5 ml-1" /> إضافة إحصائية
+              </Button>
+            </div>
+            {stats.map((it, i) => (
+              <RowFrame key={i} index={i}
+                onRemove={() => updateData(s.id, "stats", stats.filter((_, j) => j !== i))}>
+                <div className="grid grid-cols-2 gap-2">
+                  <Field label="التسمية">
+                    <Input value={it.label ?? ""}
+                      onChange={(e) => updateData(s.id, "stats", stats.map((x, j) => j === i ? { ...x, label: e.target.value } : x))} />
+                  </Field>
+                  <Field label="القيمة">
+                    <Input value={it.value ?? ""}
+                      onChange={(e) => updateData(s.id, "stats", stats.map((x, j) => j === i ? { ...x, value: e.target.value } : x))} />
+                  </Field>
+                </div>
+              </RowFrame>
+            ))}
+          </div>
+        );
+      }
+      case "mission": {
+        const values = (Array.isArray(data.values) ? data.values : []) as { title?: string; desc?: string; icon?: string }[];
+        return (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium">القيم</label>
+              <Button type="button" size="sm" variant="outline"
+                onClick={() => updateData(s.id, "values", [...values, { title: "", desc: "", icon: "Heart" }])}>
+                <Plus className="w-3.5 h-3.5 ml-1" /> إضافة قيمة
+              </Button>
+            </div>
+            {values.map((it, i) => (
+              <RowFrame key={i} index={i}
+                onRemove={() => updateData(s.id, "values", values.filter((_, j) => j !== i))}>
+                <div className="grid grid-cols-2 gap-2">
+                  <Field label="العنوان">
+                    <Input value={it.title ?? ""}
+                      onChange={(e) => updateData(s.id, "values", values.map((x, j) => j === i ? { ...x, title: e.target.value } : x))} />
+                  </Field>
+                  <Field label="الأيقونة (اختياري)">
+                    <Input placeholder="Heart, ShieldCheck, Handshake, Lightbulb" value={it.icon ?? ""}
+                      onChange={(e) => updateData(s.id, "values", values.map((x, j) => j === i ? { ...x, icon: e.target.value } : x))} />
+                  </Field>
+                </div>
+                <Field label="الوصف">
+                  <Textarea rows={2} value={it.desc ?? ""}
+                    onChange={(e) => updateData(s.id, "values", values.map((x, j) => j === i ? { ...x, desc: e.target.value } : x))} />
+                </Field>
+              </RowFrame>
+            ))}
+          </div>
+        );
+      }
+      case "strategic": {
+        const goals = (Array.isArray(data.goals) ? data.goals : []) as { title?: string; desc?: string }[];
+        return (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium">الأهداف</label>
+              <Button type="button" size="sm" variant="outline"
+                onClick={() => updateData(s.id, "goals", [...goals, { title: "", desc: "" }])}>
+                <Plus className="w-3.5 h-3.5 ml-1" /> إضافة هدف
+              </Button>
+            </div>
+            {goals.map((it, i) => (
+              <RowFrame key={i} index={i}
+                onRemove={() => updateData(s.id, "goals", goals.filter((_, j) => j !== i))}>
+                <Field label="العنوان">
+                  <Input value={it.title ?? ""}
+                    onChange={(e) => updateData(s.id, "goals", goals.map((x, j) => j === i ? { ...x, title: e.target.value } : x))} />
+                </Field>
+                <Field label="الوصف">
+                  <Textarea rows={2} value={it.desc ?? ""}
+                    onChange={(e) => updateData(s.id, "goals", goals.map((x, j) => j === i ? { ...x, desc: e.target.value } : x))} />
+                </Field>
+              </RowFrame>
+            ))}
+          </div>
+        );
+      }
+      case "operational": {
+        const items = (Array.isArray(data.items) ? data.items : []) as string[];
+        return (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium">قائمة الأهداف التشغيلية</label>
+              <Button type="button" size="sm" variant="outline"
+                onClick={() => updateData(s.id, "items", [...items, ""])}>
+                <Plus className="w-3.5 h-3.5 ml-1" /> إضافة بند
+              </Button>
+            </div>
+            {items.map((it, i) => (
+              <div key={i} className="flex gap-2 items-start">
+                <span className="text-xs text-muted-foreground tabular-nums pt-2 w-6">{i + 1}.</span>
+                <Textarea rows={2} className="flex-1" value={it}
+                  onChange={(e) => updateData(s.id, "items", items.map((x, j) => j === i ? e.target.value : x))} />
+                <Button type="button" size="icon" variant="ghost" className="h-9 w-9 text-destructive"
+                  onClick={() => updateData(s.id, "items", items.filter((_, j) => j !== i))}>
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        );
+      }
+      case "ceo": {
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Field label="الاسم">
+              <Input value={(data.name as string) ?? ""}
+                onChange={(e) => updateData(s.id, "name", e.target.value)} />
+            </Field>
+            <Field label="المسمى الوظيفي">
+              <Input value={(data.title as string) ?? ""}
+                onChange={(e) => updateData(s.id, "title", e.target.value)} />
+            </Field>
+            <Field label="رابط الصورة (اختياري)">
+              <Input value={(data.photo_url as string) ?? ""}
+                onChange={(e) => updateData(s.id, "photo_url", e.target.value)} />
+            </Field>
+          </div>
+        );
+      }
+      case "assembly": {
+        const cards = (Array.isArray(data.cards) ? data.cards : []) as { title?: string; body?: string }[];
+        return (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium">البطاقات</label>
+              <Button type="button" size="sm" variant="outline"
+                onClick={() => updateData(s.id, "cards", [...cards, { title: "", body: "" }])}>
+                <Plus className="w-3.5 h-3.5 ml-1" /> إضافة بطاقة
+              </Button>
+            </div>
+            {cards.map((it, i) => (
+              <RowFrame key={i} index={i}
+                onRemove={() => updateData(s.id, "cards", cards.filter((_, j) => j !== i))}>
+                <Field label="العنوان">
+                  <Input value={it.title ?? ""}
+                    onChange={(e) => updateData(s.id, "cards", cards.map((x, j) => j === i ? { ...x, title: e.target.value } : x))} />
+                </Field>
+                <Field label="النص">
+                  <Textarea rows={3} value={it.body ?? ""}
+                    onChange={(e) => updateData(s.id, "cards", cards.map((x, j) => j === i ? { ...x, body: e.target.value } : x))} />
+                </Field>
+              </RowFrame>
+            ))}
+          </div>
+        );
+      }
+      default:
+        return null;
+    }
   }
 
   return (
@@ -70,51 +263,31 @@ export default function AdminAboutPage() {
         <div className="p-12 flex justify-center"><Loader2 className="w-6 h-6 animate-spin" /></div>
       ) : (
         <div className="space-y-6">
-          {sections.map((s) => {
-            const dataStr = typeof s.data === "string" ? s.data : JSON.stringify(s.data ?? null, null, 2);
-            return (
-              <Card key={s.id}>
-                <CardHeader>
-                  <CardTitle className="text-base">
-                    {KEY_LABELS[s.section_key] ?? s.section_key}
-                    <span className="text-xs text-muted-foreground font-normal mr-2">({s.section_key})</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div>
-                    <label className="text-sm font-medium mb-1 block">العنوان</label>
-                    <Input value={s.title ?? ""} onChange={(e) => update(s.id, { title: e.target.value })} />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-1 block">النص</label>
-                    <Textarea rows={5} value={s.content ?? ""} onChange={(e) => update(s.id, { content: e.target.value })} />
-                  </div>
-                  {s.data !== null && (
-                    <div>
-                      <label className="text-sm font-medium mb-1 block">
-                        بيانات إضافية (JSON) — قوائم/إحصائيات/قيم
-                      </label>
-                      <Textarea
-                        rows={8}
-                        className="font-mono text-xs"
-                        value={dataStr}
-                        onChange={(e) => update(s.id, { data: e.target.value as unknown })}
-                      />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        لا تعدّل بنية المفاتيح، فقط القيم النصية بداخلها.
-                      </p>
-                    </div>
-                  )}
-                  <div className="flex justify-end pt-2">
-                    <Button onClick={() => save(s)} disabled={savingId === s.id} size="sm">
-                      {savingId === s.id ? <Loader2 className="w-4 h-4 ml-1 animate-spin" /> : <Save className="w-4 h-4 ml-1" />}
-                      حفظ القسم
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+          {sections.map((s) => (
+            <Card key={s.id}>
+              <CardHeader>
+                <CardTitle className="text-base">
+                  {KEY_LABELS[s.section_key] ?? s.section_key}
+                  <span className="text-xs text-muted-foreground font-normal mr-2">({s.section_key})</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Field label="العنوان">
+                  <Input value={s.title ?? ""} onChange={(e) => update(s.id, { title: e.target.value })} />
+                </Field>
+                <Field label="النص">
+                  <Textarea rows={5} value={s.content ?? ""} onChange={(e) => update(s.id, { content: e.target.value })} />
+                </Field>
+                {s.data !== null && renderStructured(s)}
+                <div className="flex justify-end pt-2">
+                  <Button onClick={() => save(s)} disabled={savingId === s.id} size="sm">
+                    {savingId === s.id ? <Loader2 className="w-4 h-4 ml-1 animate-spin" /> : <Save className="w-4 h-4 ml-1" />}
+                    حفظ القسم
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       )}
     </AdminLayout>
