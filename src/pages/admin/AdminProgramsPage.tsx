@@ -14,6 +14,7 @@ type Program = {
   cover_image_url: string | null;
   published: boolean;
   sort_order: number;
+  featured: boolean;
 };
 
 const slugify = (s: string) =>
