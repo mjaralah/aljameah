@@ -40,6 +40,7 @@ import AdminFeedbackPage from "./pages/admin/AdminFeedbackPage.tsx";
 import AdminAboutPage from "./pages/admin/AdminAboutPage.tsx";
 import AdminSurveysPage from "./pages/admin/AdminSurveysPage.tsx";
 import AdminLegalPagesPage from "./pages/admin/AdminLegalPagesPage.tsx";
+import AdminPageContentPage from "./pages/admin/AdminPageContentPage.tsx";
 import { ProtectedAdminRoute } from "./components/admin/ProtectedAdminRoute.tsx";
 
 const queryClient = new QueryClient();
