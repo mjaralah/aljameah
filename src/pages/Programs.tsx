@@ -110,11 +110,15 @@ const Programs = () => {
                     <div className="h-14 w-14 rounded-2xl bg-gradient-primary text-primary-foreground grid place-items-center shadow-soft group-hover:scale-110 transition-smooth">
                       <Icon className="h-7 w-7" />
                     </div>
-                    {p.category && (
+                    {p.featured ? (
+                      <Badge className="bg-accent text-accent-foreground border-0 font-bold shadow-gold">
+                        ★ مُبرز
+                      </Badge>
+                    ) : p.category ? (
                       <Badge variant="secondary" className="bg-accent-soft text-accent border-0 font-bold">
                         {t.pages.programsPage.categories[p.category]}
                       </Badge>
-                    )}
+                    ) : null}
                   </div>
                   <h3 className="text-lg font-bold text-primary mb-2">{p.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed mb-4 flex-1">
