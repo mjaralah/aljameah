@@ -354,9 +354,10 @@ const DocsPanel = ({
       {docs.map((d) => (
         <DocCard
           key={d.id}
-          title={tx(d.title)}
+          title={typeof d.title === "string" ? d.title : tx(d.title)}
           year={d.year}
           fileName={d.fileName}
+          fileUrl={d.fileUrl}
           downloadLabel={downloadLabel}
         />
       ))}
@@ -368,11 +369,13 @@ const DocCard = ({
   title,
   year,
   fileName,
+  fileUrl,
   downloadLabel,
 }: {
   title: string;
   year: number;
   fileName: string;
+  fileUrl?: string;
   downloadLabel: string;
 }) => (
   <Card className="p-4 group hover:shadow-soft hover:border-accent/50 transition-smooth flex items-start gap-3">
@@ -387,14 +390,22 @@ const DocCard = ({
         </Badge>
         <span className="text-[11px] text-muted-foreground truncate">{fileName}</span>
       </div>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="mt-3 -ms-2 h-8 text-primary hover:text-primary-foreground hover:bg-primary"
-      >
-        <Download className="h-3.5 w-3.5" />
-        <span className="text-xs font-semibold">{downloadLabel}</span>
-      </Button>
+      {fileUrl ? (
+        <a
+          href={fileUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 -ms-2 h-8 px-3 text-primary hover:text-primary-foreground hover:bg-primary inline-flex items-center gap-1.5 rounded-md transition-smooth"
+        >
+          <Download className="h-3.5 w-3.5" />
+          <span className="text-xs font-semibold">{downloadLabel}</span>
+        </a>
+      ) : (
+        <Button variant="ghost" size="sm" className="mt-3 -ms-2 h-8 text-primary hover:text-primary-foreground hover:bg-primary">
+          <Download className="h-3.5 w-3.5" />
+          <span className="text-xs font-semibold">{downloadLabel}</span>
+        </Button>
+      )}
     </div>
   </Card>
 );
