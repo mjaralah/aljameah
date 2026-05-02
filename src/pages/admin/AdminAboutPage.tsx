@@ -8,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Save, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { IconPicker } from "@/components/admin/IconPicker";
+import { MediaUpload } from "@/components/admin/MediaUpload";
 
 type AnyData = Record<string, unknown> | null;
 
@@ -142,8 +144,10 @@ export default function AdminAboutPage() {
                       onChange={(e) => updateData(s.id, "values", values.map((x, j) => j === i ? { ...x, title: e.target.value } : x))} />
                   </Field>
                   <Field label="الأيقونة (اختياري)">
-                    <Input placeholder="Heart, ShieldCheck, Handshake, Lightbulb" value={it.icon ?? ""}
-                      onChange={(e) => updateData(s.id, "values", values.map((x, j) => j === i ? { ...x, icon: e.target.value } : x))} />
+                    <IconPicker
+                      value={it.icon}
+                      onChange={(name) => updateData(s.id, "values", values.map((x, j) => j === i ? { ...x, icon: name } : x))}
+                    />
                   </Field>
                 </div>
                 <Field label="الوصف">
@@ -218,10 +222,14 @@ export default function AdminAboutPage() {
               <Input value={(data.title as string) ?? ""}
                 onChange={(e) => updateData(s.id, "title", e.target.value)} />
             </Field>
-            <Field label="رابط الصورة (اختياري)">
-              <Input value={(data.photo_url as string) ?? ""}
-                onChange={(e) => updateData(s.id, "photo_url", e.target.value)} />
-            </Field>
+            <div className="md:col-span-2">
+              <MediaUpload
+                label="الصورة الشخصية (اختياري)"
+                folder="about/ceo"
+                value={(data.photo_url as string) ?? null}
+                onChange={(url) => updateData(s.id, "photo_url", url)}
+              />
+            </div>
           </div>
         );
       }
