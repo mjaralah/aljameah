@@ -58,7 +58,7 @@ export default function AdminAboutPage() {
       catch { toast.error("خطأ في صيغة JSON للبيانات الإضافية"); setSavingId(null); return; }
     }
     const { error } = await supabase.from("about_content").update({
-      title: s.title, content: s.content, data: parsedData, published: s.published,
+      title: s.title, content: s.content, data: parsedData as never, published: s.published,
     }).eq("id", s.id);
     setSavingId(null);
     if (error) toast.error(error.message); else { toast.success("تم الحفظ"); load(); }

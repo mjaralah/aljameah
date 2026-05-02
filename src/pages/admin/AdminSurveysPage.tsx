@@ -65,7 +65,7 @@ export default function AdminSurveysPage() {
     ]);
     setSurveys((s ?? []) as Survey[]);
     const grouped: Record<string, Question[]> = {};
-    (q ?? []).forEach((qq: Question) => {
+    ((q ?? []) as unknown as Question[]).forEach((qq) => {
       grouped[qq.survey_id] = grouped[qq.survey_id] ?? [];
       grouped[qq.survey_id].push(qq);
     });
