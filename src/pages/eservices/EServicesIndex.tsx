@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { usePageContent } from "@/hooks/usePublicContent";
 import { cn } from "@/lib/utils";
 
 type Audience = "all" | "individuals" | "entities" | "inquiries";
