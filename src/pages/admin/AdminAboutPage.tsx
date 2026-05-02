@@ -222,10 +222,14 @@ export default function AdminAboutPage() {
               <Input value={(data.title as string) ?? ""}
                 onChange={(e) => updateData(s.id, "title", e.target.value)} />
             </Field>
-            <Field label="رابط الصورة (اختياري)">
-              <Input value={(data.photo_url as string) ?? ""}
-                onChange={(e) => updateData(s.id, "photo_url", e.target.value)} />
-            </Field>
+            <div className="md:col-span-2">
+              <MediaUpload
+                label="الصورة الشخصية (اختياري)"
+                folder="about/ceo"
+                value={(data.photo_url as string) ?? null}
+                onChange={(url) => updateData(s.id, "photo_url", url)}
+              />
+            </div>
           </div>
         );
       }
