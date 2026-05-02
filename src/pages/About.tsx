@@ -23,7 +23,8 @@ import { PageFeedback } from "@/components/layout/PageFeedback";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { board } from "@/data/board";
+import { board as fallbackBoard } from "@/data/board";
+import { useBoardMembers } from "@/hooks/usePublicContent";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ceoPortrait from "@/assets/ceo-portrait.jpg";
 
@@ -74,7 +75,24 @@ const values = [
 const About = () => {
   const { t } = useLanguage();
   const [active, setActive] = useState<string>("founding");
+  const { data: dbBoard } = useBoardMembers();
 
+  // مزج بيانات قاعدة البيانات مع الاحتياطية
+  const boardItems = (dbBoard && dbBoard.length > 0)
+    ? dbBoard.map((m) => ({
+        id: m.id,
+        name: m.full_name,
+        role: m.position,
+        bio: m.bio ?? "",
+        photo: m.photo_url,
+      }))
+    : fallbackBoard.map((m) => ({
+        id: m.id,
+        name: m.name.ar,
+        role: m.role.ar,
+        bio: m.bio.ar,
+        photo: undefined as string | undefined,
+      }));
   // مراقبة أقسام الصفحة لإبراز العنصر النشط في القائمة الجانبية
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -261,21 +279,25 @@ const About = () => {
                 الخبرات والتخصصات.
               </p>
               <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-4 mt-6">
-                {board.map((m) => (
+                {boardItems.map((m) => (
                   <div
                     key={m.id}
                     className="flex items-start gap-4 bg-card border border-border rounded-xl p-5 hover:shadow-card transition-smooth"
                   >
-                    <div className="h-14 w-14 shrink-0 rounded-full bg-gradient-primary text-primary-foreground grid place-items-center font-bold text-lg">
-                      {m.name.ar.split(" ").slice(-1)[0][0]}
+                    <div className="h-14 w-14 shrink-0 rounded-full bg-gradient-primary text-primary-foreground grid place-items-center font-bold text-lg overflow-hidden">
+                      {m.photo ? (
+                        <img src={m.photo} alt={m.name} className="h-full w-full object-cover" loading="lazy" />
+                      ) : (
+                        m.name.split(" ").slice(-1)[0][0]
+                      )}
                     </div>
                     <div className="min-w-0">
-                      <h4 className="font-bold text-primary">{m.name.ar}</h4>
+                      <h4 className="font-bold text-primary">{m.name}</h4>
                       <Badge variant="secondary" className="mt-1 mb-2 text-xs">
-                        {m.role.ar}
+                        {m.role}
                       </Badge>
                       <p className="text-sm text-muted-foreground leading-relaxed">
-                        {m.bio.ar}
+                        {m.bio}
                       </p>
                     </div>
                   </div>
