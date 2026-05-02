@@ -144,8 +144,10 @@ export default function AdminAboutPage() {
                       onChange={(e) => updateData(s.id, "values", values.map((x, j) => j === i ? { ...x, title: e.target.value } : x))} />
                   </Field>
                   <Field label="الأيقونة (اختياري)">
-                    <Input placeholder="Heart, ShieldCheck, Handshake, Lightbulb" value={it.icon ?? ""}
-                      onChange={(e) => updateData(s.id, "values", values.map((x, j) => j === i ? { ...x, icon: e.target.value } : x))} />
+                    <IconPicker
+                      value={it.icon}
+                      onChange={(name) => updateData(s.id, "values", values.map((x, j) => j === i ? { ...x, icon: name } : x))}
+                    />
                   </Field>
                 </div>
                 <Field label="الوصف">
