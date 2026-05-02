@@ -24,7 +24,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { board as fallbackBoard } from "@/data/board";
-import { useBoardMembers } from "@/hooks/usePublicContent";
+import { useBoardMembers, useAboutContent, type DBAboutSection } from "@/hooks/usePublicContent";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ceoPortrait from "@/assets/ceo-portrait.jpg";
 
@@ -76,6 +76,29 @@ const About = () => {
   const { t } = useLanguage();
   const [active, setActive] = useState<string>("founding");
   const { data: dbBoard } = useBoardMembers();
+  const { data: dbAbout } = useAboutContent();
+
+  // Map about_content rows by section_key for easy access
+  const aboutMap = (dbAbout ?? []).reduce<Record<string, DBAboutSection>>((acc, s) => {
+    acc[s.section_key] = s;
+    return acc;
+  }, {});
+  const get = (key: string, fallback: string) => aboutMap[key]?.content ?? fallback;
+  const getTitle = (key: string, fallback: string) => aboutMap[key]?.title ?? fallback;
+  const getData = <T,>(key: string, fallback: T): T => {
+    const d = aboutMap[key]?.data;
+    return (d ?? fallback) as T;
+  };
+
+  const dbStrategicGoals = getData<{ title: string; desc: string }[]>("strategic", []).length
+    ? getData<{ goals: { title: string; desc: string }[] }>("strategic", { goals: [] }).goals
+    : strategicGoals.map((g) => ({ title: g.t, desc: g.d }));
+  const dbOperationalGoals = getData<{ items: string[] }>("operational", { items: operationalGoals }).items;
+  const dbValues = getData<{ values: { icon: string; title: string; desc: string }[] }>("mission", { values: [] }).values;
+  const valuesIconMap: Record<string, React.ComponentType<{ className?: string }>> = { Heart, ShieldCheck, Handshake, Lightbulb };
+  const dbAssemblyCards = getData<{ cards: { title: string; body: string }[] }>("assembly", { cards: [] }).cards;
+  const dbFoundingStats = getData<{ stats: { value: string; label: string }[] }>("founding", { stats: [] }).stats;
+  const ceoData = getData<{ name: string; title: string; photo_url: string | null }>("ceo", { name: "أ. فيصل عبدالعزيز", title: "المدير التنفيذي", photo_url: null });
 
   // مزج بيانات قاعدة البيانات مع الاحتياطية
   const boardItems = (dbBoard && dbBoard.length > 0)
