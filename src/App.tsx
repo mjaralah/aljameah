@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider, useLanguage } from "@/contexts/LanguageContext";
 import { A11yProvider } from "@/contexts/A11yContext";
+import { SiteSettingsProvider } from "@/contexts/SiteSettingsContext";
 import { Layout } from "@/components/layout/Layout";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -92,6 +93,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
       <A11yProvider>
+        <SiteSettingsProvider>
         <TooltipProvider>
           <Toaster />
           <Sonner />
@@ -217,6 +219,7 @@ const App = () => (
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
+        </SiteSettingsProvider>
       </A11yProvider>
     </LanguageProvider>
   </QueryClientProvider>
