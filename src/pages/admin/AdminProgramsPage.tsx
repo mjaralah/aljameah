@@ -40,6 +40,11 @@ export default function AdminProgramsPage() {
         },
         { key: "title", label: "اسم البرنامج", className: "font-medium" },
         { key: "sort_order", label: "الترتيب" },
+        {
+          key: "featured",
+          label: "مُبرز",
+          render: (r) => (r.featured ? "★" : "—"),
+        },
       ]}
       createDefaults={() => ({
         title: "",
@@ -50,6 +55,7 @@ export default function AdminProgramsPage() {
         cover_image_url: null,
         published: true,
         sort_order: 0,
+        featured: false,
       })}
       validate={(v) => {
         if (!v.title?.trim()) return "اسم البرنامج مطلوب";
