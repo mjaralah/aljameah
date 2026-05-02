@@ -8,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Save, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { IconPicker } from "@/components/admin/IconPicker";
+import { MediaUpload } from "@/components/admin/MediaUpload";
 
 type AnyData = Record<string, unknown> | null;
 
