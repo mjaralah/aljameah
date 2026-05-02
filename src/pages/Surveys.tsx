@@ -9,12 +9,52 @@ import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { surveys } from "@/data";
+import { surveys as fallbackSurveys } from "@/data";
+import { useSurveys, usePageContent } from "@/hooks/usePublicContent";
+import { supabase } from "@/integrations/supabase/client";
 import { PageHero } from "@/components/layout/PageHero";
 import { PageFeedback } from "@/components/layout/PageFeedback";
-import type { Survey } from "@/types";
+import type { Survey, SurveyQuestion, SurveyQuestionType, LocalizedText } from "@/types";
 import { cn } from "@/lib/utils";
 import { getSurveyMetrics, saveSurveyResponse } from "@/lib/surveyResults";
+
+// تحويل صف من قاعدة البيانات إلى شكل Survey المحلي
+function toLocalized(v: any): LocalizedText {
+  if (v == null) return { ar: "", en: "" };
+  if (typeof v === "string") return { ar: v, en: v };
+  return { ar: v.ar ?? "", en: v.en ?? v.ar ?? "" };
+}
+function mapDbSurvey(row: any): Survey {
+  const questions: SurveyQuestion[] = (row.survey_questions ?? [])
+    .slice()
+    .sort((a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+    .map((q: any) => ({
+      id: q.id,
+      type: q.type as SurveyQuestionType,
+      question: toLocalized(q.question),
+      options: Array.isArray(q.options?.items)
+        ? q.options.items.map(toLocalized)
+        : Array.isArray(q.options)
+          ? q.options.map(toLocalized)
+          : undefined,
+      scale: Array.isArray(q.scale?.items)
+        ? q.scale.items.map(toLocalized)
+        : Array.isArray(q.scale)
+          ? q.scale.map(toLocalized)
+          : undefined,
+      required: !!q.required,
+    }));
+  return {
+    id: row.id,
+    title: toLocalized(row.title),
+    description: toLocalized(row.description),
+    status: (row.status === "closed" ? "closed" : "active"),
+    endsAt: row.ends_at || new Date().toISOString(),
+    participants: row.participants ?? 0,
+    questions,
+    showPublicResults: !!row.show_public_results,
+  };
+}
 
 const SurveysPage = () => {
   const { t, tx, lang, dir } = useLanguage();
