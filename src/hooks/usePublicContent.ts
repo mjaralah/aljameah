@@ -34,6 +34,7 @@ export type DBProgram = {
   icon: string | null;
   cover_image_url: string | null;
   sort_order: number;
+  featured?: boolean;
 };
 
 export type DBPartner = {
