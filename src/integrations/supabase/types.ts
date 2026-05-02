@@ -496,6 +496,7 @@ export type Database = {
           cover_image_url: string | null
           created_at: string
           description: string | null
+          featured: boolean
           icon: string | null
           id: string
           long_description: string | null
@@ -509,6 +510,7 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
+          featured?: boolean
           icon?: string | null
           id?: string
           long_description?: string | null
@@ -522,6 +524,7 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
+          featured?: boolean
           icon?: string | null
           id?: string
           long_description?: string | null
