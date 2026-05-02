@@ -258,6 +258,33 @@ export function useSurveys() {
   });
 }
 
+export type DBPageSection = {
+  id: string;
+  page_key: string;
+  section_key: string;
+  title: string | null;
+  content: string | null;
+  data: any;
+  sort_order: number;
+};
+
+export function usePageContent(pageKey: string) {
+  return useQuery({
+    queryKey: ["public", "page_content", pageKey],
+    staleTime: STALE,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("page_content")
+        .select("*")
+        .eq("page_key", pageKey)
+        .eq("published", true)
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as DBPageSection[];
+    },
+  });
+}
+
 export function useLegalPage(slug: string) {
   return useQuery({
     queryKey: ["public", "legal_pages", slug],
