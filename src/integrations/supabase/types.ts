@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      about_content: {
+        Row: {
+          content: string | null
+          created_at: string
+          data: Json | null
+          id: string
+          published: boolean
+          section_key: string
+          sort_order: number
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          data?: Json | null
+          id?: string
+          published?: boolean
+          section_key: string
+          sort_order?: number
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          data?: Json | null
+          id?: string
+          published?: boolean
+          section_key?: string
+          sort_order?: number
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       board_members: {
         Row: {
           bio: string | null
@@ -204,6 +240,36 @@ export type Database = {
           published?: boolean
           sort_order?: number
           subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      legal_pages: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          published: boolean
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          published?: boolean
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          published?: boolean
+          slug?: string
           title?: string
           updated_at?: string
         }
@@ -478,6 +544,124 @@ export type Database = {
           social_linkedin?: string | null
           social_twitter?: string | null
           social_youtube?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      survey_questions: {
+        Row: {
+          created_at: string
+          id: string
+          options: Json | null
+          question: string
+          required: boolean
+          scale: Json | null
+          sort_order: number
+          survey_id: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          options?: Json | null
+          question: string
+          required?: boolean
+          scale?: Json | null
+          sort_order?: number
+          survey_id: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          options?: Json | null
+          question?: string
+          required?: boolean
+          scale?: Json | null
+          sort_order?: number
+          survey_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "survey_questions_survey_id_fkey"
+            columns: ["survey_id"]
+            isOneToOne: false
+            referencedRelation: "surveys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      survey_responses: {
+        Row: {
+          answers: Json
+          id: string
+          submitted_at: string
+          survey_id: string
+        }
+        Insert: {
+          answers: Json
+          id?: string
+          submitted_at?: string
+          survey_id: string
+        }
+        Update: {
+          answers?: Json
+          id?: string
+          submitted_at?: string
+          survey_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "survey_responses_survey_id_fkey"
+            columns: ["survey_id"]
+            isOneToOne: false
+            referencedRelation: "surveys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      surveys: {
+        Row: {
+          created_at: string
+          description: string | null
+          ends_at: string | null
+          id: string
+          participants: number
+          published: boolean
+          show_public_results: boolean
+          slug: string
+          sort_order: number
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          participants?: number
+          published?: boolean
+          show_public_results?: boolean
+          slug: string
+          sort_order?: number
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          participants?: number
+          published?: boolean
+          show_public_results?: boolean
+          slug?: string
+          sort_order?: number
+          status?: string
+          title?: string
           updated_at?: string
         }
         Relationships: []
