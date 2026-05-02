@@ -103,10 +103,14 @@ export default function AdminProgramsPage() {
               <Label>الترتيب</Label>
               <Input type="number" value={v.sort_order ?? 0} onChange={(e) => set("sort_order", Number(e.target.value))} />
             </div>
-            <div className="flex items-end gap-2">
+            <div className="flex items-end gap-4">
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" checked={!!v.published} onChange={(e) => set("published", e.target.checked)} />
                 منشور
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                <input type="checkbox" checked={!!v.featured} onChange={(e) => set("featured", e.target.checked)} />
+                إبراز (مميز)
               </label>
             </div>
           </div>
