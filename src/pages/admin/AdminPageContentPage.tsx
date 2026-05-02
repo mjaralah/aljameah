@@ -27,6 +27,7 @@ const PAGES: { key: string; label: string; description: string }[] = [
   { key: "contact", label: "تواصل معنا", description: "نصوص ومعلومات صفحة التواصل" },
   { key: "eservices", label: "الخدمات الإلكترونية", description: "نصوص وقائمة الخدمات المعروضة" },
   { key: "media", label: "المركز الإعلامي", description: "النصوص التعريفية للأقسام الإعلامية" },
+  { key: "surveys", label: "الاستبيانات", description: "النص التعريفي لصفحة الاستبيانات" },
 ];
 
 // تسميات ودية لمفاتيح الأقسام
