@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { programs as fallbackPrograms } from "@/data";
-import { usePrograms } from "@/hooks/usePublicContent";
+import { usePrograms, usePageContent } from "@/hooks/usePublicContent";
 import { PageHero } from "@/components/layout/PageHero";
 import { PageFeedback } from "@/components/layout/PageFeedback";
 import { cn } from "@/lib/utils";
@@ -27,6 +27,8 @@ const Programs = () => {
   const { t, tx, dir } = useLanguage();
   const [active, setActive] = useState<Program["category"] | "all">("all");
   const { data: dbPrograms } = usePrograms();
+  const { data: pageSections } = usePageContent("programs");
+  const intro = (pageSections ?? []).find((s) => s.section_key === "intro");
 
   const useDb = !!(dbPrograms && dbPrograms.length > 0);
 
@@ -60,9 +62,9 @@ const Programs = () => {
     <>
       <PageHero
         eyebrow={t.nav.programs}
-        title={t.pages.programsPage.heading}
-        lead={t.pages.programsPage.lead}
-        breadcrumb={[{ label: t.nav.programs }]}
+        title={intro?.title || t.pages.programsPage.heading}
+        lead={intro?.content || t.pages.programsPage.lead}
+        breadcrumb={[{ label: intro?.title || t.nav.programs }]}
       />
 
       <section className="container py-12 md:py-16">
