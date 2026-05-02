@@ -27,6 +27,8 @@ const Programs = () => {
   const { t, tx, dir } = useLanguage();
   const [active, setActive] = useState<Program["category"] | "all">("all");
   const { data: dbPrograms } = usePrograms();
+  const { data: pageSections } = usePageContent("programs");
+  const intro = (pageSections ?? []).find((s) => s.section_key === "intro");
 
   const useDb = !!(dbPrograms && dbPrograms.length > 0);
 
