@@ -66,9 +66,9 @@ const Media = () => {
     <>
       <PageHero
         eyebrow={t.nav.media}
-        title={t.pages.media.heading}
-        lead={t.pages.media.lead}
-        breadcrumb={[{ label: t.nav.media }]}
+        title={intro?.title || t.pages.media.heading}
+        lead={intro?.content || t.pages.media.lead}
+        breadcrumb={[{ label: intro?.title || t.nav.media }]}
       />
 
       <section className="container py-12 md:py-16">
