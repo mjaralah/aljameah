@@ -14,6 +14,7 @@ type Program = {
   cover_image_url: string | null;
   published: boolean;
   sort_order: number;
+  featured: boolean;
 };
 
 const slugify = (s: string) =>
@@ -39,6 +40,11 @@ export default function AdminProgramsPage() {
         },
         { key: "title", label: "اسم البرنامج", className: "font-medium" },
         { key: "sort_order", label: "الترتيب" },
+        {
+          key: "featured",
+          label: "مُبرز",
+          render: (r) => (r.featured ? "★" : "—"),
+        },
       ]}
       createDefaults={() => ({
         title: "",
@@ -49,6 +55,7 @@ export default function AdminProgramsPage() {
         cover_image_url: null,
         published: true,
         sort_order: 0,
+        featured: false,
       })}
       validate={(v) => {
         if (!v.title?.trim()) return "اسم البرنامج مطلوب";
@@ -96,10 +103,14 @@ export default function AdminProgramsPage() {
               <Label>الترتيب</Label>
               <Input type="number" value={v.sort_order ?? 0} onChange={(e) => set("sort_order", Number(e.target.value))} />
             </div>
-            <div className="flex items-end gap-2">
+            <div className="flex items-end gap-4">
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" checked={!!v.published} onChange={(e) => set("published", e.target.checked)} />
                 منشور
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                <input type="checkbox" checked={!!v.featured} onChange={(e) => set("featured", e.target.checked)} />
+                إبراز (مميز)
               </label>
             </div>
           </div>
