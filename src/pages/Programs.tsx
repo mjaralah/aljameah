@@ -62,9 +62,9 @@ const Programs = () => {
     <>
       <PageHero
         eyebrow={t.nav.programs}
-        title={t.pages.programsPage.heading}
-        lead={t.pages.programsPage.lead}
-        breadcrumb={[{ label: t.nav.programs }]}
+        title={intro?.title || t.pages.programsPage.heading}
+        lead={intro?.content || t.pages.programsPage.lead}
+        breadcrumb={[{ label: intro?.title || t.nav.programs }]}
       />
 
       <section className="container py-12 md:py-16">
