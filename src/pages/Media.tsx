@@ -4,25 +4,59 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { news } from "@/data";
+import { news as fallbackNews } from "@/data";
+import { useNews } from "@/hooks/usePublicContent";
 import { PageHero } from "@/components/layout/PageHero";
 import { PageFeedback } from "@/components/layout/PageFeedback";
 import { cn } from "@/lib/utils";
+import news1 from "@/assets/news-1.jpg";
+
+type Item = {
+  id: string;
+  title: string;
+  excerpt: string;
+  image: string;
+  date: string;
+  category: string;
+};
 
 const Media = () => {
   const { t, tx, lang, dir } = useLanguage();
   const [filter, setFilter] = useState<string>("all");
   const [q, setQ] = useState("");
+  const { data: dbNews } = useNews();
+
+  // مزج بيانات قاعدة البيانات مع الاحتياطية
+  const items: Item[] = useMemo(() => {
+    if (dbNews && dbNews.length > 0) {
+      return dbNews.map((n) => ({
+        id: n.id,
+        title: n.title,
+        excerpt: n.excerpt ?? "",
+        image: n.cover_image_url || news1,
+        date: n.published_at || n.created_at,
+        category: n.category ?? "",
+      }));
+    }
+    return fallbackNews.map((n) => ({
+      id: n.id,
+      title: tx(n.title),
+      excerpt: tx(n.excerpt),
+      image: n.image,
+      date: n.date,
+      category: tx(n.category),
+    }));
+  }, [dbNews, tx]);
 
   const cats = useMemo(() => {
-    const map = new Map<string, string>();
-    news.forEach((n) => map.set(tx(n.category), tx(n.category)));
-    return Array.from(map.keys());
-  }, [tx]);
+    const set = new Set<string>();
+    items.forEach((n) => n.category && set.add(n.category));
+    return Array.from(set);
+  }, [items]);
 
-  const filtered = news.filter((n) => {
-    const okCat = filter === "all" || tx(n.category) === filter;
-    const okQ = !q || tx(n.title).toLowerCase().includes(q.toLowerCase()) || tx(n.excerpt).toLowerCase().includes(q.toLowerCase());
+  const filtered = items.filter((n) => {
+    const okCat = filter === "all" || n.category === filter;
+    const okQ = !q || n.title.toLowerCase().includes(q.toLowerCase()) || n.excerpt.toLowerCase().includes(q.toLowerCase());
     return okCat && okQ;
   });
 
@@ -36,7 +70,6 @@ const Media = () => {
       />
 
       <section className="container py-12 md:py-16">
-        {/* أدوات التحكم */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="relative md:w-80">
             <Search className="h-4 w-4 absolute top-1/2 -translate-y-1/2 start-3 text-muted-foreground" />
@@ -65,13 +98,15 @@ const Media = () => {
                 <div className="aspect-[16/10] overflow-hidden bg-muted relative">
                   <img
                     src={n.image}
-                    alt={tx(n.title)}
+                    alt={n.title}
                     loading="lazy"
                     className="h-full w-full object-cover group-hover:scale-105 transition-smooth"
                   />
-                  <Badge className="absolute top-3 start-3 bg-accent text-accent-foreground border-0 font-bold shadow-gold">
-                    {tx(n.category)}
-                  </Badge>
+                  {n.category && (
+                    <Badge className="absolute top-3 start-3 bg-accent text-accent-foreground border-0 font-bold shadow-gold">
+                      {n.category}
+                    </Badge>
+                  )}
                 </div>
                 <div className="p-5 flex flex-col flex-1">
                   <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
@@ -80,8 +115,8 @@ const Media = () => {
                       year: "numeric", month: "short", day: "numeric",
                     })}
                   </div>
-                  <h3 className="font-bold text-primary mb-2 line-clamp-2">{tx(n.title)}</h3>
-                  <p className="text-sm text-muted-foreground line-clamp-3 mb-4 flex-1">{tx(n.excerpt)}</p>
+                  <h3 className="font-bold text-primary mb-2 line-clamp-2">{n.title}</h3>
+                  <p className="text-sm text-muted-foreground line-clamp-3 mb-4 flex-1">{n.excerpt}</p>
                   <button className="text-sm font-semibold text-accent hover:underline inline-flex items-center gap-1 self-start">
                     {t.pages.media.readArticle}
                     <ArrowLeft className={dir === "rtl" ? "h-3.5 w-3.5" : "h-3.5 w-3.5 rotate-180"} />
