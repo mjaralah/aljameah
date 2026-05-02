@@ -158,6 +158,12 @@ const TAB_DEFS: { key: Audience; ar: string; en: string; icon: LucideIcon }[] = 
   { key: "inquiries", ar: "استفسارات", en: "Inquiries", icon: HelpCircle },
 ];
 
+function resolveIcon(name?: string): LucideIcon {
+  if (!name) return Sparkles;
+  const Comp = (LucideIcons as any)[name];
+  return (Comp as LucideIcon) || Sparkles;
+}
+
 export default function EServicesIndex() {
   const { lang, tx } = useLanguage();
   const isAr = lang === "ar";
@@ -165,26 +171,42 @@ export default function EServicesIndex() {
   const [query, setQuery] = useState("");
   const { data: pageSections } = usePageContent("eservices");
   const intro = (pageSections ?? []).find((s) => s.section_key === "intro");
+  const servicesSection = (pageSections ?? []).find((s) => s.section_key === "services_list");
+
+  const services: ServiceItem[] = useMemo(() => {
+    const items: any[] = Array.isArray(servicesSection?.data?.items) ? servicesSection!.data.items : [];
+    if (items.length === 0) return SERVICES;
+    return items.map((it) => ({
+      to: it.url || undefined,
+      title: { ar: it.title ?? "", en: it.title ?? "" },
+      desc: { ar: it.description ?? "", en: it.description ?? "" },
+      icon: resolveIcon(it.icon),
+      audience: (["individuals", "entities", "inquiries"].includes(it.audience) ? it.audience : "individuals") as Exclude<Audience, "all">,
+      status: (it.status === "soon" ? "soon" : "available") as Status,
+      duration: { ar: it.duration ?? "", en: it.duration ?? "" },
+      featured: !!it.featured,
+    }));
+  }, [servicesSection]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return SERVICES.filter((s) => {
+    return services.filter((s) => {
       const inTab = tab === "all" || s.audience === tab;
       if (!inTab) return false;
       if (!q) return true;
       const hay = `${s.title.ar} ${s.title.en} ${s.desc.ar} ${s.desc.en}`.toLowerCase();
       return hay.includes(q);
     });
-  }, [tab, query]);
+  }, [tab, query, services]);
 
-  const featured = SERVICES.filter((s) => s.featured);
+  const featured = services.filter((s) => s.featured);
   const Arrow = isAr ? ArrowLeft : ArrowRight;
 
   const counts = useMemo(() => {
-    const c: Record<Audience, number> = { all: SERVICES.length, individuals: 0, entities: 0, inquiries: 0 };
-    SERVICES.forEach((s) => (c[s.audience] += 1));
+    const c: Record<Audience, number> = { all: services.length, individuals: 0, entities: 0, inquiries: 0 };
+    services.forEach((s) => (c[s.audience] += 1));
     return c;
-  }, []);
+  }, [services]);
 
   return (
     <>
