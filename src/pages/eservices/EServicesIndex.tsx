@@ -20,6 +20,7 @@ import {
   Building2,
   type LucideIcon,
 } from "lucide-react";
+import * as LucideIcons from "lucide-react";
 import { PageHero } from "@/components/layout/PageHero";
 import { PageFeedback } from "@/components/layout/PageFeedback";
 import { Card } from "@/components/ui/card";
