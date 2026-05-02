@@ -112,13 +112,14 @@ export default function Contact() {
   });
   const [errors, setErrors] = useState<Partial<Record<keyof ContactForm, string>>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
 
   const update = <K extends keyof ContactForm>(k: K, v: ContactForm[K]) => {
     setForm((f) => ({ ...f, [k]: v }));
     if (errors[k]) setErrors((e) => ({ ...e, [k]: undefined }));
   };
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const res = contactSchema.safeParse(form);
     if (!res.success) {
@@ -131,6 +132,22 @@ export default function Contact() {
       toast({ title: "تحقق من البيانات", description: "يرجى تصحيح الحقول المظللة", variant: "destructive" });
       return;
     }
+
+    setSending(true);
+    const { error } = await supabase.from("contact_messages").insert({
+      full_name: form.fullName,
+      phone: form.phone,
+      email: form.email,
+      purpose: form.purpose,
+      message: form.message,
+    });
+    setSending(false);
+
+    if (error) {
+      toast({ title: "تعذّر إرسال الرسالة", description: error.message, variant: "destructive" });
+      return;
+    }
+
     setSubmitted(true);
     toast({ title: "تم استلام رسالتك بنجاح", description: "سنتواصل معك خلال 48 ساعة" });
   };
@@ -403,10 +420,11 @@ export default function Contact() {
                   </p>
                   <Button
                     type="submit"
+                    disabled={sending}
                     className="gap-2 bg-gradient-primary hover:opacity-90 px-8"
                   >
                     <Send className="h-4 w-4" />
-                    إرسال الرسالة
+                    {sending ? "جاري الإرسال..." : "إرسال الرسالة"}
                   </Button>
                 </div>
               </div>
