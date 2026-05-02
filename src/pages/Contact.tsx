@@ -104,6 +104,15 @@ const socials = [
 
 export default function Contact() {
   const { toast } = useToast();
+  const { data: pageSections } = usePageContent("contact");
+  const sectionMap = (pageSections ?? []).reduce<Record<string, any>>(
+    (acc, s) => ({ ...acc, [s.section_key]: s }),
+    {},
+  );
+  const intro = sectionMap.intro;
+  const hours = sectionMap.hours;
+  const mapSec = sectionMap.map;
+
   const [form, setForm] = useState<ContactForm>({
     fullName: "",
     phone: "",
