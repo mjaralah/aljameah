@@ -21,6 +21,7 @@ import {
   Info,
   ClipboardList,
   Scale,
+  LayoutTemplate,
 } from "lucide-react";
 import {
   Sidebar,
