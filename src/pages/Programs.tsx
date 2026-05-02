@@ -54,10 +54,10 @@ const Programs = () => {
     }));
   }, [useDb, dbPrograms, tx]);
 
-  const filtered = useMemo(
-    () => (active === "all" || useDb ? items : items.filter((p) => p.category === active)),
-    [active, items, useDb],
-  );
+  const filtered = useMemo(() => {
+    const base = active === "all" || useDb ? items : items.filter((p) => p.category === active);
+    return [...base].sort((a, b) => Number(!!b.featured) - Number(!!a.featured));
+  }, [active, items, useDb]);
   const total = useMemo(() => items.reduce((s, p) => s + p.beneficiaries, 0), [items]);
 
   return (
