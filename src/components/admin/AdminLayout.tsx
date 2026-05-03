@@ -61,7 +61,7 @@ const contentItems: NavItem[] = [
   { to: "/admin/legal-pages", label: "الصفحات القانونية", icon: Scale },
   { to: "/admin/board", label: "مجلس الإدارة", icon: Users },
   { to: "/admin/partners", label: "الشركاء", icon: Handshake },
-  { to: "/admin/hero", label: "شريط البطل", icon: ImageIcon },
+  { to: "/admin/hero", label: "السلايدر الرئيسي (Hero)", icon: ImageIcon },
   { to: "/admin/governance", label: "ملفات الحوكمة", icon: ScrollText },
 ];
 
