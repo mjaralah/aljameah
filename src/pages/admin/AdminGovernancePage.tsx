@@ -3,6 +3,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MediaUpload } from "@/components/admin/MediaUpload";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const GOV_CATEGORIES: { value: string; label: string }[] = [
+  { value: "policies", label: "السياسات" },
+  { value: "regulations", label: "اللوائح" },
+  { value: "plans", label: "الخطط" },
+  { value: "investments", label: "قرارات الاستثمار" },
+  { value: "aid", label: "المساعدات العينية والنقدية" },
+  { value: "financialReports", label: "التقارير المالية" },
+  { value: "annualReport", label: "التقرير السنوي" },
+  { value: "events", label: "تقرير الفعاليات" },
+];
 
 type GovDoc = {
   id: string;
@@ -20,11 +32,15 @@ export default function AdminGovernancePage() {
     <CrudPage<GovDoc>
       table="governance_documents"
       title="ملفات الحوكمة"
-      description="رفع وثائق الحوكمة (PDF) لعرضها في صفحة الحوكمة"
+      description="إدارة جميع وثائق الحوكمة (السياسات، اللوائح، الخطط، التقارير...) لعرضها في صفحة الحوكمة العامة"
       searchField="title"
       columns={[
         { key: "title", label: "العنوان", className: "font-medium" },
-        { key: "category", label: "التصنيف" },
+        {
+          key: "category",
+          label: "التصنيف",
+          render: (r) => GOV_CATEGORIES.find((c) => c.value === r.category)?.label ?? r.category ?? "—",
+        },
         {
           key: "file_url",
           label: "الملف",
@@ -54,8 +70,16 @@ export default function AdminGovernancePage() {
             <Input value={v.title ?? ""} onChange={(e) => set("title", e.target.value)} />
           </div>
           <div>
-            <Label>التصنيف</Label>
-            <Input value={v.category ?? ""} onChange={(e) => set("category", e.target.value)} placeholder="مثال: policies, reports, bylaws" />
+            <Label>التصنيف *</Label>
+            <Select value={v.category ?? "policies"} onValueChange={(val) => set("category", val)}>
+              <SelectTrigger><SelectValue placeholder="اختر التصنيف" /></SelectTrigger>
+              <SelectContent>
+                {GOV_CATEGORIES.map((c) => (
+                  <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground mt-1">يحدد القسم الذي يظهر فيه الملف ضمن صفحة الحوكمة.</p>
           </div>
           <div>
             <Label>الوصف</Label>
