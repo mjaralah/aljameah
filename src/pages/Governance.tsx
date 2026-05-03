@@ -150,6 +150,8 @@ const Governance = () => {
                 onPick={setActiveKey}
                 t={t}
                 lang={lang}
+                financialsOverride={finOverride}
+                financialsTitle={finSection?.title}
               />
             ) : active ? (
               <DocsPanel
