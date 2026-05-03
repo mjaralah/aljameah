@@ -1,11 +1,12 @@
 // لوحة تحرير محتوى صفحة "من نحن" — حقول هيكلية لكل قسم بدون JSON
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Save, Plus, Trash2 } from "lucide-react";
+import { Loader2, Save, Plus, Trash2, Users, ExternalLink, EyeOff, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { IconPicker } from "@/components/admin/IconPicker";
