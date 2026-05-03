@@ -246,11 +246,127 @@ export default function AdminPageContentPage() {
     if (s.section_key === "services_list" || s.section_key === "sections") {
       return renderItemsEditor(s);
     }
+    if (s.section_key === "stats") {
+      const items: any[] = Array.isArray(s.data?.items) ? s.data.items : [];
+      const setItems = (next: any[]) => updateData(s.id, "items", next);
+      return (
+        <div className="space-y-3">
+          {items.map((it, idx) => (
+            <div key={idx} className="rounded-lg border p-3 space-y-2 bg-muted/30">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">إحصائية #{idx + 1}</span>
+                <Button type="button" size="icon" variant="ghost"
+                  onClick={() => setItems(items.filter((_, i) => i !== idx))}>
+                  <Trash2 className="w-4 h-4 text-destructive" />
+                </Button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <div>
+                  <Label>الأيقونة</Label>
+                  <IconPicker value={it.icon ?? ""} onChange={(name) => {
+                    const next = [...items]; next[idx] = { ...it, icon: name }; setItems(next);
+                  }} />
+                </div>
+                <div>
+                  <Label>التسمية</Label>
+                  <Input value={it.label ?? ""} onChange={(e) => {
+                    const next = [...items]; next[idx] = { ...it, label: e.target.value }; setItems(next);
+                  }} />
+                </div>
+                <div>
+                  <Label>القيمة (رقم)</Label>
+                  <Input type="number" value={it.value ?? 0} onChange={(e) => {
+                    const next = [...items]; next[idx] = { ...it, value: Number(e.target.value) }; setItems(next);
+                  }} />
+                </div>
+              </div>
+            </div>
+          ))}
+          <Button type="button" variant="outline" size="sm"
+            onClick={() => setItems([...items, { icon: "Sparkles", label: "", value: 0 }])}>
+            <Plus className="w-4 h-4 ml-1" /> إضافة إحصائية
+          </Button>
+        </div>
+      );
+    }
+    if (s.section_key === "about_preview" || s.section_key === "satisfaction" || s.section_key === "volunteer_cta") {
+      const d = s.data || {};
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <Label>نص الزر</Label>
+            <Input value={d.cta_label ?? ""} onChange={(e) => updateData(s.id, "cta_label", e.target.value)} />
+          </div>
+          <div>
+            <Label>رابط الزر</Label>
+            <Input dir="ltr" value={d.cta_url ?? ""} onChange={(e) => updateData(s.id, "cta_url", e.target.value)} />
+          </div>
+        </div>
+      );
+    }
+    if (s.section_key === "financials") {
+      const d = s.data || {};
+      const allocation: any[] = Array.isArray(d.allocation) ? d.allocation : [];
+      const setAlloc = (next: any[]) => updateData(s.id, "allocation", next);
+      return (
+        <div className="space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+            <div>
+              <Label>السنة</Label>
+              <Input type="number" value={d.year ?? new Date().getFullYear()}
+                onChange={(e) => updateData(s.id, "year", Number(e.target.value))} />
+            </div>
+            <div>
+              <Label>إجمالي الإيرادات</Label>
+              <Input type="number" value={d.total_revenue ?? 0}
+                onChange={(e) => updateData(s.id, "total_revenue", Number(e.target.value))} />
+            </div>
+            <div>
+              <Label>إجمالي المصروفات</Label>
+              <Input type="number" value={d.total_expenses ?? 0}
+                onChange={(e) => updateData(s.id, "total_expenses", Number(e.target.value))} />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label>توزيع المصروفات</Label>
+            {allocation.map((a, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <Input className="flex-1" placeholder="مثال: البرامج التنموية" value={a.label ?? ""}
+                  onChange={(e) => { const n = [...allocation]; n[i] = { ...a, label: e.target.value }; setAlloc(n); }} />
+                <Input className="w-24" type="number" placeholder="%" value={a.percent ?? 0}
+                  onChange={(e) => { const n = [...allocation]; n[i] = { ...a, percent: Number(e.target.value) }; setAlloc(n); }} />
+                <Button type="button" size="icon" variant="ghost"
+                  onClick={() => setAlloc(allocation.filter((_, j) => j !== i))}>
+                  <Trash2 className="w-4 h-4 text-destructive" />
+                </Button>
+              </div>
+            ))}
+            <Button type="button" variant="outline" size="sm"
+              onClick={() => setAlloc([...allocation, { label: "", percent: 0 }])}>
+              <Plus className="w-4 h-4 ml-1" /> إضافة بند
+            </Button>
+          </div>
+        </div>
+      );
+    }
     return null;
   }
 
-  // روابط سريعة لإدارة الكيانات الكاملة (الأخبار، الاستبيانات، البرامج) لكل صفحة
+  // روابط سريعة لإدارة الكيانات الكاملة لكل صفحة
   const QUICK_LINKS: Record<string, { to: string; label: string; icon: any; desc: string }[]> = {
+    home: [
+      { to: "/admin/hero", label: "السلايدر الرئيسي", icon: ExternalLink, desc: "إدارة شرائح البطل المتحركة في أعلى الصفحة" },
+      { to: "/admin/partners", label: "الشركاء", icon: ExternalLink, desc: "شعارات الشركاء الظاهرة في الصفحة" },
+      { to: "/admin/programs", label: "البرامج", icon: FolderKanban, desc: "البرامج الظاهرة في الصفحة الرئيسية" },
+      { to: "/admin/news", label: "الأخبار", icon: Newspaper, desc: "آخر الأخبار الظاهرة في الصفحة الرئيسية" },
+    ],
+    about: [
+      { to: "/admin/about", label: "محرر صفحة من نحن", icon: ExternalLink, desc: "تحرير الرؤية والرسالة والأهداف" },
+      { to: "/admin/board", label: "مجلس الإدارة", icon: ExternalLink, desc: "إضافة وتعديل الأعضاء" },
+    ],
+    governance: [
+      { to: "/admin/governance", label: "ملفات الحوكمة", icon: ExternalLink, desc: "رفع وحذف وثائق السياسات والتقارير" },
+    ],
     media: [{ to: "/admin/news", label: "إدارة الأخبار", icon: Newspaper, desc: "إضافة وتعديل وحذف وأرشفة الأخبار" }],
     surveys: [{ to: "/admin/surveys", label: "إدارة الاستبيانات", icon: ClipboardList, desc: "إضافة وتعديل الاستبيانات والأسئلة" }],
     programs: [{ to: "/admin/programs", label: "إدارة البرامج", icon: FolderKanban, desc: "إضافة وتعديل وحذف البرامج" }],
