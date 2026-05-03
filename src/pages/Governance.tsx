@@ -31,7 +31,7 @@ import {
   eventsReports,
   financials,
 } from "@/data/governance";
-import { useGovernanceDocs } from "@/hooks/usePublicContent";
+import { useGovernanceDocs, usePageContent } from "@/hooks/usePublicContent";
 import { PageHero } from "@/components/layout/PageHero";
 import { PageFeedback } from "@/components/layout/PageFeedback";
 import { cn } from "@/lib/utils";
