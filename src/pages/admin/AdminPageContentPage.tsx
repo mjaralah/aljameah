@@ -30,6 +30,9 @@ type Section = {
 };
 
 const PAGES: { key: string; label: string; description: string }[] = [
+  { key: "home", label: "الصفحة الرئيسية", description: "السلايدر، عدّاد الأرقام، نبذة، مؤشرات الرضا، دعوة التطوع" },
+  { key: "about", label: "من نحن", description: "الرؤية، الرسالة، الأهداف، إلخ" },
+  { key: "governance", label: "الحوكمة", description: "النصوص التعريفية والمؤشرات المالية" },
   { key: "contact", label: "تواصل معنا", description: "نصوص ومعلومات صفحة التواصل" },
   { key: "eservices", label: "الخدمات الإلكترونية", description: "نصوص وقائمة جميع الخدمات (المتاحة والقادمة)" },
   { key: "media", label: "المركز الإعلامي", description: "النصوص التعريفية + إدارة الأخبار" },
@@ -43,6 +46,11 @@ const SECTION_LABELS: Record<string, string> = {
   map: "الخريطة والعنوان",
   services_list: "قائمة الخدمات",
   sections: "الأقسام الإعلامية",
+  stats: "عدّاد الأرقام",
+  about_preview: "نبذة عن الجمعية",
+  satisfaction: "مؤشرات رضا المستفيدين",
+  volunteer_cta: "دعوة التطوع",
+  financials: "المؤشرات المالية",
 };
 
 const AUDIENCES = [
