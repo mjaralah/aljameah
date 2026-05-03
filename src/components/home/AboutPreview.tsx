@@ -2,10 +2,17 @@ import { ArrowLeft, BadgeCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { usePageContent } from "@/hooks/usePublicContent";
 import aboutImg from "@/assets/about-preview.jpg";
 
 export const AboutPreview = () => {
   const { t, dir } = useLanguage();
+  const { data } = usePageContent("home");
+  const sec = data?.find((s) => s.section_key === "about_preview");
+  const title = sec?.title || t.brand.name;
+  const body = sec?.content || t.about.body;
+  const ctaLabel = sec?.data?.cta_label || t.about.learnMore;
+  const ctaUrl = sec?.data?.cta_url || "/about";
   return (
     <section className="container py-16 md:py-24 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center" aria-label="about-preview">
       <div className="relative order-2 lg:order-1">
@@ -31,11 +38,11 @@ export const AboutPreview = () => {
 
       <div className="order-1 lg:order-2">
         <span className="text-accent font-bold text-sm uppercase tracking-wider">{t.about.title}</span>
-        <h2 className="text-3xl md:text-4xl font-extrabold text-primary mt-2 mb-5">{t.brand.name}</h2>
-        <p className="text-lg text-muted-foreground leading-loose mb-6">{t.about.body}</p>
+        <h2 className="text-3xl md:text-4xl font-extrabold text-primary mt-2 mb-5">{title}</h2>
+        <p className="text-lg text-muted-foreground leading-loose mb-6">{body}</p>
         <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
-          <Link to="/about">
-            {t.about.learnMore}
+          <Link to={ctaUrl}>
+            {ctaLabel}
             <ArrowLeft className={dir === "rtl" ? "h-5 w-5" : "h-5 w-5 rotate-180"} />
           </Link>
         </Button>

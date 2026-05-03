@@ -2,9 +2,17 @@ import { HandHeart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { usePageContent } from "@/hooks/usePublicContent";
 
 export const VolunteerCta = () => {
   const { t } = useLanguage();
+  const { data } = usePageContent("home");
+  const sec = data?.find((s) => s.section_key === "volunteer_cta");
+  const title = sec?.title || t.volunteerCta.title;
+  const body = sec?.content || t.volunteerCta.body;
+  const ctaLabel = sec?.data?.cta_label || t.volunteerCta.cta;
+  const ctaUrl = sec?.data?.cta_url || "/e-services/volunteer";
+
   return (
     <section className="container py-12" aria-label="volunteer-cta">
       <div className="relative overflow-hidden rounded-3xl bg-gradient-cta text-primary-foreground p-8 md:p-14 shadow-card">
@@ -16,13 +24,13 @@ export const VolunteerCta = () => {
               <HandHeart className="h-4 w-4" />
               {t.nav.volunteer}
             </div>
-            <h2 className="text-2xl md:text-4xl font-extrabold mb-3 leading-tight">{t.volunteerCta.title}</h2>
-            <p className="text-base md:text-lg opacity-95 max-w-xl">{t.volunteerCta.body}</p>
+            <h2 className="text-2xl md:text-4xl font-extrabold mb-3 leading-tight">{title}</h2>
+            <p className="text-base md:text-lg opacity-95 max-w-xl">{body}</p>
           </div>
           <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold shadow-gold">
-            <Link to="/e-services/volunteer">
+            <Link to={ctaUrl}>
               <HandHeart className="h-5 w-5" fill="currentColor" />
-              {t.volunteerCta.cta}
+              {ctaLabel}
             </Link>
           </Button>
         </div>

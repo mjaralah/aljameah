@@ -1,11 +1,12 @@
 // لوحة تحرير محتوى صفحة "من نحن" — حقول هيكلية لكل قسم بدون JSON
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Save, Plus, Trash2 } from "lucide-react";
+import { Loader2, Save, Plus, Trash2, Users, ExternalLink, EyeOff, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { IconPicker } from "@/components/admin/IconPicker";
@@ -88,6 +89,20 @@ export default function AdminAboutPage() {
     setSavingId(null);
     if (error) toast.error(error.message);
     else { toast.success("تم الحفظ"); load(); }
+  }
+
+  async function togglePublished(s: Section) {
+    const { error } = await supabase.from("about_content")
+      .update({ published: !s.published }).eq("id", s.id);
+    if (error) toast.error(error.message);
+    else { toast.success(!s.published ? "تم الإظهار" : "تم الإخفاء"); load(); }
+  }
+
+  async function remove(s: Section) {
+    if (!confirm(`حذف القسم "${KEY_LABELS[s.section_key] ?? s.section_key}" نهائياً؟`)) return;
+    const { error } = await supabase.from("about_content").delete().eq("id", s.id);
+    if (error) toast.error(error.message);
+    else { toast.success("تم الحذف"); load(); }
   }
 
   // عناصر التحرير الهيكلية حسب نوع القسم
@@ -270,13 +285,44 @@ export default function AdminAboutPage() {
       {loading ? (
         <div className="p-12 flex justify-center"><Loader2 className="w-6 h-6 animate-spin" /></div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-6" dir="rtl">
+          <Card className="border-primary/30 bg-primary/5">
+            <CardContent className="flex items-center justify-between p-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-primary/10 text-primary grid place-items-center">
+                  <Users className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="font-semibold">إدارة أعضاء مجلس الإدارة</p>
+                  <p className="text-xs text-muted-foreground">إضافة وتعديل وحذف الأعضاء الظاهرين في تبويب "أعضاء مجلس الإدارة"</p>
+                </div>
+              </div>
+              <Button asChild size="sm">
+                <Link to="/admin/board">
+                  فتح
+                  <ExternalLink className="h-4 w-4 mr-1" />
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+
           {sections.map((s) => (
-            <Card key={s.id}>
+            <Card key={s.id} className={!s.published ? "opacity-70 border-dashed" : undefined}>
               <CardHeader>
-                <CardTitle className="text-base">
-                  {KEY_LABELS[s.section_key] ?? s.section_key}
-                  <span className="text-xs text-muted-foreground font-normal mr-2">({s.section_key})</span>
+                <CardTitle className="text-base flex items-center justify-between gap-2">
+                  <span>
+                    {KEY_LABELS[s.section_key] ?? s.section_key}
+                    <span className="text-xs text-muted-foreground font-normal mr-2">({s.section_key})</span>
+                    {!s.published && <span className="text-[10px] mr-2 px-2 py-0.5 rounded bg-muted">مخفي</span>}
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <Button type="button" size="sm" variant="ghost" onClick={() => togglePublished(s)} title={s.published ? "إخفاء" : "إظهار"}>
+                      {s.published ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </Button>
+                    <Button type="button" size="sm" variant="ghost" className="text-destructive" onClick={() => remove(s)} title="حذف">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -287,7 +333,12 @@ export default function AdminAboutPage() {
                   <Textarea rows={5} value={s.content ?? ""} onChange={(e) => update(s.id, { content: e.target.value })} />
                 </Field>
                 {s.data !== null && renderStructured(s)}
-                <div className="flex justify-end pt-2">
+                <div className="flex justify-between items-center pt-2">
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" checked={s.published}
+                      onChange={(e) => update(s.id, { published: e.target.checked })} />
+                    منشور
+                  </label>
                   <Button onClick={() => save(s)} disabled={savingId === s.id} size="sm">
                     {savingId === s.id ? <Loader2 className="w-4 h-4 ml-1 animate-spin" /> : <Save className="w-4 h-4 ml-1" />}
                     حفظ القسم

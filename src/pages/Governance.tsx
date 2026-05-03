@@ -31,7 +31,7 @@ import {
   eventsReports,
   financials,
 } from "@/data/governance";
-import { useGovernanceDocs } from "@/hooks/usePublicContent";
+import { useGovernanceDocs, usePageContent } from "@/hooks/usePublicContent";
 import { PageHero } from "@/components/layout/PageHero";
 import { PageFeedback } from "@/components/layout/PageFeedback";
 import { cn } from "@/lib/utils";
@@ -49,6 +49,20 @@ const Governance = () => {
   const { t, tx, lang } = useLanguage();
   const [activeKey, setActiveKey] = useState<string>("overview");
   const { data: dbDocs } = useGovernanceDocs();
+  const { data: pageData } = usePageContent("governance");
+  const introSection = pageData?.find((s) => s.section_key === "intro");
+  const finSection = pageData?.find((s) => s.section_key === "financials");
+  const finData = finSection?.data || {};
+  const finOverride = finSection ? {
+    year: finData.year ?? financials.year,
+    totalRevenue: Number(finData.total_revenue ?? financials.totalRevenue),
+    totalExpenses: Number(finData.total_expenses ?? financials.totalExpenses),
+    allocation: Array.isArray(finData.allocation) && finData.allocation.length > 0
+      ? finData.allocation.map((a: any, i: number) => ({
+          key: String(i), labelAr: a.label ?? "", labelEn: a.label ?? "", pct: Number(a.percent ?? 0),
+        }))
+      : financials.allocation,
+  } : null;
 
   // وثائق قاعدة البيانات مجمّعة حسب التصنيف
   const dbByCategory = useMemo(() => {
@@ -89,8 +103,8 @@ const Governance = () => {
     <>
       <PageHero
         eyebrow={t.brand.verified}
-        title={t.pages.governance.heading}
-        lead={t.pages.governance.lead}
+        title={introSection?.title || t.pages.governance.heading}
+        lead={introSection?.content || t.pages.governance.lead}
         breadcrumb={[{ label: t.nav.governance }]}
       />
 
@@ -136,6 +150,8 @@ const Governance = () => {
                 onPick={setActiveKey}
                 t={t}
                 lang={lang}
+                financialsOverride={finOverride}
+                financialsTitle={finSection?.title}
               />
             ) : active ? (
               <DocsPanel
@@ -216,12 +232,18 @@ const OverviewPanel = ({
   onPick,
   t,
   lang,
+  financialsOverride,
+  financialsTitle,
 }: {
   sections: Section[];
   onPick: (k: string) => void;
   t: ReturnType<typeof useLanguage>["t"];
   lang: "ar" | "en";
-}) => (
+  financialsOverride?: { year: number; totalRevenue: number; totalExpenses: number; allocation: { key: string; labelAr: string; labelEn: string; pct: number }[] } | null;
+  financialsTitle?: string | null;
+}) => {
+  const fin = financialsOverride ?? financials;
+  return (
   <div className="space-y-8 animate-in fade-in-50 duration-500">
     {/* بطاقات إحصائية مالية */}
     <Card className="p-6 md:p-8 bg-gradient-primary text-primary-foreground border-0 overflow-hidden relative">
@@ -229,8 +251,8 @@ const OverviewPanel = ({
       <div className="relative">
         <div className="flex items-center gap-2 mb-4">
           <Wallet className="h-5 w-5 text-accent" />
-          <h2 className="text-xl md:text-2xl font-extrabold">{t.pages.governance.financials}</h2>
-          <Badge className="ms-auto bg-accent text-accent-foreground font-bold">{financials.year}</Badge>
+          <h2 className="text-xl md:text-2xl font-extrabold">{financialsTitle || t.pages.governance.financials}</h2>
+          <Badge className="ms-auto bg-accent text-accent-foreground font-bold">{fin.year}</Badge>
         </div>
 
         <div className="grid sm:grid-cols-2 gap-4 mb-6">
@@ -240,7 +262,7 @@ const OverviewPanel = ({
             </span>
             <div className="mt-1.5 flex items-baseline gap-2">
               <span className="text-2xl md:text-3xl font-extrabold tabular-nums">
-                {financials.totalRevenue.toLocaleString()}
+                {fin.totalRevenue.toLocaleString()}
               </span>
               <span className="text-sm opacity-80">{t.pages.governance.currency}</span>
             </div>
@@ -251,7 +273,7 @@ const OverviewPanel = ({
             </span>
             <div className="mt-1.5 flex items-baseline gap-2">
               <span className="text-2xl md:text-3xl font-extrabold tabular-nums">
-                {financials.totalExpenses.toLocaleString()}
+                {fin.totalExpenses.toLocaleString()}
               </span>
               <span className="text-sm opacity-90">{t.pages.governance.currency}</span>
             </div>
@@ -261,7 +283,7 @@ const OverviewPanel = ({
         <div>
           <h3 className="text-sm font-bold mb-3 opacity-95">{t.pages.governance.allocation}</h3>
           <div className="space-y-3">
-            {financials.allocation.map((a) => (
+            {fin.allocation.map((a) => (
               <div key={a.key}>
                 <div className="flex items-center justify-between mb-1 text-xs">
                   <span className="font-semibold">{lang === "ar" ? a.labelAr : a.labelEn}</span>
@@ -317,7 +339,8 @@ const OverviewPanel = ({
       </div>
     </div>
   </div>
-);
+  );
+};
 
 /* ====================== لوحة الوثائق ====================== */
 const DocsPanel = ({

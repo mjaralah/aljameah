@@ -4,22 +4,29 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getOverallSurveyMetrics } from "@/lib/surveyResults";
+import { usePageContent } from "@/hooks/usePublicContent";
 
 export const SatisfactionIndicators = () => {
   const { lang, dir } = useLanguage();
   const metrics = getOverallSurveyMetrics();
+  const { data } = usePageContent("home");
+  const sec = data?.find((s) => s.section_key === "satisfaction");
+  const title = sec?.title || (lang === "ar" ? "مؤشرات رضا المستفيدين" : "Beneficiary Satisfaction Indicators");
+  const eyebrow = lang === "ar" ? "صوت المستفيدين" : "Beneficiary voice";
+  const ctaLabel = sec?.data?.cta_label || (lang === "ar" ? "عرض نتائج الاستبيانات" : "View survey results");
+  const ctaUrl = sec?.data?.cta_url || "/surveys";
 
   return (
     <section className="py-16 md:py-20 bg-muted/35">
       <div className="container">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5 mb-8">
           <div>
-            <p className="text-sm font-bold text-accent mb-2">{lang === "ar" ? "صوت المستفيدين" : "Beneficiary voice"}</p>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-primary">{lang === "ar" ? "مؤشرات رضا المستفيدين" : "Beneficiary Satisfaction Indicators"}</h2>
+            <p className="text-sm font-bold text-accent mb-2">{eyebrow}</p>
+            <h2 className="text-2xl md:text-3xl font-extrabold text-primary">{title}</h2>
           </div>
           <Button asChild className="bg-primary text-primary-foreground min-h-11">
-            <Link to="/surveys">
-              {lang === "ar" ? "عرض نتائج الاستبيانات" : "View survey results"}
+            <Link to={ctaUrl}>
+              {ctaLabel}
               <ArrowLeft className={dir === "rtl" ? "h-4 w-4" : "h-4 w-4 rotate-180"} />
             </Link>
           </Button>
