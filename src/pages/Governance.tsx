@@ -49,6 +49,20 @@ const Governance = () => {
   const { t, tx, lang } = useLanguage();
   const [activeKey, setActiveKey] = useState<string>("overview");
   const { data: dbDocs } = useGovernanceDocs();
+  const { data: pageData } = usePageContent("governance");
+  const introSection = pageData?.find((s) => s.section_key === "intro");
+  const finSection = pageData?.find((s) => s.section_key === "financials");
+  const finData = finSection?.data || {};
+  const finOverride = finSection ? {
+    year: finData.year ?? financials.year,
+    totalRevenue: Number(finData.total_revenue ?? financials.totalRevenue),
+    totalExpenses: Number(finData.total_expenses ?? financials.totalExpenses),
+    allocation: Array.isArray(finData.allocation) && finData.allocation.length > 0
+      ? finData.allocation.map((a: any, i: number) => ({
+          key: String(i), labelAr: a.label ?? "", labelEn: a.label ?? "", pct: Number(a.percent ?? 0),
+        }))
+      : financials.allocation,
+  } : null;
 
   // وثائق قاعدة البيانات مجمّعة حسب التصنيف
   const dbByCategory = useMemo(() => {
