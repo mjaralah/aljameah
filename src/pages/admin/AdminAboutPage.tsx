@@ -91,6 +91,20 @@ export default function AdminAboutPage() {
     else { toast.success("تم الحفظ"); load(); }
   }
 
+  async function togglePublished(s: Section) {
+    const { error } = await supabase.from("about_content")
+      .update({ published: !s.published }).eq("id", s.id);
+    if (error) toast.error(error.message);
+    else { toast.success(!s.published ? "تم الإظهار" : "تم الإخفاء"); load(); }
+  }
+
+  async function remove(s: Section) {
+    if (!confirm(`حذف القسم "${KEY_LABELS[s.section_key] ?? s.section_key}" نهائياً؟`)) return;
+    const { error } = await supabase.from("about_content").delete().eq("id", s.id);
+    if (error) toast.error(error.message);
+    else { toast.success("تم الحذف"); load(); }
+  }
+
   // عناصر التحرير الهيكلية حسب نوع القسم
   function renderStructured(s: Section) {
     const data = (s.data && typeof s.data === "object" ? s.data : {}) as Record<string, unknown>;
