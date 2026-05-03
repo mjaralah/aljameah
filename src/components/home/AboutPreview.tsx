@@ -38,11 +38,11 @@ export const AboutPreview = () => {
 
       <div className="order-1 lg:order-2">
         <span className="text-accent font-bold text-sm uppercase tracking-wider">{t.about.title}</span>
-        <h2 className="text-3xl md:text-4xl font-extrabold text-primary mt-2 mb-5">{t.brand.name}</h2>
-        <p className="text-lg text-muted-foreground leading-loose mb-6">{t.about.body}</p>
+        <h2 className="text-3xl md:text-4xl font-extrabold text-primary mt-2 mb-5">{title}</h2>
+        <p className="text-lg text-muted-foreground leading-loose mb-6">{body}</p>
         <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
-          <Link to="/about">
-            {t.about.learnMore}
+          <Link to={ctaUrl}>
+            {ctaLabel}
             <ArrowLeft className={dir === "rtl" ? "h-5 w-5" : "h-5 w-5 rotate-180"} />
           </Link>
         </Button>
