@@ -232,12 +232,28 @@ const OverviewPanel = ({
   onPick,
   t,
   lang,
+  financialsOverride,
+  financialsTitle,
 }: {
   sections: Section[];
   onPick: (k: string) => void;
   t: ReturnType<typeof useLanguage>["t"];
   lang: "ar" | "en";
-}) => (
+  financialsOverride?: { year: number; totalRevenue: number; totalExpenses: number; allocation: { key: string; labelAr: string; labelEn: string; pct: number }[] } | null;
+  financialsTitle?: string | null;
+}) => {
+  const fin = financialsOverride ?? financials;
+  return (
+  <div className="space-y-8 animate-in fade-in-50 duration-500">
+    {/* بطاقات إحصائية مالية */}
+    <Card className="p-6 md:p-8 bg-gradient-primary text-primary-foreground border-0 overflow-hidden relative">
+      <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(circle_at_85%_15%,white_1px,transparent_1px)] [background-size:20px_20px]" aria-hidden />
+      <div className="relative">
+        <div className="flex items-center gap-2 mb-4">
+          <Wallet className="h-5 w-5 text-accent" />
+          <h2 className="text-xl md:text-2xl font-extrabold">{financialsTitle || t.pages.governance.financials}</h2>
+          <Badge className="ms-auto bg-accent text-accent-foreground font-bold">{fin.year}</Badge>
+        </div>
   <div className="space-y-8 animate-in fade-in-50 duration-500">
     {/* بطاقات إحصائية مالية */}
     <Card className="p-6 md:p-8 bg-gradient-primary text-primary-foreground border-0 overflow-hidden relative">
