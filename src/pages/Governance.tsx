@@ -262,7 +262,7 @@ const OverviewPanel = ({
             </span>
             <div className="mt-1.5 flex items-baseline gap-2">
               <span className="text-2xl md:text-3xl font-extrabold tabular-nums">
-                {financials.totalRevenue.toLocaleString()}
+                {fin.totalRevenue.toLocaleString()}
               </span>
               <span className="text-sm opacity-80">{t.pages.governance.currency}</span>
             </div>
@@ -273,7 +273,7 @@ const OverviewPanel = ({
             </span>
             <div className="mt-1.5 flex items-baseline gap-2">
               <span className="text-2xl md:text-3xl font-extrabold tabular-nums">
-                {financials.totalExpenses.toLocaleString()}
+                {fin.totalExpenses.toLocaleString()}
               </span>
               <span className="text-sm opacity-90">{t.pages.governance.currency}</span>
             </div>
@@ -283,7 +283,7 @@ const OverviewPanel = ({
         <div>
           <h3 className="text-sm font-bold mb-3 opacity-95">{t.pages.governance.allocation}</h3>
           <div className="space-y-3">
-            {financials.allocation.map((a) => (
+            {fin.allocation.map((a) => (
               <div key={a.key}>
                 <div className="flex items-center justify-between mb-1 text-xs">
                   <span className="font-semibold">{lang === "ar" ? a.labelAr : a.labelEn}</span>
