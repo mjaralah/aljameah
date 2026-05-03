@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import * as Icons from "lucide-react";
 import { Award, HandHeart, Sparkles, Users } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { usePageContent } from "@/hooks/usePublicContent";
 
-// عدّاد رقمي متحرّك يبدأ عند ظهور العنصر
 const Counter = ({ value, duration = 1600 }: { value: number; duration?: number }) => {
   const [n, setN] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
@@ -32,14 +33,29 @@ const Counter = ({ value, duration = 1600 }: { value: number; duration?: number 
   return <span ref={ref}>{n.toLocaleString()}</span>;
 };
 
+const ICON_MAP: Record<string, any> = { Users, Sparkles, HandHeart, Award };
+
 export const StatsCounters = () => {
   const { t } = useLanguage();
-  const stats = [
+  const { data } = usePageContent("home");
+  const section = data?.find((s) => s.section_key === "stats");
+  const items = (section?.data?.items as { icon?: string; label?: string; value?: number }[] | undefined) ?? null;
+
+  const fallback = [
     { icon: Users, value: 24500, label: t.stats.beneficiaries },
     { icon: Sparkles, value: 32, label: t.stats.programs },
     { icon: HandHeart, value: 1250, label: t.stats.volunteers },
     { icon: Award, value: 12, label: t.stats.years },
   ];
+
+  const stats = items && items.length > 0
+    ? items.map((it) => ({
+        icon: ICON_MAP[it.icon ?? ""] ?? (Icons as any)[it.icon ?? ""] ?? Sparkles,
+        value: Number(it.value ?? 0),
+        label: it.label ?? "",
+      }))
+    : fallback;
+
   return (
     <section className="container -mt-16 relative z-10" aria-label="stats">
       <div className="rounded-2xl bg-card shadow-card border border-border p-6 md:p-8 grid grid-cols-2 lg:grid-cols-4 gap-6">
