@@ -2,10 +2,17 @@ import { ArrowLeft, BadgeCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { usePageContent } from "@/hooks/usePublicContent";
 import aboutImg from "@/assets/about-preview.jpg";
 
 export const AboutPreview = () => {
   const { t, dir } = useLanguage();
+  const { data } = usePageContent("home");
+  const sec = data?.find((s) => s.section_key === "about_preview");
+  const title = sec?.title || t.brand.name;
+  const body = sec?.content || t.about.body;
+  const ctaLabel = sec?.data?.cta_label || t.about.learnMore;
+  const ctaUrl = sec?.data?.cta_url || "/about";
   return (
     <section className="container py-16 md:py-24 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center" aria-label="about-preview">
       <div className="relative order-2 lg:order-1">
