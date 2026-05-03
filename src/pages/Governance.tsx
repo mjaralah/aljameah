@@ -103,8 +103,8 @@ const Governance = () => {
     <>
       <PageHero
         eyebrow={t.brand.verified}
-        title={t.pages.governance.heading}
-        lead={t.pages.governance.lead}
+        title={introSection?.title || t.pages.governance.heading}
+        lead={introSection?.content || t.pages.governance.lead}
         breadcrumb={[{ label: t.nav.governance }]}
       />
 
