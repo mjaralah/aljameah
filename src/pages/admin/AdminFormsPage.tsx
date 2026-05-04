@@ -127,7 +127,7 @@ export default function AdminFormsPage() {
       icon: editing.icon,
       audience: editing.audience,
       duration: editing.duration,
-      fields: editing.fields,
+      fields: editing.fields as any,
       success_message: editing.success_message,
       published: editing.published,
       featured: editing.featured,
