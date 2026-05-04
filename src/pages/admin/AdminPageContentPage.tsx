@@ -38,6 +38,8 @@ const PAGES: { key: string; label: string; description: string }[] = [
   { key: "media", label: "المركز الإعلامي", description: "النصوص التعريفية + إدارة الأخبار" },
   { key: "surveys", label: "الاستبيانات", description: "النص التعريفي + إدارة الاستبيانات" },
   { key: "programs", label: "البرامج والخدمات", description: "النص التعريفي + إدارة البرامج" },
+  { key: "eservices_volunteer", label: "نموذج التطوع", description: "نصوص ومزايا صفحة طلب التطوع" },
+  { key: "eservices_membership", label: "نموذج طلب العضوية", description: "نصوص ومزايا صفحة طلب العضوية" },
 ];
 
 const SECTION_LABELS: Record<string, string> = {
