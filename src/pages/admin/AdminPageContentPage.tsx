@@ -53,6 +53,7 @@ const SECTION_LABELS: Record<string, string> = {
   satisfaction: "مؤشرات رضا المستفيدين",
   volunteer_cta: "دعوة التطوع",
   financials: "المؤشرات المالية",
+  benefits: "المزايا",
 };
 
 const AUDIENCES = [
