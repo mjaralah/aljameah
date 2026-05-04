@@ -49,15 +49,30 @@ const membershipSchema = z.object({
 
 type MembershipForm = z.infer<typeof membershipSchema>;
 
-const benefits = [
+const defaultBenefits = [
   { icon: Award, title: "شهادة عضوية معتمدة", desc: "وثيقة رسمية تُثبت انتسابك للجمعية" },
   { icon: Gift, title: "مزايا حصرية للأعضاء", desc: "خصومات وفعاليات وبرامج تدريبية" },
   { icon: TrendingUp, title: "حق التصويت في الجمعية العمومية", desc: "شارك في صنع القرار وتوجيه المسار" },
   { icon: Users, title: "شبكة علاقات واسعة", desc: "تواصل مع نخبة من المهتمين بالعمل التطوعي" },
 ];
 
+function resolveIcon(name?: string): any {
+  if (!name) return BadgeCheck;
+  return (LucideIcons as any)[name] || BadgeCheck;
+}
+
 export default function MembershipService() {
   const { toast } = useToast();
+  const { data: pageSections } = usePageContent("eservices_membership");
+  const intro = (pageSections ?? []).find((s) => s.section_key === "intro");
+  const benefitsSection = (pageSections ?? []).find((s) => s.section_key === "benefits");
+  const benefits = (Array.isArray(benefitsSection?.data?.items) && benefitsSection!.data.items.length > 0)
+    ? benefitsSection!.data.items.map((it: any) => ({
+        icon: resolveIcon(it.icon),
+        title: it.title || "",
+        desc: it.description || "",
+      }))
+    : defaultBenefits;
   const [form, setForm] = useState<MembershipForm>({
     fullName: "", phone: "", gender: "", email: "", nationalId: "",
     education: "", jobTitle: "", employer: "",
@@ -105,11 +120,11 @@ export default function MembershipService() {
     <>
       <PageHero
         eyebrow="الخدمات الإلكترونية"
-        title="طلب عضوية الجمعية"
-        lead="انضم رسمياً إلى أسرة الجمعية، واحصل على مزايا حصرية وحق المشاركة في صنع القرار."
+        title={intro?.title || "طلب عضوية الجمعية"}
+        lead={intro?.content || "انضم رسمياً إلى أسرة الجمعية، واحصل على مزايا حصرية وحق المشاركة في صنع القرار."}
         breadcrumb={[
           { label: "الخدمات الإلكترونية", to: "/e-services" },
-          { label: "طلب عضوية" },
+          { label: intro?.title || "طلب عضوية" },
         ]}
       />
 
