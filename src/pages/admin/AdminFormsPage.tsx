@@ -135,7 +135,7 @@ export default function AdminFormsPage() {
     };
     const { error } = editing.id
       ? await supabase.from("custom_forms").update(payload).eq("id", editing.id)
-      : await supabase.from("custom_forms").insert(payload);
+      : await supabase.from("custom_forms").insert([payload]);
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("تم الحفظ");
