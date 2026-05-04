@@ -29,6 +29,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { usePageContent } from "@/hooks/usePublicContent";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 
 type Audience = "all" | "individuals" | "entities" | "inquiries";
@@ -173,10 +175,17 @@ export default function EServicesIndex() {
   const intro = (pageSections ?? []).find((s) => s.section_key === "intro");
   const servicesSection = (pageSections ?? []).find((s) => s.section_key === "services_list");
 
+  const { data: customForms } = useQuery({
+    queryKey: ["public-custom-forms"],
+    queryFn: async () => {
+      const { data } = await supabase.from("custom_forms").select("*").eq("published", true).order("sort_order");
+      return data ?? [];
+    },
+  });
+
   const services: ServiceItem[] = useMemo(() => {
     const items: any[] = Array.isArray(servicesSection?.data?.items) ? servicesSection!.data.items : [];
-    if (items.length === 0) return SERVICES;
-    return items.map((it) => ({
+    const base: ServiceItem[] = items.length === 0 ? SERVICES : items.map((it) => ({
       to: it.url || undefined,
       title: { ar: it.title ?? "", en: it.title ?? "" },
       desc: { ar: it.description ?? "", en: it.description ?? "" },
@@ -186,7 +195,18 @@ export default function EServicesIndex() {
       duration: { ar: it.duration ?? "", en: it.duration ?? "" },
       featured: !!it.featured,
     }));
-  }, [servicesSection]);
+    const dynamic: ServiceItem[] = (customForms ?? []).map((f: any) => ({
+      to: `/e-services/form/${f.slug}`,
+      title: { ar: f.title, en: f.title },
+      desc: { ar: f.description ?? "", en: f.description ?? "" },
+      icon: resolveIcon(f.icon),
+      audience: (["individuals", "entities", "inquiries"].includes(f.audience) ? f.audience : "individuals") as Exclude<Audience, "all">,
+      status: "available",
+      duration: { ar: f.duration ?? "", en: f.duration ?? "" },
+      featured: !!f.featured,
+    }));
+    return [...base, ...dynamic];
+  }, [servicesSection, customForms]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
