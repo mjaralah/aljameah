@@ -74,6 +74,8 @@ const steps = [
 
 export default function VolunteerService() {
   const { toast } = useToast();
+  const { data: pageSections } = usePageContent("eservices_volunteer");
+  const intro = (pageSections ?? []).find((s) => s.section_key === "intro");
   const [data, setData] = useState<VolunteerForm>(initial);
   const [errors, setErrors] = useState<Partial<Record<keyof VolunteerForm, string>>>({});
   const [step, setStep] = useState(0);
@@ -156,7 +158,7 @@ export default function VolunteerService() {
   if (submitted) {
     return (
       <>
-        <PageHero eyebrow="الخدمات الإلكترونية" title="طلب التطوع" lead="انضم إلى أسرة المتطوعين معنا" />
+        <PageHero eyebrow="الخدمات الإلكترونية" title={intro?.title || "طلب التطوع"} lead={intro?.content || "انضم إلى أسرة المتطوعين معنا"} />
         <section className="container py-20">
           <div className="mx-auto max-w-2xl text-center">
             <div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-primary shadow-card">
@@ -197,11 +199,11 @@ export default function VolunteerService() {
     <>
       <PageHero
         eyebrow="الخدمات الإلكترونية"
-        title="انضم لفريق المتطوعين"
-        lead="كن جزءاً من رسالتنا في خدمة المجتمع — املأ النموذج وسنتواصل معك"
+        title={intro?.title || "انضم لفريق المتطوعين"}
+        lead={intro?.content || "كن جزءاً من رسالتنا في خدمة المجتمع — املأ النموذج وسنتواصل معك"}
         breadcrumb={[
           { label: "الخدمات الإلكترونية", to: "/e-services" },
-          { label: "التطوع" },
+          { label: intro?.title || "التطوع" },
         ]}
       />
 
