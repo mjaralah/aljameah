@@ -125,6 +125,95 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_form_submissions: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          data: Json
+          form_id: string
+          id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          data?: Json
+          form_id: string
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          data?: Json
+          form_id?: string
+          id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_form_submissions_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "custom_forms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      custom_forms: {
+        Row: {
+          audience: string
+          created_at: string
+          description: string | null
+          duration: string | null
+          featured: boolean
+          fields: Json
+          icon: string | null
+          id: string
+          published: boolean
+          slug: string
+          sort_order: number
+          success_message: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          audience?: string
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          featured?: boolean
+          fields?: Json
+          icon?: string | null
+          id?: string
+          published?: boolean
+          slug: string
+          sort_order?: number
+          success_message?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          audience?: string
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          featured?: boolean
+          fields?: Json
+          icon?: string | null
+          id?: string
+          published?: boolean
+          slug?: string
+          sort_order?: number
+          success_message?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       custom_pages: {
         Row: {
           content: string | null
