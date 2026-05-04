@@ -33,6 +33,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { IconField } from "@/components/eservices/FormFields";
+import { usePageContent } from "@/hooks/usePublicContent";
+import * as LucideIcons from "lucide-react";
 
 const membershipSchema = z.object({
   fullName: z.string().trim().min(3, "الاسم يجب أن يكون 3 أحرف على الأقل").max(100),

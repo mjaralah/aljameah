@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Field } from "@/components/eservices/FormFields";
+import { usePageContent } from "@/hooks/usePublicContent";
 
 // مخطط التحقق من البيانات
 const volunteerSchema = z.object({
