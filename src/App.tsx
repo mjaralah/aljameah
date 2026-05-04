@@ -41,6 +41,8 @@ import AdminAboutPage from "./pages/admin/AdminAboutPage.tsx";
 import AdminSurveysPage from "./pages/admin/AdminSurveysPage.tsx";
 import AdminLegalPagesPage from "./pages/admin/AdminLegalPagesPage.tsx";
 import AdminPageContentPage from "./pages/admin/AdminPageContentPage.tsx";
+import AdminFormsPage from "./pages/admin/AdminFormsPage.tsx";
+import CustomFormPage from "./pages/eservices/CustomFormPage.tsx";
 import { ProtectedAdminRoute } from "./components/admin/ProtectedAdminRoute.tsx";
 
 const queryClient = new QueryClient();
@@ -78,6 +80,7 @@ const PublicRoutes = () => (
       <Route path="/e-services" element={<EServicesIndex />} />
       <Route path="/e-services/volunteer" element={<VolunteerService />} />
       <Route path="/e-services/membership" element={<MembershipService />} />
+      <Route path="/e-services/form/:slug" element={<CustomFormPage />} />
       <Route path="/surveys" element={<SurveysPage />} />
       <Route path="/surveys/:surveyId/results" element={<SurveyResults />} />
       <Route path="/contact" element={<Contact />} />
@@ -246,6 +249,14 @@ const App = () => (
                 element={
                   <ProtectedAdminRoute>
                     <AdminPageContentPage />
+                  </ProtectedAdminRoute>
+                }
+              />
+              <Route
+                path="/admin/forms"
+                element={
+                  <ProtectedAdminRoute>
+                    <AdminFormsPage />
                   </ProtectedAdminRoute>
                 }
               />

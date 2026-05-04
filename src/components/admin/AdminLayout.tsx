@@ -57,6 +57,7 @@ const contentItems: NavItem[] = [
   { to: "/admin/about", label: "محتوى من نحن", icon: Info },
   { to: "/admin/surveys", label: "الاستبيانات", icon: ClipboardList },
   { to: "/admin/page-content", label: "محتوى الصفحات", icon: LayoutTemplate },
+  { to: "/admin/forms", label: "نماذج الخدمات", icon: ClipboardList },
   { to: "/admin/pages", label: "الصفحات المخصصة", icon: FileText },
   { to: "/admin/legal-pages", label: "الصفحات القانونية", icon: Scale },
   { to: "/admin/board", label: "مجلس الإدارة", icon: Users },
