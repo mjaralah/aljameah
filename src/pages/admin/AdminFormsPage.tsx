@@ -212,6 +212,7 @@ export default function AdminFormsPage() {
                     <h3 className="font-bold">{f.title}</h3>
                     {sys && <Badge variant="outline" className="border-accent text-accent"><Lock className="h-3 w-3 me-1" /> نظامي</Badge>}
                     <Badge variant={f.published ? "default" : "secondary"}>{f.published ? "منشور" : "مخفي"}</Badge>
+                    {f.coming_soon && <Badge variant="outline" className="border-amber-500 text-amber-600">قريباً</Badge>}
                     {f.featured && <Badge variant="outline">مميز</Badge>}
                     {f.archived && <Badge variant="destructive">مؤرشف</Badge>}
                     <code className="text-xs text-muted-foreground">{publicUrl}</code>
