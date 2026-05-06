@@ -31,6 +31,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Field } from "@/components/eservices/FormFields";
 import { usePageContent } from "@/hooks/usePublicContent";
+import { useSystemForm } from "@/hooks/useSystemForm";
 
 // مخطط التحقق من البيانات
 const volunteerSchema = z.object({
@@ -75,11 +76,27 @@ const steps = [
 export default function VolunteerService() {
   const { toast } = useToast();
   const { data: pageSections } = usePageContent("eservices_volunteer");
+  const { data: systemForm } = useSystemForm("volunteer");
   const intro = (pageSections ?? []).find((s) => s.section_key === "intro");
+  const heroTitle = systemForm?.title || intro?.title || "انضم لفريق المتطوعين";
+  const heroLead = systemForm?.description || intro?.content || "كن جزءاً من رسالتنا في خدمة المجتمع — املأ النموذج وسنتواصل معك";
+  const unavailable = systemForm && (systemForm.archived || !systemForm.published);
   const [data, setData] = useState<VolunteerForm>(initial);
   const [errors, setErrors] = useState<Partial<Record<keyof VolunteerForm, string>>>({});
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+
+  if (unavailable) {
+    return (
+      <>
+        <PageHero eyebrow="الخدمات الإلكترونية" title={heroTitle} lead="هذه الخدمة غير متاحة حالياً" />
+        <section className="container py-20 text-center">
+          <p className="text-muted-foreground mb-6">نموذج التطوع غير متاح في الوقت الحالي. يُرجى المحاولة لاحقاً.</p>
+          <Button asChild><Link to="/e-services">العودة للخدمات الإلكترونية</Link></Button>
+        </section>
+      </>
+    );
+  }
 
   const update = <K extends keyof VolunteerForm>(key: K, val: VolunteerForm[K]) => {
     setData((d) => ({ ...d, [key]: val }));

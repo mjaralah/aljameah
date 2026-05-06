@@ -34,6 +34,7 @@ import {
 import { cn } from "@/lib/utils";
 import { IconField } from "@/components/eservices/FormFields";
 import { usePageContent } from "@/hooks/usePublicContent";
+import { useSystemForm } from "@/hooks/useSystemForm";
 import * as LucideIcons from "lucide-react";
 
 const membershipSchema = z.object({
@@ -64,7 +65,11 @@ function resolveIcon(name?: string): any {
 export default function MembershipService() {
   const { toast } = useToast();
   const { data: pageSections } = usePageContent("eservices_membership");
+  const { data: systemForm } = useSystemForm("membership");
   const intro = (pageSections ?? []).find((s) => s.section_key === "intro");
+  const heroTitle = systemForm?.title || intro?.title || "طلب عضوية الجمعية";
+  const heroLead = systemForm?.description || intro?.content || "انضم رسمياً إلى أسرة الجمعية، واحصل على مزايا حصرية وحق المشاركة في صنع القرار.";
+  const unavailable = systemForm && (systemForm.archived || !systemForm.published);
   const benefitsSection = (pageSections ?? []).find((s) => s.section_key === "benefits");
   const benefits = (Array.isArray(benefitsSection?.data?.items) && benefitsSection!.data.items.length > 0)
     ? benefitsSection!.data.items.map((it: any) => ({
@@ -79,6 +84,18 @@ export default function MembershipService() {
   });
   const [errors, setErrors] = useState<Partial<Record<keyof MembershipForm, string>>>({});
   const [submitted, setSubmitted] = useState(false);
+
+  if (unavailable) {
+    return (
+      <>
+        <PageHero eyebrow="الخدمات الإلكترونية" title={heroTitle} lead="هذه الخدمة غير متاحة حالياً" />
+        <section className="container py-20 text-center">
+          <p className="text-muted-foreground mb-6">نموذج العضوية غير متاح في الوقت الحالي. يُرجى المحاولة لاحقاً.</p>
+          <Button asChild><Link to="/e-services">العودة للخدمات الإلكترونية</Link></Button>
+        </section>
+      </>
+    );
+  }
 
   const update = (k: keyof MembershipForm, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
