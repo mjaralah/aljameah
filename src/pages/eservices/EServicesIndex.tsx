@@ -175,44 +175,41 @@ export default function EServicesIndex() {
   const intro = (pageSections ?? []).find((s) => s.section_key === "intro");
   const servicesSection = (pageSections ?? []).find((s) => s.section_key === "services_list");
 
-  const { data: customForms } = useQuery({
-    queryKey: ["public-custom-forms"],
+  const { data: allForms } = useQuery({
+    queryKey: ["public-eservices-forms"],
     queryFn: async () => {
       const { data } = await supabase
         .from("custom_forms")
         .select("*")
         .eq("published", true)
         .eq("archived", false)
-        .is("is_system", null)
         .order("sort_order");
       return data ?? [];
     },
   });
 
+  const SYSTEM_ROUTES: Record<string, string> = {
+    volunteer: "/e-services/volunteer",
+    membership: "/e-services/membership",
+    contact: "/contact",
+  };
+
   const services: ServiceItem[] = useMemo(() => {
-    const items: any[] = Array.isArray(servicesSection?.data?.items) ? servicesSection!.data.items : [];
-    const base: ServiceItem[] = items.length === 0 ? SERVICES : items.map((it) => ({
-      to: it.url || undefined,
-      title: { ar: it.title ?? "", en: it.title ?? "" },
-      desc: { ar: it.description ?? "", en: it.description ?? "" },
-      icon: resolveIcon(it.icon),
-      audience: (["individuals", "entities", "inquiries"].includes(it.audience) ? it.audience : "individuals") as Exclude<Audience, "all">,
-      status: (it.status === "soon" ? "soon" : "available") as Status,
-      duration: { ar: it.duration ?? "", en: it.duration ?? "" },
-      featured: !!it.featured,
-    }));
-    const dynamic: ServiceItem[] = (customForms ?? []).map((f: any) => ({
-      to: `/e-services/form/${f.slug}`,
-      title: { ar: f.title, en: f.title },
-      desc: { ar: f.description ?? "", en: f.description ?? "" },
-      icon: resolveIcon(f.icon),
-      audience: (["individuals", "entities", "inquiries"].includes(f.audience) ? f.audience : "individuals") as Exclude<Audience, "all">,
-      status: "available",
-      duration: { ar: f.duration ?? "", en: f.duration ?? "" },
-      featured: !!f.featured,
-    }));
-    return [...base, ...dynamic];
-  }, [servicesSection, customForms]);
+    return (allForms ?? []).map((f: any) => {
+      const isSoon = !!f.coming_soon;
+      const route = f.is_system ? (SYSTEM_ROUTES[f.is_system] ?? `/e-services/form/${f.slug}`) : `/e-services/form/${f.slug}`;
+      return {
+        to: isSoon ? undefined : route,
+        title: { ar: f.title, en: f.title },
+        desc: { ar: f.description ?? "", en: f.description ?? "" },
+        icon: resolveIcon(f.icon),
+        audience: (["individuals", "entities", "inquiries"].includes(f.audience) ? f.audience : "individuals") as Exclude<Audience, "all">,
+        status: isSoon ? "soon" : "available",
+        duration: { ar: f.duration ?? "", en: f.duration ?? "" },
+        featured: !!f.featured,
+      } as ServiceItem;
+    });
+  }, [allForms]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
