@@ -326,6 +326,7 @@ function FormEditor({ value, onChange, onCancel, onSave, saving }: {
                 </div>
                 <div className="flex items-center gap-2"><Switch checked={value.published} onCheckedChange={(v) => update("published", v)} /><Label>منشور</Label></div>
                 <div className="flex items-center gap-2"><Switch checked={value.featured} onCheckedChange={(v) => update("featured", v)} /><Label>مميز (الأكثر طلباً)</Label></div>
+                <div className="flex items-center gap-2"><Switch checked={!!value.coming_soon} onCheckedChange={(v) => update("coming_soon", v)} /><Label>قادم قريباً (يُعرض كبطاقة دون نموذج)</Label></div>
               </div>
             </TabsContent>
 
