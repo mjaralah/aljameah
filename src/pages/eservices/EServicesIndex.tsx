@@ -173,7 +173,7 @@ export default function EServicesIndex() {
   const [query, setQuery] = useState("");
   const { data: pageSections } = usePageContent("eservices");
   const intro = (pageSections ?? []).find((s) => s.section_key === "intro");
-  const servicesSection = (pageSections ?? []).find((s) => s.section_key === "services_list");
+  
 
   const { data: allForms } = useQuery({
     queryKey: ["public-eservices-forms"],
