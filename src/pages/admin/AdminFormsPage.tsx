@@ -164,6 +164,7 @@ export default function AdminFormsPage() {
       success_message: editing.success_message,
       published: editing.published,
       featured: editing.featured,
+      coming_soon: !!editing.coming_soon,
       sort_order: editing.sort_order ?? forms.length,
     };
     const { error } = editing.id
