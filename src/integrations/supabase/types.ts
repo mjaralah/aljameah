@@ -167,6 +167,7 @@ export type Database = {
         Row: {
           archived: boolean
           audience: string
+          coming_soon: boolean
           created_at: string
           description: string | null
           duration: string | null
@@ -185,6 +186,7 @@ export type Database = {
         Insert: {
           archived?: boolean
           audience?: string
+          coming_soon?: boolean
           created_at?: string
           description?: string | null
           duration?: string | null
@@ -203,6 +205,7 @@ export type Database = {
         Update: {
           archived?: boolean
           audience?: string
+          coming_soon?: boolean
           created_at?: string
           description?: string | null
           duration?: string | null

@@ -73,6 +73,18 @@ export default function CustomFormPage() {
               <p className="text-muted-foreground mb-6">{form.success_message ?? "شكراً لتواصلك معنا."}</p>
               <Button asChild><Link to="/e-services"><ArrowRight className="h-4 w-4 me-2" /> العودة للخدمات</Link></Button>
             </div>
+          ) : form.coming_soon ? (
+            <div className="text-center py-10">
+              <h2 className="text-2xl font-bold mb-3">قريباً</h2>
+              <p className="text-muted-foreground mb-6">هذه الخدمة ستكون متاحة قريباً. تابعونا للحصول على آخر التحديثات.</p>
+              <Button asChild><Link to="/e-services"><ArrowRight className="h-4 w-4 me-2" /> العودة للخدمات</Link></Button>
+            </div>
+          ) : !form.fields || (form.fields as Field[]).length === 0 ? (
+            <div className="text-center py-10">
+              <h2 className="text-2xl font-bold mb-3">النموذج قيد الإعداد</h2>
+              <p className="text-muted-foreground mb-6">لم يتم إضافة حقول لهذا النموذج بعد.</p>
+              <Button asChild><Link to="/e-services"><ArrowRight className="h-4 w-4 me-2" /> العودة للخدمات</Link></Button>
+            </div>
           ) : (
             <form onSubmit={submit} className="space-y-4">
               {(form.fields as Field[]).map((f) => (

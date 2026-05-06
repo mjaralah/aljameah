@@ -38,6 +38,7 @@ interface CustomForm {
   sort_order: number;
   archived?: boolean;
   is_system?: string | null;
+  coming_soon?: boolean;
 }
 
 const SYSTEM_LABELS: Record<string, { label: string; url: string }> = {
@@ -163,6 +164,7 @@ export default function AdminFormsPage() {
       success_message: editing.success_message,
       published: editing.published,
       featured: editing.featured,
+      coming_soon: !!editing.coming_soon,
       sort_order: editing.sort_order ?? forms.length,
     };
     const { error } = editing.id
@@ -210,6 +212,7 @@ export default function AdminFormsPage() {
                     <h3 className="font-bold">{f.title}</h3>
                     {sys && <Badge variant="outline" className="border-accent text-accent"><Lock className="h-3 w-3 me-1" /> نظامي</Badge>}
                     <Badge variant={f.published ? "default" : "secondary"}>{f.published ? "منشور" : "مخفي"}</Badge>
+                    {f.coming_soon && <Badge variant="outline" className="border-amber-500 text-amber-600">قريباً</Badge>}
                     {f.featured && <Badge variant="outline">مميز</Badge>}
                     {f.archived && <Badge variant="destructive">مؤرشف</Badge>}
                     <code className="text-xs text-muted-foreground">{publicUrl}</code>
@@ -326,6 +329,7 @@ function FormEditor({ value, onChange, onCancel, onSave, saving }: {
                 </div>
                 <div className="flex items-center gap-2"><Switch checked={value.published} onCheckedChange={(v) => update("published", v)} /><Label>منشور</Label></div>
                 <div className="flex items-center gap-2"><Switch checked={value.featured} onCheckedChange={(v) => update("featured", v)} /><Label>مميز (الأكثر طلباً)</Label></div>
+                <div className="flex items-center gap-2"><Switch checked={!!value.coming_soon} onCheckedChange={(v) => update("coming_soon", v)} /><Label>قادم قريباً (يُعرض كبطاقة دون نموذج)</Label></div>
               </div>
             </TabsContent>
 
