@@ -66,7 +66,14 @@ export default function CustomFormPage() {
       />
       <section className="container py-10 md:py-14">
         <Card className="p-6 md:p-8 max-w-3xl mx-auto">
-          {form.coming_soon ? (
+          {done ? (
+            <div className="text-center py-8">
+              <CheckCircle2 className="h-16 w-16 text-primary mx-auto mb-4" />
+              <h2 className="text-2xl font-bold mb-2">تم الإرسال بنجاح</h2>
+              <p className="text-muted-foreground mb-6">{form.success_message ?? "شكراً لتواصلك معنا."}</p>
+              <Button asChild><Link to="/e-services"><ArrowRight className="h-4 w-4 me-2" /> العودة للخدمات</Link></Button>
+            </div>
+          ) : form.coming_soon ? (
             <div className="text-center py-10">
               <h2 className="text-2xl font-bold mb-3">قريباً</h2>
               <p className="text-muted-foreground mb-6">هذه الخدمة ستكون متاحة قريباً. تابعونا للحصول على آخر التحديثات.</p>
