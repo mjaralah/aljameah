@@ -38,6 +38,7 @@ interface CustomForm {
   sort_order: number;
   archived?: boolean;
   is_system?: string | null;
+  coming_soon?: boolean;
 }
 
 const SYSTEM_LABELS: Record<string, { label: string; url: string }> = {
