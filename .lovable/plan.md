@@ -1,68 +1,43 @@
+## الهدف
+نقل قائمة بطاقات الخدمات الإلكترونية (التطوع، طلب عضوية، طلب مساعدة، تبرع، شراكة، رعاية فعالية، استفسار، شكوى، شهادة شكر) من تبويب **الخدمات الإلكترونية** في "محتوى الصفحات" إلى صفحة **نماذج الخدمات** الموحّدة، مع الإبقاء على التبويب لتحرير **عنوان ووصف الصفحة فقط**.
 
-# Phase 1 — Foundation + Home Page
+## التغييرات
 
-A high-fidelity Arabic-first (RTL) charitable association prototype. Phase 1 establishes the design system, global layout, accessibility & language infrastructure, dummy data, and a fully built **Home page** + **404 page**. Subsequent phases add inner pages, Surveys, and the Admin dashboard.
+### 1. قاعدة البيانات (هجرة جديدة)
+- بذر (seed) السجلات الست المتبقية في `custom_forms` كنماذج "قادمة قريباً":
+  - `aid_request`, `donation`, `corporate_partnership`, `event_sponsorship`, `general_inquiry`, `complaint_feedback`, `volunteer_certificate`
+- إضافة عمود جديد `coming_soon boolean default false` على `custom_forms` لتمييز "قادم قريباً" بدل ربطها بحالة النشر.
+- جعلها مُعلَّمة بـ `is_system = '<key>'` لمنع حذفها من المدير (مع السماح بالتعديل/الأرشفة/الإخفاء).
 
-## Brand & Design System
-- **Font:** IBM Plex Sans Arabic (Arabic) + Inter (English fallback)
-- **Colors:** Primary green `#1B5E35`, Gold accent `#C5973A`, neutral whites/greys
-- **Style:** Clean, modern, trustworthy nonprofit; generous spacing; rounded cards; soft shadows; subtle green/gold gradients
-- **Tokens** wired through `index.css` + `tailwind.config.ts` (HSL semantic tokens, dark/high-contrast variants ready)
-- **Defaults (placeholders, editable later):**
-  - Name: «جمعية العطاء الخيرية»
-  - Registration No.: «1234/2020»
+### 2. صفحة نماذج الخدمات `AdminFormsPage.tsx`
+- إضافة شارة "قادم قريباً" + مفتاح Switch لتفعيل/إيقاف الحالة.
+- توسيع منطقة التحرير لتشمل: `audience` (للأفراد/جهات/استفسارات)، `duration`، `icon`، `featured`، `description`.
+- تجميع التبويبات: **نشط / قادم قريباً / مؤرشف**.
 
-## Global Infrastructure
-- **RTL-first layout** — `<html dir="rtl" lang="ar">` by default
-- **Language toggle (AR ⇄ EN)** — switches `dir`/`lang`, persists choice in localStorage; full translation dictionary for all Phase 1 strings
-- **Floating Accessibility Toolbar** (bottom-corner FAB, expands to panel):
-  - Text size A− / A / A+
-  - High contrast mode
-  - Dyslexia-friendly font (OpenDyslexic)
-  - Reading guide (horizontal cursor bar)
-  - Reset
-  - All preferences saved to localStorage
-- **Sticky top utility bar** — gold verification badge ✓ + registration number + language switcher
-- **Main header** — logo, primary nav (Home, About, Programs, Governance, Media, Volunteer, Surveys, Contact), search icon, donate CTA
-- **Full footer** — about blurb, quick links, legal links (privacy/terms/cookies/accessibility/sitemap), contact info, social icons, registration line, copyright
-- **Page Feedback widget** — "هل كانت هذه الصفحة مفيدة؟" 👍 / 👎 + optional comment, stored in localStorage (reusable component for every page)
-- **Breadcrumb component** (ready for inner pages)
+### 3. تبويب الخدمات الإلكترونية في `AdminPageContentPage.tsx`
+- إزالة قسم `services_list` (المحرّر اليدوي للبطاقات) من واجهة هذا التبويب فقط.
+- الإبقاء فقط على قسم `intro` (عنوان + وصف الصفحة).
+- إضافة شريط ملاحظة بزر "إدارة بطاقات الخدمات ←" يوجّه إلى `/admin/forms`.
 
-## Home Page Sections
-1. **Hero slider** — 3 slides (Swiper.js), full-width, image + headline + CTA, autoplay + pagination
-2. **Impact statistics counters** — 4 animated counters (beneficiaries, programs, volunteers, years of service)
-3. **About preview** — 2-column: image + intro text + "Learn more" link
-4. **Programs grid** — 6 program cards with icon, title, short description
-5. **News preview** — 3 latest news cards (image, date, title, excerpt)
-6. **Partners carousel** — Swiper logo carousel (3 dummy partners, looped)
-7. **Volunteer CTA banner** — green/gold gradient with "Join us" button
-8. **Page feedback widget**
-9. **Footer**
+### 4. صفحة الواجهة `EServicesIndex.tsx`
+- إزالة الاعتماد على `servicesSection.data.items` و`SERVICES` الثابتة.
+- جلب جميع البطاقات من `custom_forms` فقط (تشمل النظامية وغير النظامية):
+  - الزر يفتح `/e-services/<system_route>` للنماذج النظامية المعروفة (volunteer/membership/contact)، أو `/e-services/form/:slug` للبقية.
+  - النماذج المؤشّرة `coming_soon=true` تظهر بشارة "قريباً" بدون زر تنفيذ.
+- الإبقاء على `intro` كمصدر لعنوان/وصف الصفحة فقط.
 
-## Pages Delivered in Phase 1
-- `/` Home (full build)
-- `/404` (NotFound) — friendly Arabic message, search box, helpful links
-- All other routes (`/about`, `/programs`, `/governance`, `/media`, `/volunteer`, `/contact`, `/surveys`, `/admin`, legal pages) wired into the router as **placeholder stubs** with breadcrumb + "Coming in next phase" notice — so navigation works end-to-end.
+### 5. صفحة `CustomFormPage.tsx`
+- عرض شاشة "الخدمة قادمة قريباً" بدل النموذج إذا كانت `coming_soon=true`.
 
-## Dummy Data (seeded into `src/data/`)
-- 5 news articles, 6 programs, 4 board members, 3 partners, 8 volunteers, 3 contact messages, 2 surveys (1 active + 1 closed with results), 1 annual report, 2 policies — all in Arabic with English translations, ready for later phases.
+## تفاصيل تقنية
+- لن يتم حذف بيانات `page_content.services_list` الموجودة (للأمان والتراجع)، فقط لن تُعرض في الواجهتين.
+- النماذج النظامية الجديدة (السبعة) بدون حقول افتراضياً (`fields: []`)؛ المدير يضيف الحقول لاحقاً عند تفعيل الخدمة.
+- `is_system` يمنع زر الحذف ويُظهر شارة "نظامي" كما في النماذج الثلاثة الحالية.
 
-## Tech & Folder Structure
-- React 18 + TypeScript + Tailwind + React Router v6
-- Swiper.js (hero + partners), Recharts & SweetAlert2 installed for later phases
-- Lucide icons (Heroicons-equivalent, already available)
-```
-src/
-├── components/        (Header, Footer, TopBar, AccessibilityToolbar,
-│                       LanguageToggle, PageFeedback, Breadcrumb, …)
-├── pages/             (Home, NotFound, stubs)
-├── admin/             (placeholder for Phase 3)
-├── hooks/             (useLanguage, useLocalStorage, useTranslation, useA11y)
-├── data/              (news, programs, partners, board, surveys, …)
-├── types/             (shared TS types)
-└── i18n/              (ar.ts, en.ts dictionaries)
-```
-- Arabic comments throughout the codebase
-
-## Phase 2 (next) — Inner pages: About, Programs, Governance, Media, Volunteer, Contact, Surveys (full builder + Recharts results), Search, Sitemap, Legal pages
-## Phase 3 — Admin Dashboard (fake login + 13 sections)
+## الملفات المتأثرة
+- جديد: `supabase/migrations/<ts>_seed_eservices_forms.sql`
+- تعديل: `src/pages/admin/AdminFormsPage.tsx`
+- تعديل: `src/pages/admin/AdminPageContentPage.tsx`
+- تعديل: `src/pages/eservices/EServicesIndex.tsx`
+- تعديل: `src/pages/eservices/CustomFormPage.tsx`
+- تعديل: `src/hooks/useSystemForm.ts` (توسيع نوع `key` ليشمل المفاتيح الجديدة عند الحاجة)
