@@ -93,6 +93,7 @@ export default function AdminFormsPage() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<CustomForm | (Omit<CustomForm, "id"> & { id?: string }) | null>(null);
   const [saving, setSaving] = useState(false);
+  const [view, setView] = useState<"active" | "archived">("active");
 
   async function load() {
     setLoading(true);
@@ -103,7 +104,16 @@ export default function AdminFormsPage() {
   }
   useEffect(() => { load(); }, []);
 
-  async function remove(id: string) {
+  const visibleForms = useMemo(
+    () => forms.filter((f) => (view === "archived" ? f.archived : !f.archived)),
+    [forms, view],
+  );
+
+  async function remove(id: string, isSystem?: string | null) {
+    if (isSystem) {
+      toast.error("لا يمكن حذف النموذج النظامي. يمكنك إخفاؤه أو أرشفته.");
+      return;
+    }
     if (!confirm("حذف النموذج؟ سيتم حذف جميع طلباته أيضاً.")) return;
     const { error } = await supabase.from("custom_forms").delete().eq("id", id);
     if (error) return toast.error(error.message);
@@ -111,11 +121,25 @@ export default function AdminFormsPage() {
     load();
   }
 
+  async function toggleArchive(f: CustomForm) {
+    const { error } = await supabase.from("custom_forms").update({ archived: !f.archived }).eq("id", f.id);
+    if (error) return toast.error(error.message);
+    toast.success(f.archived ? "تم استعادة النموذج" : "تم نقل النموذج للأرشيف");
+    load();
+  }
+
+  async function togglePublished(f: CustomForm) {
+    const { error } = await supabase.from("custom_forms").update({ published: !f.published }).eq("id", f.id);
+    if (error) return toast.error(error.message);
+    toast.success(f.published ? "تم إخفاء النموذج" : "تم نشر النموذج");
+    load();
+  }
+
   async function move(id: string, dir: -1 | 1) {
-    const idx = forms.findIndex((f) => f.id === id);
+    const idx = visibleForms.findIndex((f) => f.id === id);
     const j = idx + dir;
-    if (j < 0 || j >= forms.length) return;
-    const a = forms[idx], b = forms[j];
+    if (j < 0 || j >= visibleForms.length) return;
+    const a = visibleForms[idx], b = visibleForms[j];
     await supabase.from("custom_forms").update({ sort_order: b.sort_order }).eq("id", a.id);
     await supabase.from("custom_forms").update({ sort_order: a.sort_order }).eq("id", b.id);
     load();
