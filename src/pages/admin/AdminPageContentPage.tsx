@@ -373,6 +373,10 @@ export default function AdminPageContentPage() {
     media: [{ to: "/admin/news", label: "إدارة الأخبار", icon: Newspaper, desc: "إضافة وتعديل وحذف وأرشفة الأخبار" }],
     surveys: [{ to: "/admin/surveys", label: "إدارة الاستبيانات", icon: ClipboardList, desc: "إضافة وتعديل الاستبيانات والأسئلة" }],
     programs: [{ to: "/admin/programs", label: "إدارة البرامج", icon: FolderKanban, desc: "إضافة وتعديل وحذف البرامج" }],
+    eservices: [{ to: "/admin/forms", label: "إدارة بطاقات الخدمات والنماذج", icon: ClipboardList, desc: "تحرير عناوين/أوصاف بطاقات الخدمات وحقول النماذج وحالات (نشط/قريباً/مؤرشف)" }],
+    eservices_volunteer: [{ to: "/admin/forms", label: "تحرير نموذج التطوع", icon: ClipboardList, desc: "إدارة حقول وعنوان نموذج التطوع من صفحة النماذج الموحّدة" }],
+    eservices_membership: [{ to: "/admin/forms", label: "تحرير نموذج العضوية", icon: ClipboardList, desc: "إدارة حقول وعنوان نموذج العضوية من صفحة النماذج الموحّدة" }],
+    contact: [{ to: "/admin/forms", label: "تحرير نموذج التواصل", icon: ClipboardList, desc: "إدارة حقول وعنوان نموذج التواصل من صفحة النماذج الموحّدة" }],
   };
 
   return (
