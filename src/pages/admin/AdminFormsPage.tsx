@@ -36,7 +36,15 @@ interface CustomForm {
   published: boolean;
   featured: boolean;
   sort_order: number;
+  archived?: boolean;
+  is_system?: string | null;
 }
+
+const SYSTEM_LABELS: Record<string, { label: string; url: string }> = {
+  volunteer: { label: "نموذج التطوع (نظامي)", url: "/e-services/volunteer" },
+  membership: { label: "نموذج العضوية (نظامي)", url: "/e-services/membership" },
+  contact: { label: "نموذج التواصل (نظامي)", url: "/contact" },
+};
 
 const TEMPLATES: Record<string, Field[]> = {
   blank: [],
