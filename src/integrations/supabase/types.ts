@@ -165,6 +165,7 @@ export type Database = {
       }
       custom_forms: {
         Row: {
+          archived: boolean
           audience: string
           created_at: string
           description: string | null
@@ -173,6 +174,7 @@ export type Database = {
           fields: Json
           icon: string | null
           id: string
+          is_system: string | null
           published: boolean
           slug: string
           sort_order: number
@@ -181,6 +183,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          archived?: boolean
           audience?: string
           created_at?: string
           description?: string | null
@@ -189,6 +192,7 @@ export type Database = {
           fields?: Json
           icon?: string | null
           id?: string
+          is_system?: string | null
           published?: boolean
           slug: string
           sort_order?: number
@@ -197,6 +201,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          archived?: boolean
           audience?: string
           created_at?: string
           description?: string | null
@@ -205,6 +210,7 @@ export type Database = {
           fields?: Json
           icon?: string | null
           id?: string
+          is_system?: string | null
           published?: boolean
           slug?: string
           sort_order?: number
