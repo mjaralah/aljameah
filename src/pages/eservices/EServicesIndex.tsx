@@ -178,7 +178,13 @@ export default function EServicesIndex() {
   const { data: customForms } = useQuery({
     queryKey: ["public-custom-forms"],
     queryFn: async () => {
-      const { data } = await supabase.from("custom_forms").select("*").eq("published", true).order("sort_order");
+      const { data } = await supabase
+        .from("custom_forms")
+        .select("*")
+        .eq("published", true)
+        .eq("archived", false)
+        .is("is_system", null)
+        .order("sort_order");
       return data ?? [];
     },
   });

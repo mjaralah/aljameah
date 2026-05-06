@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Trash2, ArrowUp, ArrowDown, ExternalLink, Copy, Loader2 } from "lucide-react";
+import { Plus, Trash2, ArrowUp, ArrowDown, ExternalLink, Copy, Loader2, Archive, ArchiveRestore, Lock, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
@@ -36,7 +36,15 @@ interface CustomForm {
   published: boolean;
   featured: boolean;
   sort_order: number;
+  archived?: boolean;
+  is_system?: string | null;
 }
+
+const SYSTEM_LABELS: Record<string, { label: string; url: string }> = {
+  volunteer: { label: "نموذج التطوع (نظامي)", url: "/e-services/volunteer" },
+  membership: { label: "نموذج العضوية (نظامي)", url: "/e-services/membership" },
+  contact: { label: "نموذج التواصل (نظامي)", url: "/contact" },
+};
 
 const TEMPLATES: Record<string, Field[]> = {
   blank: [],
@@ -85,6 +93,7 @@ export default function AdminFormsPage() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<CustomForm | (Omit<CustomForm, "id"> & { id?: string }) | null>(null);
   const [saving, setSaving] = useState(false);
+  const [view, setView] = useState<"active" | "archived">("active");
 
   async function load() {
     setLoading(true);
@@ -95,7 +104,16 @@ export default function AdminFormsPage() {
   }
   useEffect(() => { load(); }, []);
 
-  async function remove(id: string) {
+  const visibleForms = useMemo(
+    () => forms.filter((f) => (view === "archived" ? f.archived : !f.archived)),
+    [forms, view],
+  );
+
+  async function remove(id: string, isSystem?: string | null) {
+    if (isSystem) {
+      toast.error("لا يمكن حذف النموذج النظامي. يمكنك إخفاؤه أو أرشفته.");
+      return;
+    }
     if (!confirm("حذف النموذج؟ سيتم حذف جميع طلباته أيضاً.")) return;
     const { error } = await supabase.from("custom_forms").delete().eq("id", id);
     if (error) return toast.error(error.message);
@@ -103,11 +121,25 @@ export default function AdminFormsPage() {
     load();
   }
 
+  async function toggleArchive(f: CustomForm) {
+    const { error } = await supabase.from("custom_forms").update({ archived: !f.archived }).eq("id", f.id);
+    if (error) return toast.error(error.message);
+    toast.success(f.archived ? "تم استعادة النموذج" : "تم نقل النموذج للأرشيف");
+    load();
+  }
+
+  async function togglePublished(f: CustomForm) {
+    const { error } = await supabase.from("custom_forms").update({ published: !f.published }).eq("id", f.id);
+    if (error) return toast.error(error.message);
+    toast.success(f.published ? "تم إخفاء النموذج" : "تم نشر النموذج");
+    load();
+  }
+
   async function move(id: string, dir: -1 | 1) {
-    const idx = forms.findIndex((f) => f.id === id);
+    const idx = visibleForms.findIndex((f) => f.id === id);
     const j = idx + dir;
-    if (j < 0 || j >= forms.length) return;
-    const a = forms[idx], b = forms[j];
+    if (j < 0 || j >= visibleForms.length) return;
+    const a = visibleForms[idx], b = visibleForms[j];
     await supabase.from("custom_forms").update({ sort_order: b.sort_order }).eq("id", a.id);
     await supabase.from("custom_forms").update({ sort_order: a.sort_order }).eq("id", b.id);
     load();
@@ -143,44 +175,73 @@ export default function AdminFormsPage() {
     load();
   }
 
+  const activeCount = forms.filter((f) => !f.archived).length;
+  const archivedCount = forms.filter((f) => f.archived).length;
+
   return (
     <AdminLayout title="نماذج الخدمات الإلكترونية">
-      <div className="flex items-center justify-between mb-6">
-        <p className="text-muted-foreground text-sm">أنشئ نماذج جديدة أو انسخ القوالب الجاهزة. كل نموذج يظهر تلقائياً في صفحة الخدمات الإلكترونية.</p>
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+        <p className="text-muted-foreground text-sm">جميع النماذج: نماذج التطوع والعضوية والتواصل النظامية + النماذج المخصصة. يمكنك التعديل والإخفاء والأرشفة والحذف.</p>
         <Button onClick={() => setEditing({ ...emptyForm(), sort_order: forms.length })}>
           <Plus className="h-4 w-4 me-2" /> نموذج جديد
         </Button>
       </div>
 
+      <Tabs value={view} onValueChange={(v) => setView(v as any)} className="mb-4">
+        <TabsList>
+          <TabsTrigger value="active">النشطة ({activeCount})</TabsTrigger>
+          <TabsTrigger value="archived">الأرشيف ({archivedCount})</TabsTrigger>
+        </TabsList>
+      </Tabs>
+
       {loading ? (
         <div className="flex justify-center p-12"><Loader2 className="h-6 w-6 animate-spin" /></div>
       ) : (
         <div className="grid gap-3">
-          {forms.length === 0 && <Card><CardContent className="p-8 text-center text-muted-foreground">لا توجد نماذج بعد. ابدأ بإضافة نموذج جديد.</CardContent></Card>}
-          {forms.map((f, i) => (
-            <Card key={f.id}>
+          {visibleForms.length === 0 && <Card><CardContent className="p-8 text-center text-muted-foreground">{view === "archived" ? "لا توجد نماذج مؤرشفة." : "لا توجد نماذج بعد. ابدأ بإضافة نموذج جديد."}</CardContent></Card>}
+          {visibleForms.map((f, i) => {
+            const sys = f.is_system ? SYSTEM_LABELS[f.is_system] : null;
+            const publicUrl = sys?.url ?? `/e-services/form/${f.slug}`;
+            return (
+            <Card key={f.id} className={f.archived ? "opacity-70" : ""}>
               <CardContent className="p-4 flex items-center justify-between gap-3 flex-wrap">
                 <div className="flex-1 min-w-[200px]">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-bold">{f.title}</h3>
+                    {sys && <Badge variant="outline" className="border-accent text-accent"><Lock className="h-3 w-3 me-1" /> نظامي</Badge>}
                     <Badge variant={f.published ? "default" : "secondary"}>{f.published ? "منشور" : "مخفي"}</Badge>
                     {f.featured && <Badge variant="outline">مميز</Badge>}
-                    <code className="text-xs text-muted-foreground">/e-services/form/{f.slug}</code>
+                    {f.archived && <Badge variant="destructive">مؤرشف</Badge>}
+                    <code className="text-xs text-muted-foreground">{publicUrl}</code>
                   </div>
                   {f.description && <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{f.description}</p>}
-                  <p className="text-xs text-muted-foreground mt-1">{f.fields.length} حقل</p>
+                  <p className="text-xs text-muted-foreground mt-1">{f.fields.length} حقل / سؤال</p>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Button size="icon" variant="ghost" onClick={() => move(f.id, -1)} disabled={i === 0}><ArrowUp className="h-4 w-4" /></Button>
-                  <Button size="icon" variant="ghost" onClick={() => move(f.id, 1)} disabled={i === forms.length - 1}><ArrowDown className="h-4 w-4" /></Button>
-                  <Button size="icon" variant="ghost" asChild><Link to={`/e-services/form/${f.slug}`} target="_blank"><ExternalLink className="h-4 w-4" /></Link></Button>
-                  <Button size="icon" variant="ghost" onClick={() => setEditing({ ...emptyForm(), ...f, slug: f.slug + "-copy", title: f.title + " (نسخة)", id: undefined })}><Copy className="h-4 w-4" /></Button>
+                <div className="flex items-center gap-1 flex-wrap">
+                  {!f.archived && (
+                    <>
+                      <Button size="icon" variant="ghost" onClick={() => move(f.id, -1)} disabled={i === 0}><ArrowUp className="h-4 w-4" /></Button>
+                      <Button size="icon" variant="ghost" onClick={() => move(f.id, 1)} disabled={i === visibleForms.length - 1}><ArrowDown className="h-4 w-4" /></Button>
+                    </>
+                  )}
+                  <Button size="icon" variant="ghost" asChild title="معاينة"><Link to={publicUrl} target="_blank"><ExternalLink className="h-4 w-4" /></Link></Button>
+                  <Button size="icon" variant="ghost" title={f.published ? "إخفاء" : "نشر"} onClick={() => togglePublished(f)}>
+                    {f.published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                  {!f.is_system && (
+                    <Button size="icon" variant="ghost" title="نسخ" onClick={() => setEditing({ ...emptyForm(), ...f, slug: f.slug + "-copy", title: f.title + " (نسخة)", id: undefined, is_system: null, archived: false })}><Copy className="h-4 w-4" /></Button>
+                  )}
                   <Button variant="outline" onClick={() => setEditing(f)}>تعديل</Button>
-                  <Button size="icon" variant="ghost" onClick={() => remove(f.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                  <Button size="icon" variant="ghost" title={f.archived ? "استعادة" : "أرشفة"} onClick={() => toggleArchive(f)}>
+                    {f.archived ? <ArchiveRestore className="h-4 w-4" /> : <Archive className="h-4 w-4" />}
+                  </Button>
+                  {!f.is_system && (
+                    <Button size="icon" variant="ghost" title="حذف" onClick={() => remove(f.id, f.is_system)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
-          ))}
+          );})}
         </div>
       )}
 

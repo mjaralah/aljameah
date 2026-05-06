@@ -41,6 +41,7 @@ import {
 import { cn } from "@/lib/utils";
 import { IconField } from "@/components/eservices/FormFields";
 import { usePageContent } from "@/hooks/usePublicContent";
+import { useSystemForm } from "@/hooks/useSystemForm";
 
 const contactSchema = z.object({
   fullName: z.string().trim().min(3, "الاسم يجب أن يكون 3 أحرف على الأقل").max(100),
@@ -105,6 +106,7 @@ const socials = [
 export default function Contact() {
   const { toast } = useToast();
   const { data: pageSections } = usePageContent("contact");
+  const { data: systemForm } = useSystemForm("contact");
   const sectionMap = (pageSections ?? []).reduce<Record<string, any>>(
     (acc, s) => ({ ...acc, [s.section_key]: s }),
     {},
@@ -112,6 +114,7 @@ export default function Contact() {
   const intro = sectionMap.intro;
   const hours = sectionMap.hours;
   const mapSec = sectionMap.map;
+  const formUnavailable = systemForm && (systemForm.archived || !systemForm.published);
 
   const [form, setForm] = useState<ContactForm>({
     fullName: "",

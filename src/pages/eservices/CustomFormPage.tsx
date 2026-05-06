@@ -26,7 +26,7 @@ export default function CustomFormPage() {
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await supabase.from("custom_forms").select("*").eq("slug", slug).eq("published", true).maybeSingle();
+      const { data, error } = await supabase.from("custom_forms").select("*").eq("slug", slug).eq("published", true).eq("archived", false).maybeSingle();
       if (error) toast.error(error.message);
       setForm(data);
       setLoading(false);
