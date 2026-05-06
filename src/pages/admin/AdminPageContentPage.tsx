@@ -432,7 +432,7 @@ export default function AdminPageContentPage() {
                   );
                 })}
 
-                {(grouped[page.key] ?? []).map((s) => (
+                {(grouped[page.key] ?? []).filter((s) => !(page.key === "eservices" && s.section_key === "services_list")).map((s) => (
                   <Card key={s.id} className={!s.published ? "opacity-70 border-dashed" : undefined}>
                     <CardHeader>
                       <CardTitle className="text-base flex items-center justify-between gap-2">
