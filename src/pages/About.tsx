@@ -17,6 +17,10 @@ import {
   Lightbulb,
   ArrowLeft,
   Award,
+  Clock,
+  CalendarCheck,
+  FileDown,
+  ScrollText,
 } from "lucide-react";
 import { PageHero } from "@/components/layout/PageHero";
 import { PageFeedback } from "@/components/layout/PageFeedback";
@@ -24,7 +28,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { board as fallbackBoard } from "@/data/board";
-import { useBoardMembers, useAboutContent, type DBAboutSection } from "@/hooks/usePublicContent";
+import { useBoardMembers, useBoardSettings, useAboutContent, type DBAboutSection } from "@/hooks/usePublicContent";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ceoPortrait from "@/assets/ceo-portrait.jpg";
 
