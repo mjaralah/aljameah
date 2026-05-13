@@ -80,6 +80,7 @@ const About = () => {
   const { t } = useLanguage();
   const [active, setActive] = useState<string>("founding");
   const { data: dbBoard } = useBoardMembers();
+  const { data: dbBoardSettings } = useBoardSettings();
   const { data: dbAbout } = useAboutContent();
 
   // Map about_content rows by section_key for easy access
