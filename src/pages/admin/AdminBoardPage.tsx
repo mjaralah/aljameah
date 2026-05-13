@@ -153,12 +153,14 @@ function SettingsTab() {
         formation_decree_url: s.formation_decree_url,
         formation_decree_name: s.formation_decree_name,
       };
-      const q = s.id
-        ? supabase.from("board_settings").update(payload).eq("id", s.id)
-        : supabase.from("board_settings").insert(payload).select().single();
-      const { data, error } = await q;
-      if (error) throw error;
-      if (!s.id && data) setS({ ...(data as Settings) });
+      if (s.id) {
+        const { error } = await supabase.from("board_settings").update(payload).eq("id", s.id);
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase.from("board_settings").insert(payload).select().single();
+        if (error) throw error;
+        if (data) setS({ ...(data as Settings) });
+      }
       toast.success("تم حفظ الإعدادات");
     } catch (e) {
       toast.error((e as Error).message);
