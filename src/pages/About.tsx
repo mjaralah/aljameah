@@ -113,6 +113,7 @@ const About = () => {
         role: m.position,
         bio: m.bio ?? "",
         photo: m.photo_url,
+        term: m.term_duration ?? "",
       }))
     : fallbackBoard.map((m) => ({
         id: m.id,
@@ -120,6 +121,7 @@ const About = () => {
         role: m.role.ar,
         bio: m.bio.ar,
         photo: undefined as string | undefined,
+        term: "",
       }));
   // مراقبة أقسام الصفحة لإبراز العنصر النشط في القائمة الجانبية
   useEffect(() => {
