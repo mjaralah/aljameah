@@ -160,6 +160,21 @@ export function usePartners() {
   });
 }
 
+export function useBoardSettings() {
+  return useQuery({
+    queryKey: ["public", "board_settings"],
+    staleTime: STALE,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("board_settings")
+        .select("*")
+        .maybeSingle();
+      if (error) throw error;
+      return data as DBBoardSettings | null;
+    },
+  });
+}
+
 export function useBoardMembers() {
   return useQuery({
     queryKey: ["public", "board_members"],
