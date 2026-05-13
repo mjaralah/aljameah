@@ -60,6 +60,7 @@ export type Database = {
           position: string
           published: boolean
           sort_order: number
+          term_duration: string | null
           updated_at: string
         }
         Insert: {
@@ -71,6 +72,7 @@ export type Database = {
           position: string
           published?: boolean
           sort_order?: number
+          term_duration?: string | null
           updated_at?: string
         }
         Update: {
@@ -82,6 +84,49 @@ export type Database = {
           position?: string
           published?: boolean
           sort_order?: number
+          term_duration?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      board_settings: {
+        Row: {
+          created_at: string
+          formation_decree_name: string | null
+          formation_decree_url: string | null
+          id: string
+          intro_text: string | null
+          show_gregorian: boolean
+          show_hijri: boolean
+          term_duration_label: string | null
+          term_end_gregorian: string | null
+          term_end_hijri: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          formation_decree_name?: string | null
+          formation_decree_url?: string | null
+          id?: string
+          intro_text?: string | null
+          show_gregorian?: boolean
+          show_hijri?: boolean
+          term_duration_label?: string | null
+          term_end_gregorian?: string | null
+          term_end_hijri?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          formation_decree_name?: string | null
+          formation_decree_url?: string | null
+          id?: string
+          intro_text?: string | null
+          show_gregorian?: boolean
+          show_hijri?: boolean
+          term_duration_label?: string | null
+          term_end_gregorian?: string | null
+          term_end_hijri?: string | null
           updated_at?: string
         }
         Relationships: []

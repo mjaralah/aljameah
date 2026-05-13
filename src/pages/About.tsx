@@ -17,6 +17,10 @@ import {
   Lightbulb,
   ArrowLeft,
   Award,
+  Clock,
+  CalendarCheck,
+  FileDown,
+  ScrollText,
 } from "lucide-react";
 import { PageHero } from "@/components/layout/PageHero";
 import { PageFeedback } from "@/components/layout/PageFeedback";
@@ -24,7 +28,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { board as fallbackBoard } from "@/data/board";
-import { useBoardMembers, useAboutContent, type DBAboutSection } from "@/hooks/usePublicContent";
+import { useBoardMembers, useBoardSettings, useAboutContent, type DBAboutSection } from "@/hooks/usePublicContent";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ceoPortrait from "@/assets/ceo-portrait.jpg";
 
@@ -76,6 +80,7 @@ const About = () => {
   const { t } = useLanguage();
   const [active, setActive] = useState<string>("founding");
   const { data: dbBoard } = useBoardMembers();
+  const { data: dbBoardSettings } = useBoardSettings();
   const { data: dbAbout } = useAboutContent();
 
   // Map about_content rows by section_key for easy access
@@ -108,6 +113,7 @@ const About = () => {
         role: m.position,
         bio: m.bio ?? "",
         photo: m.photo_url,
+        term: m.term_duration ?? "",
       }))
     : fallbackBoard.map((m) => ({
         id: m.id,
@@ -115,6 +121,7 @@ const About = () => {
         role: m.role.ar,
         bio: m.bio.ar,
         photo: undefined as string | undefined,
+        term: "",
       }));
   // مراقبة أقسام الصفحة لإبراز العنصر النشط في القائمة الجانبية
   useEffect(() => {
@@ -301,33 +308,102 @@ const About = () => {
             {/* أعضاء مجلس الإدارة */}
             <SectionBlock id="board" icon={UserSquare2} title="أعضاء مجلس الإدارة">
               <p>
-                نخبةٌ من الكفاءات المتطوّعة لخدمة رسالة الجمعية، يُمثّلون تنوعاً في
-                الخبرات والتخصصات.
+                {dbBoardSettings?.intro_text ||
+                  "نخبةٌ من الكفاءات المتطوّعة لخدمة رسالة الجمعية، يُمثّلون تنوعاً في الخبرات والتخصصات."}
               </p>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-4 mt-6">
-                {boardItems.map((m) => (
-                  <div
-                    key={m.id}
-                    className="flex items-start gap-4 bg-card border border-border rounded-xl p-5 hover:shadow-card transition-smooth"
-                  >
-                    <div className="h-14 w-14 shrink-0 rounded-full bg-gradient-primary text-primary-foreground grid place-items-center font-bold text-lg overflow-hidden">
-                      {m.photo ? (
-                        <img src={m.photo} alt={m.name} className="h-full w-full object-cover" loading="lazy" />
-                      ) : (
-                        m.name.split(" ").slice(-1)[0][0]
+
+              <div className="grid lg:grid-cols-3 gap-5 mt-6">
+                {/* البطاقات */}
+                <div className="lg:col-span-2 grid sm:grid-cols-2 gap-4">
+                  {boardItems.map((m) => (
+                    <div
+                      key={m.id}
+                      className="flex flex-col bg-card border border-border rounded-xl p-5 hover:shadow-card transition-smooth"
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="h-14 w-14 shrink-0 rounded-full bg-gradient-primary text-primary-foreground grid place-items-center font-bold text-lg overflow-hidden">
+                          {m.photo ? (
+                            <img src={m.photo} alt={m.name} className="h-full w-full object-cover" loading="lazy" />
+                          ) : (
+                            m.name.split(" ").slice(-1)[0][0]
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-bold text-primary">{m.name}</h4>
+                          <Badge variant="secondary" className="mt-1 mb-2 text-xs">
+                            {m.role}
+                          </Badge>
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            {m.bio}
+                          </p>
+                        </div>
+                      </div>
+                      {m.term && (
+                        <div className="mt-4 pt-3 border-t border-border flex items-center gap-2 text-xs text-primary/80">
+                          <Clock className="h-3.5 w-3.5 text-accent" />
+                          <span>مدة الدورة: <span className="font-semibold">{m.term}</span></span>
+                        </div>
                       )}
                     </div>
-                    <div className="min-w-0">
-                      <h4 className="font-bold text-primary">{m.name}</h4>
-                      <Badge variant="secondary" className="mt-1 mb-2 text-xs">
-                        {m.role}
-                      </Badge>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        {m.bio}
-                      </p>
+                  ))}
+                </div>
+
+                {/* لوحة جانبية */}
+                <aside className="lg:sticky lg:top-24 self-start space-y-4">
+                  {dbBoardSettings?.term_duration_label && (
+                    <div className="bg-gradient-to-br from-primary/5 to-accent/5 border border-border rounded-xl p-5 text-center">
+                      <Clock className="h-7 w-7 text-accent mx-auto mb-2" />
+                      <div className="text-3xl font-extrabold text-primary leading-none">
+                        {dbBoardSettings.term_duration_label}
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-2">مدة دورة مجلس الإدارة</div>
                     </div>
-                  </div>
-                ))}
+                  )}
+
+                  {((dbBoardSettings?.show_hijri && dbBoardSettings?.term_end_hijri) ||
+                    (dbBoardSettings?.show_gregorian && dbBoardSettings?.term_end_gregorian)) && (
+                    <div className="bg-card border border-border rounded-xl p-5">
+                      <div className="flex items-center gap-2 mb-3">
+                        <CalendarCheck className="h-5 w-5 text-accent" />
+                        <h4 className="font-bold text-primary text-sm">تاريخ انتهاء دورة المجلس</h4>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        {dbBoardSettings?.show_hijri && dbBoardSettings?.term_end_hijri && (
+                          <div className="flex items-center justify-between gap-3 p-2 rounded-md bg-muted/40">
+                            <span className="text-xs text-muted-foreground">هجري</span>
+                            <span className="font-semibold text-primary" dir="ltr">{dbBoardSettings.term_end_hijri}</span>
+                          </div>
+                        )}
+                        {dbBoardSettings?.show_gregorian && dbBoardSettings?.term_end_gregorian && (
+                          <div className="flex items-center justify-between gap-3 p-2 rounded-md bg-muted/40">
+                            <span className="text-xs text-muted-foreground">ميلادي</span>
+                            <span className="font-semibold text-primary" dir="ltr">{dbBoardSettings.term_end_gregorian}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {dbBoardSettings?.formation_decree_url && (
+                    <div className="bg-card border border-border rounded-xl p-5">
+                      <div className="flex items-center gap-2 mb-3">
+                        <ScrollText className="h-5 w-5 text-accent" />
+                        <h4 className="font-bold text-primary text-sm">قرار تشكيل المجلس</h4>
+                      </div>
+                      <Button asChild variant="outline" className="w-full">
+                        <a
+                          href={dbBoardSettings.formation_decree_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          download
+                        >
+                          <FileDown className="h-4 w-4 ml-2" />
+                          {dbBoardSettings.formation_decree_name || "تحميل الملف المرفق"}
+                        </a>
+                      </Button>
+                    </div>
+                  )}
+                </aside>
               </div>
             </SectionBlock>
 
