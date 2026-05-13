@@ -51,6 +51,19 @@ export type DBBoardMember = {
   bio: string | null;
   photo_url: string | null;
   sort_order: number;
+  term_duration: string | null;
+};
+
+export type DBBoardSettings = {
+  id: string;
+  intro_text: string | null;
+  term_duration_label: string | null;
+  term_end_hijri: string | null;
+  term_end_gregorian: string | null;
+  show_hijri: boolean;
+  show_gregorian: boolean;
+  formation_decree_url: string | null;
+  formation_decree_name: string | null;
 };
 
 export type DBGovernanceDoc = {
