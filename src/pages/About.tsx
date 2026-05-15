@@ -348,61 +348,63 @@ const About = () => {
                   ))}
                 </div>
 
-                {/* لوحة جانبية */}
-                <aside className="lg:sticky lg:top-24 self-start space-y-4">
-                  {dbBoardSettings?.term_duration_label && (
-                    <div className="bg-gradient-to-br from-primary/5 to-accent/5 border border-border rounded-xl p-5 text-center">
-                      <Clock className="h-7 w-7 text-accent mx-auto mb-2" />
-                      <div className="text-3xl font-extrabold text-primary leading-none">
-                        {dbBoardSettings.term_duration_label}
+                {/* لوحة جانبية يمنى */}
+                <aside className="lg:col-span-1 order-first lg:order-first self-start">
+                  <div className="bg-card border border-border rounded-xl overflow-hidden divide-y divide-border">
+                    {dbBoardSettings?.term_duration_label && (
+                      <div className="p-5 bg-gradient-to-br from-primary/5 to-accent/5 text-center">
+                        <Clock className="h-6 w-6 text-accent mx-auto mb-2" />
+                        <div className="text-2xl font-extrabold text-primary leading-none">
+                          {dbBoardSettings.term_duration_label}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-2">مدة دورة مجلس الإدارة</div>
                       </div>
-                      <div className="text-xs text-muted-foreground mt-2">مدة دورة مجلس الإدارة</div>
-                    </div>
-                  )}
+                    )}
 
-                  {((dbBoardSettings?.show_hijri && dbBoardSettings?.term_end_hijri) ||
-                    (dbBoardSettings?.show_gregorian && dbBoardSettings?.term_end_gregorian)) && (
-                    <div className="bg-card border border-border rounded-xl p-5">
-                      <div className="flex items-center gap-2 mb-3">
-                        <CalendarCheck className="h-5 w-5 text-accent" />
-                        <h4 className="font-bold text-primary text-sm">تاريخ انتهاء دورة المجلس</h4>
+                    {((dbBoardSettings?.show_hijri && dbBoardSettings?.term_end_hijri) ||
+                      (dbBoardSettings?.show_gregorian && dbBoardSettings?.term_end_gregorian)) && (
+                      <div className="p-5">
+                        <div className="flex items-center gap-2 mb-3">
+                          <CalendarCheck className="h-5 w-5 text-accent" />
+                          <h4 className="font-bold text-primary text-sm">تاريخ انتهاء الدورة</h4>
+                        </div>
+                        <div className="space-y-2 text-sm">
+                          {dbBoardSettings?.show_hijri && dbBoardSettings?.term_end_hijri && (
+                            <div className="flex items-center justify-between gap-3 p-2 rounded-md bg-muted/40">
+                              <span className="text-xs text-muted-foreground">هجري</span>
+                              <span className="font-semibold text-primary" dir="ltr">{dbBoardSettings.term_end_hijri}</span>
+                            </div>
+                          )}
+                          {dbBoardSettings?.show_gregorian && dbBoardSettings?.term_end_gregorian && (
+                            <div className="flex items-center justify-between gap-3 p-2 rounded-md bg-muted/40">
+                              <span className="text-xs text-muted-foreground">ميلادي</span>
+                              <span className="font-semibold text-primary" dir="ltr">{dbBoardSettings.term_end_gregorian}</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <div className="space-y-2 text-sm">
-                        {dbBoardSettings?.show_hijri && dbBoardSettings?.term_end_hijri && (
-                          <div className="flex items-center justify-between gap-3 p-2 rounded-md bg-muted/40">
-                            <span className="text-xs text-muted-foreground">هجري</span>
-                            <span className="font-semibold text-primary" dir="ltr">{dbBoardSettings.term_end_hijri}</span>
-                          </div>
-                        )}
-                        {dbBoardSettings?.show_gregorian && dbBoardSettings?.term_end_gregorian && (
-                          <div className="flex items-center justify-between gap-3 p-2 rounded-md bg-muted/40">
-                            <span className="text-xs text-muted-foreground">ميلادي</span>
-                            <span className="font-semibold text-primary" dir="ltr">{dbBoardSettings.term_end_gregorian}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
+                    )}
 
-                  {dbBoardSettings?.formation_decree_url && (
-                    <div className="bg-card border border-border rounded-xl p-5">
-                      <div className="flex items-center gap-2 mb-3">
-                        <ScrollText className="h-5 w-5 text-accent" />
-                        <h4 className="font-bold text-primary text-sm">قرار تشكيل المجلس</h4>
+                    {dbBoardSettings?.formation_decree_url && (
+                      <div className="p-5">
+                        <div className="flex items-center gap-2 mb-3">
+                          <ScrollText className="h-5 w-5 text-accent" />
+                          <h4 className="font-bold text-primary text-sm">قرار تشكيل المجلس</h4>
+                        </div>
+                        <Button asChild variant="outline" className="w-full">
+                          <a
+                            href={dbBoardSettings.formation_decree_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download
+                          >
+                            <FileDown className="h-4 w-4 ml-2" />
+                            {dbBoardSettings.formation_decree_name || "تحميل الملف المرفق"}
+                          </a>
+                        </Button>
                       </div>
-                      <Button asChild variant="outline" className="w-full">
-                        <a
-                          href={dbBoardSettings.formation_decree_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          download
-                        >
-                          <FileDown className="h-4 w-4 ml-2" />
-                          {dbBoardSettings.formation_decree_name || "تحميل الملف المرفق"}
-                        </a>
-                      </Button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </aside>
               </div>
             </SectionBlock>
