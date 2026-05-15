@@ -312,9 +312,9 @@ const About = () => {
                   "نخبةٌ من الكفاءات المتطوّعة لخدمة رسالة الجمعية، يُمثّلون تنوعاً في الخبرات والتخصصات."}
               </p>
 
-              <div className="grid lg:grid-cols-3 gap-5 mt-6">
+              <div className="grid lg:grid-cols-4 gap-5 mt-6">
                 {/* البطاقات */}
-                <div className="lg:col-span-2 grid sm:grid-cols-2 gap-4">
+                <div className="lg:col-span-3 lg:order-last grid sm:grid-cols-2 gap-4">
                   {boardItems.map((m) => (
                     <div
                       key={m.id}
