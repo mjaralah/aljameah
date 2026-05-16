@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Plus, Pencil, Trash2, ChevronDown, ChevronUp, GripVertical } from "lucide-react";
 import { SortableList, SortableItem, persistSortOrder } from "@/components/admin/SortableList";
-import { PublishToggleButton } from "@/components/admin/PublishToggleButton";
+import { AdminListRow } from "@/components/admin/AdminListRow";
+import { Button as BtnIcon } from "@/components/ui/button";
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
@@ -152,41 +153,39 @@ export default function AdminSurveysPage() {
               return (
                 <SortableItem key={s.id} id={s.id}>
                   {({ handleProps, setNodeRef, style }) => (
-                    <Card ref={setNodeRef as any} style={style} className={!s.published ? "opacity-60" : ""}>
-                      <CardHeader className="flex flex-row items-start justify-between gap-2">
-                        <div className="flex items-start gap-2 flex-1 min-w-0">
-                          <button type="button" {...handleProps}
-                            className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground p-1 touch-none mt-0.5"
-                            aria-label="سحب">
-                            <GripVertical className="w-4 h-4" />
-                          </button>
-                          <div className="flex-1 min-w-0">
-                            <CardTitle className="text-base flex items-center gap-2 flex-wrap">
-                              {s.title}
-                              <Badge variant={s.published ? "default" : "secondary"}>
-                                {s.published ? "منشور" : "مسودة"}
-                              </Badge>
-                              <Badge variant={s.status === "active" ? "default" : "secondary"}>
-                                {s.status === "active" ? "نشط" : "مغلق"}
-                              </Badge>
-                              <Badge variant="outline">{qs.length} سؤال</Badge>
-                            </CardTitle>
-                            {s.description && <p className="text-xs text-muted-foreground mt-1">{s.description}</p>}
-                          </div>
-                        </div>
-                        <div className="flex gap-1">
-                          <PublishToggleButton table="surveys" id={s.id} published={s.published} onToggled={load} />
-                          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setOpenId(open ? null : s.id)}>
-                            {open ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                          </Button>
-                          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setEditing(s)}>
-                            <Pencil className="w-4 h-4" />
-                          </Button>
-                          <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => deleteSurvey(s.id)}>
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </CardHeader>
+                    <AdminListRow
+                      ref={setNodeRef as any}
+                      style={style}
+                      id={s.id}
+                      table="surveys"
+                      dragHandleProps={handleProps}
+                      title={s.title}
+                      subtitle={s.description ?? undefined}
+                      badges={
+                        <>
+                          <Badge variant={s.status === "active" ? "default" : "secondary"}>
+                            {s.status === "active" ? "نشط" : "مغلق"}
+                          </Badge>
+                          <Badge variant="outline">{qs.length} سؤال</Badge>
+                        </>
+                      }
+                      published={s.published}
+                      onTogglePublished={load}
+                      onEdit={() => setEditing(s)}
+                      onDelete={() => deleteSurvey(s.id)}
+                      extraActions={
+                        <BtnIcon
+                          type="button"
+                          size="icon"
+                          variant="outline"
+                          className="h-9 w-9 border-border bg-muted/40"
+                          onClick={() => setOpenId(open ? null : s.id)}
+                          aria-label="عرض الأسئلة"
+                        >
+                          {open ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                        </BtnIcon>
+                      }
+                    >
                       {open && (
                         <CardContent className="border-t pt-4 space-y-3">
                           <div className="flex justify-between items-center">
@@ -237,7 +236,7 @@ export default function AdminSurveysPage() {
                           )}
                         </CardContent>
                       )}
-                    </Card>
+                    </AdminListRow>
                   )}
                 </SortableItem>
               );

@@ -15,7 +15,7 @@ import {
   Newspaper, ClipboardList, FolderKanban, ExternalLink,
 } from "lucide-react";
 import { SortableList, SortableItem, persistSortOrder } from "@/components/admin/SortableList";
-import { PublishToggleButton } from "@/components/admin/PublishToggleButton";
+import { AdminListRow } from "@/components/admin/AdminListRow";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { IconPicker } from "@/components/admin/IconPicker";
@@ -457,40 +457,24 @@ export default function AdminPageContentPage() {
                         {pageSections.map((s) => (
                           <SortableItem key={s.id} id={s.id}>
                             {({ handleProps, setNodeRef, style }) => (
-                              <Card ref={setNodeRef as any} style={style} className={!s.published ? "opacity-60 border-dashed" : undefined}>
-                                <CardHeader>
-                                  <CardTitle className="text-base flex items-center justify-between gap-2">
-                                    <span className="flex items-center gap-2">
-                                      <button type="button" {...handleProps}
-                                        className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground p-1 touch-none"
-                                        aria-label="سحب">
-                                        <GripVertical className="w-4 h-4" />
-                                      </button>
-                                      {SECTION_LABELS[s.section_key] ?? s.section_key}
-                                      <span className={`text-[10px] px-2 py-0.5 rounded ${s.published ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>
-                                        {s.published ? "منشور" : "مسودة"}
-                                      </span>
-                                    </span>
-                                    <div className="flex items-center gap-1">
-                                      <PublishToggleButton
-                                        table="page_content"
-                                        id={s.id}
-                                        published={s.published}
-                                        onToggled={(next) => update(s.id, { published: next })}
-                                      />
-                                      <Button type="button" size="icon" variant="ghost" className="text-destructive h-8 w-8"
-                                        onClick={async () => {
-                                          if (!confirm("حذف هذا القسم نهائياً؟")) return;
-                                          const { error } = await supabase.from("page_content").delete().eq("id", s.id);
-                                          if (error) toast.error(error.message);
-                                          else { toast.success("تم الحذف"); load(); }
-                                        }}>
-                                        <Trash2 className="w-4 h-4" />
-                                      </Button>
-                                    </div>
-                                  </CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-3">
+                              <AdminListRow
+                                ref={setNodeRef as any}
+                                style={style}
+                                id={s.id}
+                                table="page_content"
+                                dragHandleProps={handleProps}
+                                title={SECTION_LABELS[s.section_key] ?? s.section_key}
+                                subtitle={s.title ?? undefined}
+                                published={s.published}
+                                onTogglePublished={(next) => update(s.id, { published: next })}
+                                onDelete={async () => {
+                                  if (!confirm("حذف هذا القسم نهائياً؟")) return;
+                                  const { error } = await supabase.from("page_content").delete().eq("id", s.id);
+                                  if (error) toast.error(error.message);
+                                  else { toast.success("تم الحذف"); load(); }
+                                }}
+                              >
+                                <CardContent className="space-y-3 border-t pt-4">
                                   <div>
                                     <Label>العنوان</Label>
                                     <Input value={s.title ?? ""}
@@ -517,7 +501,7 @@ export default function AdminPageContentPage() {
                                     </Button>
                                   </div>
                                 </CardContent>
-                              </Card>
+                              </AdminListRow>
                             )}
                           </SortableItem>
                         ))}
