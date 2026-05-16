@@ -26,7 +26,8 @@ export default function AdminNewsPage() {
       title="إدارة الأخبار"
       description="أضف أو حرّر أو احذف الأخبار المنشورة على الموقع"
       searchField="title"
-      orderBy={{ column: "created_at", ascending: false }}
+      orderBy={{ column: "sort_order", ascending: true }}
+      reorderable
       columns={[
         {
           key: "cover_image_url",
