@@ -134,68 +134,110 @@ export default function AdminSurveysPage() {
         <div className="p-12 flex justify-center"><Loader2 className="w-6 h-6 animate-spin" /></div>
       ) : (
         <div className="space-y-4">
-          {surveys.map((s) => {
-            const open = openId === s.id;
-            const qs = questions[s.id] ?? [];
-            return (
-              <Card key={s.id}>
-                <CardHeader className="flex flex-row items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <CardTitle className="text-base flex items-center gap-2 flex-wrap">
-                      {s.title}
-                      <Badge variant={s.status === "active" ? "default" : "secondary"}>
-                        {s.status === "active" ? "نشط" : "مغلق"}
-                      </Badge>
-                      <Badge variant="outline">{qs.length} سؤال</Badge>
-                    </CardTitle>
-                    {s.description && <p className="text-xs text-muted-foreground mt-1">{s.description}</p>}
-                  </div>
-                  <div className="flex gap-1">
-                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setOpenId(open ? null : s.id)}>
-                      {open ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                    </Button>
-                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setEditing(s)}>
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-                    <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => deleteSurvey(s.id)}>
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </CardHeader>
-                {open && (
-                  <CardContent className="border-t pt-4 space-y-3">
-                    <div className="flex justify-between items-center">
-                      <h4 className="text-sm font-semibold">الأسئلة</h4>
-                      <Button size="sm" variant="outline" onClick={() => setEditQ({ survey_id: s.id, type: "text", required: false, sort_order: qs.length })}>
-                        <Plus className="w-3 h-3 ml-1" /> سؤال
-                      </Button>
-                    </div>
-                    {qs.length === 0 ? (
-                      <p className="text-xs text-muted-foreground">لا توجد أسئلة بعد.</p>
-                    ) : (
-                      <ul className="space-y-2">
-                        {qs.map((q) => (
-                          <li key={q.id} className="flex items-start gap-2 p-2 rounded-md bg-muted/40 text-sm">
-                            <span className="text-muted-foreground tabular-nums w-6">{q.sort_order + 1}.</span>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-medium">{q.question}</p>
-                              <p className="text-xs text-muted-foreground">{QTYPES.find((t) => t.value === q.type)?.label ?? q.type}{q.required ? " · مطلوب" : ""}</p>
-                            </div>
-                            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditQ(q)}>
-                              <Pencil className="w-3 h-3" />
+          {surveys.length > 1 && (
+            <p className="text-xs text-muted-foreground">اسحب أيقونة <GripVertical className="inline w-3 h-3" /> لإعادة ترتيب الاستبيانات والأسئلة.</p>
+          )}
+          <SortableList
+            ids={surveys.map((s) => s.id)}
+            onReorder={async (newIds) => {
+              setSurveys(newIds.map((id) => surveys.find((s) => s.id === id)!));
+              try { await persistSortOrder(supabase, "surveys", newIds); toast.success("تم تحديث الترتيب"); }
+              catch { toast.error("تعذر حفظ الترتيب"); load(); }
+            }}
+          >
+            {surveys.map((s) => {
+              const open = openId === s.id;
+              const qs = questions[s.id] ?? [];
+              return (
+                <SortableItem key={s.id} id={s.id}>
+                  {({ handleProps, setNodeRef, style }) => (
+                    <Card ref={setNodeRef as any} style={style}>
+                      <CardHeader className="flex flex-row items-start justify-between gap-2">
+                        <div className="flex items-start gap-2 flex-1 min-w-0">
+                          <button type="button" {...handleProps}
+                            className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground p-1 touch-none mt-0.5"
+                            aria-label="سحب">
+                            <GripVertical className="w-4 h-4" />
+                          </button>
+                          <div className="flex-1 min-w-0">
+                            <CardTitle className="text-base flex items-center gap-2 flex-wrap">
+                              {s.title}
+                              <Badge variant={s.status === "active" ? "default" : "secondary"}>
+                                {s.status === "active" ? "نشط" : "مغلق"}
+                              </Badge>
+                              <Badge variant="outline">{qs.length} سؤال</Badge>
+                            </CardTitle>
+                            {s.description && <p className="text-xs text-muted-foreground mt-1">{s.description}</p>}
+                          </div>
+                        </div>
+                        <div className="flex gap-1">
+                          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setOpenId(open ? null : s.id)}>
+                            {open ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                          </Button>
+                          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setEditing(s)}>
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                          <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => deleteSurvey(s.id)}>
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      {open && (
+                        <CardContent className="border-t pt-4 space-y-3">
+                          <div className="flex justify-between items-center">
+                            <h4 className="text-sm font-semibold">الأسئلة</h4>
+                            <Button size="sm" variant="outline" onClick={() => setEditQ({ survey_id: s.id, type: "text", required: false, sort_order: qs.length })}>
+                              <Plus className="w-3 h-3 ml-1" /> سؤال
                             </Button>
-                            <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => deleteQuestion(q.id)}>
-                              <Trash2 className="w-3 h-3" />
-                            </Button>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </CardContent>
-                )}
-              </Card>
-            );
-          })}
+                          </div>
+                          {qs.length === 0 ? (
+                            <p className="text-xs text-muted-foreground">لا توجد أسئلة بعد.</p>
+                          ) : (
+                            <SortableList
+                              ids={qs.map((q) => q.id)}
+                              onReorder={async (newIds) => {
+                                const reordered = newIds.map((id) => qs.find((q) => q.id === id)!);
+                                setQuestions((prev) => ({ ...prev, [s.id]: reordered }));
+                                try { await persistSortOrder(supabase, "survey_questions", newIds); toast.success("تم تحديث الترتيب"); }
+                                catch { toast.error("تعذر حفظ الترتيب"); load(); }
+                              }}
+                            >
+                              <ul className="space-y-2">
+                                {qs.map((q, idx) => (
+                                  <SortableItem key={q.id} id={q.id}>
+                                    {({ handleProps, setNodeRef, style }) => (
+                                      <li ref={setNodeRef as any} style={style} className="flex items-start gap-2 p-2 rounded-md bg-muted/40 text-sm">
+                                        <button type="button" {...handleProps}
+                                          className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground p-1 touch-none"
+                                          aria-label="سحب">
+                                          <GripVertical className="w-3.5 h-3.5" />
+                                        </button>
+                                        <span className="text-muted-foreground tabular-nums w-6">{idx + 1}.</span>
+                                        <div className="flex-1 min-w-0">
+                                          <p className="font-medium">{q.question}</p>
+                                          <p className="text-xs text-muted-foreground">{QTYPES.find((t) => t.value === q.type)?.label ?? q.type}{q.required ? " · مطلوب" : ""}</p>
+                                        </div>
+                                        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditQ(q)}>
+                                          <Pencil className="w-3 h-3" />
+                                        </Button>
+                                        <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => deleteQuestion(q.id)}>
+                                          <Trash2 className="w-3 h-3" />
+                                        </Button>
+                                      </li>
+                                    )}
+                                  </SortableItem>
+                                ))}
+                              </ul>
+                            </SortableList>
+                          )}
+                        </CardContent>
+                      )}
+                    </Card>
+                  )}
+                </SortableItem>
+              );
+            })}
+          </SortableList>
         </div>
       )}
 
