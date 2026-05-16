@@ -109,6 +109,7 @@ const SurveysPage = () => {
                   {surveysCount}
                 </Badge>
               </TabsTrigger>
+              {reportsCount > 0 && (
               <TabsTrigger
                 value="reports"
                 className={cn(
@@ -130,6 +131,7 @@ const SurveysPage = () => {
                   {reportsCount}
                 </Badge>
               </TabsTrigger>
+              )}
             </TabsList>
           </div>
           <TabsContent value="surveys" className="mt-0">
