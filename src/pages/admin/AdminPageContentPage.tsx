@@ -433,61 +433,94 @@ export default function AdminPageContentPage() {
                   );
                 })}
 
-                {(grouped[page.key] ?? []).filter((s) => !(page.key === "eservices" && s.section_key === "services_list")).map((s) => (
-                  <Card key={s.id} className={!s.published ? "opacity-70 border-dashed" : undefined}>
-                    <CardHeader>
-                      <CardTitle className="text-base flex items-center justify-between gap-2">
-                        <span className="flex items-center gap-2">
-                          {SECTION_LABELS[s.section_key] ?? s.section_key}
-                          {!s.published && <span className="text-[10px] px-2 py-0.5 rounded bg-muted">مخفي</span>}
-                        </span>
-                        <div className="flex items-center gap-1">
-                          <label className="flex items-center gap-1 text-xs font-normal mx-2">
-                            <input type="checkbox" checked={s.published}
-                              onChange={(e) => update(s.id, { published: e.target.checked })} />
-                            منشور
-                          </label>
-                          <Button type="button" size="icon" variant="ghost" className="text-destructive h-8 w-8"
-                            onClick={async () => {
-                              if (!confirm("حذف هذا القسم نهائياً؟")) return;
-                              const { error } = await supabase.from("page_content").delete().eq("id", s.id);
-                              if (error) toast.error(error.message);
-                              else { toast.success("تم الحذف"); load(); }
-                            }}>
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div>
-                        <Label>العنوان</Label>
-                        <Input value={s.title ?? ""}
-                          onChange={(e) => update(s.id, { title: e.target.value })} />
-                      </div>
-                      {s.section_key !== "map" &&
-                        s.section_key !== "services_list" &&
-                        s.section_key !== "sections" && (
-                          <div>
-                            <Label>النص</Label>
-                            <Textarea rows={4} value={s.content ?? ""}
-                              onChange={(e) => update(s.id, { content: e.target.value })} />
-                          </div>
-                        )}
-                      {renderStructured(s)}
-                      <div className="flex justify-end">
-                        <Button onClick={() => save(s)} disabled={savingId === s.id} size="sm">
-                          {savingId === s.id ? (
-                            <Loader2 className="w-4 h-4 ml-1 animate-spin" />
-                          ) : (
-                            <Save className="w-4 h-4 ml-1" />
-                          )}
-                          حفظ
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                {(() => {
+                  const pageSections = (grouped[page.key] ?? []).filter((s) => !(page.key === "eservices" && s.section_key === "services_list"));
+                  if (pageSections.length === 0) return null;
+                  return (
+                    <>
+                      {pageSections.length > 1 && (
+                        <p className="text-xs text-muted-foreground">اسحب أيقونة <GripVertical className="inline w-3 h-3" /> لإعادة ترتيب الأقسام.</p>
+                      )}
+                      <SortableList
+                        ids={pageSections.map((s) => s.id)}
+                        onReorder={async (newIds) => {
+                          // optimistic local reorder
+                          const idIndex = new Map(newIds.map((id, i) => [id, i]));
+                          setSections((arr) => arr.map((s) =>
+                            idIndex.has(s.id) ? { ...s, sort_order: (idIndex.get(s.id)! + 1) * 10 } : s,
+                          ));
+                          try { await persistSortOrder(supabase, "page_content", newIds); toast.success("تم تحديث الترتيب"); }
+                          catch { toast.error("تعذر حفظ الترتيب"); load(); }
+                        }}
+                      >
+                        {pageSections.map((s) => (
+                          <SortableItem key={s.id} id={s.id}>
+                            {({ handleProps, setNodeRef, style }) => (
+                              <Card ref={setNodeRef as any} style={style} className={!s.published ? "opacity-70 border-dashed" : undefined}>
+                                <CardHeader>
+                                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                                    <span className="flex items-center gap-2">
+                                      <button type="button" {...handleProps}
+                                        className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground p-1 touch-none"
+                                        aria-label="سحب">
+                                        <GripVertical className="w-4 h-4" />
+                                      </button>
+                                      {SECTION_LABELS[s.section_key] ?? s.section_key}
+                                      {!s.published && <span className="text-[10px] px-2 py-0.5 rounded bg-muted">مخفي</span>}
+                                    </span>
+                                    <div className="flex items-center gap-1">
+                                      <label className="flex items-center gap-1 text-xs font-normal mx-2">
+                                        <input type="checkbox" checked={s.published}
+                                          onChange={(e) => update(s.id, { published: e.target.checked })} />
+                                        منشور
+                                      </label>
+                                      <Button type="button" size="icon" variant="ghost" className="text-destructive h-8 w-8"
+                                        onClick={async () => {
+                                          if (!confirm("حذف هذا القسم نهائياً؟")) return;
+                                          const { error } = await supabase.from("page_content").delete().eq("id", s.id);
+                                          if (error) toast.error(error.message);
+                                          else { toast.success("تم الحذف"); load(); }
+                                        }}>
+                                        <Trash2 className="w-4 h-4" />
+                                      </Button>
+                                    </div>
+                                  </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-3">
+                                  <div>
+                                    <Label>العنوان</Label>
+                                    <Input value={s.title ?? ""}
+                                      onChange={(e) => update(s.id, { title: e.target.value })} />
+                                  </div>
+                                  {s.section_key !== "map" &&
+                                    s.section_key !== "services_list" &&
+                                    s.section_key !== "sections" && (
+                                      <div>
+                                        <Label>النص</Label>
+                                        <Textarea rows={4} value={s.content ?? ""}
+                                          onChange={(e) => update(s.id, { content: e.target.value })} />
+                                      </div>
+                                    )}
+                                  {renderStructured(s)}
+                                  <div className="flex justify-end">
+                                    <Button onClick={() => save(s)} disabled={savingId === s.id} size="sm">
+                                      {savingId === s.id ? (
+                                        <Loader2 className="w-4 h-4 ml-1 animate-spin" />
+                                      ) : (
+                                        <Save className="w-4 h-4 ml-1" />
+                                      )}
+                                      حفظ
+                                    </Button>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            )}
+                          </SortableItem>
+                        ))}
+                      </SortableList>
+                    </>
+                  );
+                })()}
 
                 {(grouped[page.key] ?? []).length === 0 &&
                   !(QUICK_LINKS[page.key]?.length) && (
