@@ -15,6 +15,7 @@ import {
   Newspaper, ClipboardList, FolderKanban, ExternalLink,
 } from "lucide-react";
 import { SortableList, SortableItem, persistSortOrder } from "@/components/admin/SortableList";
+import { PublishToggleButton } from "@/components/admin/PublishToggleButton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { IconPicker } from "@/components/admin/IconPicker";
