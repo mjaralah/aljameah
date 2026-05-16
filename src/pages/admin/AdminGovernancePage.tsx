@@ -34,6 +34,11 @@ export default function AdminGovernancePage() {
       title="ملفات الحوكمة"
       description="إدارة جميع وثائق الحوكمة (السياسات، اللوائح، الخطط، التقارير...) لعرضها في صفحة الحوكمة العامة"
       searchField="title"
+      reorderable
+      categoryFilter={{
+        field: "category",
+        options: GOV_CATEGORIES,
+      }}
       columns={[
         { key: "title", label: "العنوان", className: "font-medium" },
         {
