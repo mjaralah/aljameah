@@ -131,6 +131,7 @@ const SurveysPage = () => {
                   {reportsCount}
                 </Badge>
               </TabsTrigger>
+              )}
             </TabsList>
           </div>
           <TabsContent value="surveys" className="mt-0">
