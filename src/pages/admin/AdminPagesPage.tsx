@@ -26,6 +26,7 @@ export default function AdminPagesPage() {
       description="أنشئ صفحات رئيسية وفرعية وحرّر محتواها"
       searchField="title"
       orderBy={{ column: "sort_order", ascending: true }}
+      reorderable
       columns={[
         { key: "title", label: "العنوان", className: "font-medium" },
         { key: "slug", label: "المعرّف" },

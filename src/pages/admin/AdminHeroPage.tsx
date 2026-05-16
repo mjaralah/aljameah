@@ -19,6 +19,8 @@ export default function AdminHeroPage() {
   return (
     <CrudPage<Slide>
       table="hero_slides"
+      reorderable
+      orderBy={{ column: "sort_order", ascending: true }}
       title="شريط البطل (Hero Slider)"
       description="الشرائح المتحركة في أعلى الصفحة الرئيسية"
       columns={[

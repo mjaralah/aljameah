@@ -16,6 +16,8 @@ export default function AdminPartnersPage() {
   return (
     <CrudPage<Partner>
       table="partners"
+      reorderable
+      orderBy={{ column: "sort_order", ascending: true }}
       title="الشركاء"
       description="شعارات الشركاء والداعمين"
       searchField="name"
