@@ -454,6 +454,7 @@ export default function AdminPageContentPage() {
                           catch { toast.error("تعذر حفظ الترتيب"); load(); }
                         }}
                       >
+                        {pageSections.map((s) => (
                           <SortableItem key={s.id} id={s.id}>
                             {({ handleProps, setNodeRef, style }) => (
                               <AdminListRow
@@ -503,6 +504,7 @@ export default function AdminPageContentPage() {
                               </AdminListRow>
                             )}
                           </SortableItem>
+                        ))}
                       </SortableList>
                     </>
                   );
