@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Trash2, ArrowUp, ArrowDown, ExternalLink, Copy, Loader2, Archive, ArchiveRestore, Lock, Eye, EyeOff } from "lucide-react";
+import { Plus, Trash2, GripVertical, ExternalLink, Copy, Loader2, Archive, ArchiveRestore, Lock, Eye, EyeOff } from "lucide-react";
+import { SortableList, SortableItem, persistSortOrder } from "@/components/admin/SortableList";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
