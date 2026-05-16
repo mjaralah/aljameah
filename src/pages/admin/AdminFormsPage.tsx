@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Plus, Trash2, GripVertical, ExternalLink, Copy, Loader2, Archive, ArchiveRestore, Lock, Eye, EyeOff } from "lucide-react";
 import { SortableList, SortableItem, persistSortOrder } from "@/components/admin/SortableList";
+import { AdminListRow } from "@/components/admin/AdminListRow";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
@@ -220,49 +221,52 @@ export default function AdminFormsPage() {
               return (
                 <SortableItem key={f.id} id={f.id} disabled={view === "archived"}>
                   {({ handleProps, setNodeRef, style }) => (
-                    <Card ref={setNodeRef as any} style={style} className={f.archived ? "opacity-70" : !f.published ? "opacity-60" : ""}>
-                      <CardContent className="p-4 flex items-center justify-between gap-3 flex-wrap">
-                        {view === "active" && (
-                          <button
-                            type="button"
-                            {...handleProps}
-                            className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground p-1 touch-none"
-                            aria-label="سحب لإعادة الترتيب"
-                          >
-                            <GripVertical className="h-4 w-4" />
-                          </button>
-                        )}
-                        <div className="flex-1 min-w-[200px]">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="font-bold">{f.title}</h3>
-                            {sys && <Badge variant="outline" className="border-accent text-accent"><Lock className="h-3 w-3 me-1" /> نظامي</Badge>}
-                            <Badge variant={f.published ? "default" : "secondary"}>{f.published ? "منشور" : "مخفي"}</Badge>
-                            {f.coming_soon && <Badge variant="outline" className="border-amber-500 text-amber-600">قريباً</Badge>}
-                            {f.featured && <Badge variant="outline">مميز</Badge>}
-                            {f.archived && <Badge variant="destructive">مؤرشف</Badge>}
-                            <code className="text-xs text-muted-foreground">{publicUrl}</code>
-                          </div>
-                          {f.description && <p className="text-sm text-muted-foreground mt-1 line-clamp-1">{f.description}</p>}
-                          <p className="text-xs text-muted-foreground mt-1">{f.fields.length} حقل / سؤال</p>
-                        </div>
-                        <div className="flex items-center gap-1 flex-wrap">
-                          <Button size="icon" variant="ghost" asChild title="معاينة"><Link to={publicUrl} target="_blank"><ExternalLink className="h-4 w-4" /></Link></Button>
-                          <Button size="icon" variant="ghost" title={f.published ? "إخفاء" : "نشر"} onClick={() => togglePublished(f)}>
-                            {f.published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    <AdminListRow
+                      ref={setNodeRef as any}
+                      style={style}
+                      id={f.id}
+                      table="custom_forms"
+                      dragHandleProps={handleProps}
+                      showDragHandle={view === "active"}
+                      title={
+                        <span className="flex items-center gap-2 flex-wrap">
+                          {f.title}
+                          <code className="text-xs text-muted-foreground font-normal">{publicUrl}</code>
+                        </span>
+                      }
+                      subtitle={
+                        <span>
+                          {f.description ? `${f.description} · ` : ""}{f.fields.length} حقل
+                        </span>
+                      }
+                      badges={
+                        <>
+                          {sys && <Badge variant="outline" className="border-accent text-accent"><Lock className="h-3 w-3 me-1" /> نظامي</Badge>}
+                          {f.coming_soon && <Badge variant="outline" className="border-amber-500 text-amber-600">قريباً</Badge>}
+                          {f.featured && <Badge variant="outline">مميز</Badge>}
+                          {f.archived && <Badge variant="destructive">مؤرشف</Badge>}
+                        </>
+                      }
+                      published={f.published}
+                      onTogglePublished={load}
+                      onEdit={() => setEditing(f)}
+                      onDelete={f.is_system ? undefined : () => remove(f.id, f.is_system)}
+                      extraActions={
+                        <>
+                          <Button size="icon" variant="outline" className="h-9 w-9 border-border bg-muted/40" asChild title="معاينة">
+                            <Link to={publicUrl} target="_blank"><ExternalLink className="h-4 w-4" /></Link>
                           </Button>
                           {!f.is_system && (
-                            <Button size="icon" variant="ghost" title="نسخ" onClick={() => setEditing({ ...emptyForm(), ...f, slug: f.slug + "-copy", title: f.title + " (نسخة)", id: undefined, is_system: null, archived: false })}><Copy className="h-4 w-4" /></Button>
+                            <Button size="icon" variant="outline" className="h-9 w-9 border-border bg-muted/40" title="نسخ" onClick={() => setEditing({ ...emptyForm(), ...f, slug: f.slug + "-copy", title: f.title + " (نسخة)", id: undefined, is_system: null, archived: false })}>
+                              <Copy className="h-4 w-4" />
+                            </Button>
                           )}
-                          <Button variant="outline" onClick={() => setEditing(f)}>تعديل</Button>
-                          <Button size="icon" variant="ghost" title={f.archived ? "استعادة" : "أرشفة"} onClick={() => toggleArchive(f)}>
+                          <Button size="icon" variant="outline" className="h-9 w-9 border-border bg-muted/40" title={f.archived ? "استعادة" : "أرشفة"} onClick={() => toggleArchive(f)}>
                             {f.archived ? <ArchiveRestore className="h-4 w-4" /> : <Archive className="h-4 w-4" />}
                           </Button>
-                          {!f.is_system && (
-                            <Button size="icon" variant="ghost" title="حذف" onClick={() => remove(f.id, f.is_system)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
+                        </>
+                      }
+                    />
                   )}
                 </SortableItem>
               );
