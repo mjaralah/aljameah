@@ -137,14 +137,19 @@ export default function AdminFormsPage() {
     load();
   }
 
-  async function move(id: string, dir: -1 | 1) {
-    const idx = visibleForms.findIndex((f) => f.id === id);
-    const j = idx + dir;
-    if (j < 0 || j >= visibleForms.length) return;
-    const a = visibleForms[idx], b = visibleForms[j];
-    await supabase.from("custom_forms").update({ sort_order: b.sort_order }).eq("id", a.id);
-    await supabase.from("custom_forms").update({ sort_order: a.sort_order }).eq("id", b.id);
-    load();
+  async function reorder(newIds: string[]) {
+    // Optimistic: reorder forms by newIds, keep others intact
+    const subset = new Set(newIds);
+    const reorderedActive = newIds.map((id) => forms.find((f) => f.id === id)!).filter(Boolean);
+    const others = forms.filter((f) => !subset.has(f.id));
+    setForms([...reorderedActive, ...others]);
+    try {
+      await persistSortOrder(supabase, "custom_forms", newIds);
+      toast.success("تم تحديث الترتيب");
+    } catch {
+      toast.error("تعذر حفظ الترتيب");
+      load();
+    }
   }
 
   async function save() {
