@@ -152,7 +152,7 @@ export default function AdminSurveysPage() {
               return (
                 <SortableItem key={s.id} id={s.id}>
                   {({ handleProps, setNodeRef, style }) => (
-                    <Card ref={setNodeRef as any} style={style}>
+                    <Card ref={setNodeRef as any} style={style} className={!s.published ? "opacity-60" : ""}>
                       <CardHeader className="flex flex-row items-start justify-between gap-2">
                         <div className="flex items-start gap-2 flex-1 min-w-0">
                           <button type="button" {...handleProps}
@@ -163,6 +163,9 @@ export default function AdminSurveysPage() {
                           <div className="flex-1 min-w-0">
                             <CardTitle className="text-base flex items-center gap-2 flex-wrap">
                               {s.title}
+                              <Badge variant={s.published ? "default" : "secondary"}>
+                                {s.published ? "منشور" : "مسودة"}
+                              </Badge>
                               <Badge variant={s.status === "active" ? "default" : "secondary"}>
                                 {s.status === "active" ? "نشط" : "مغلق"}
                               </Badge>
@@ -172,6 +175,7 @@ export default function AdminSurveysPage() {
                           </div>
                         </div>
                         <div className="flex gap-1">
+                          <PublishToggleButton table="surveys" id={s.id} published={s.published} onToggled={load} />
                           <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setOpenId(open ? null : s.id)}>
                             {open ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                           </Button>
