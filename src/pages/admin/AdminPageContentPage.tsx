@@ -457,7 +457,7 @@ export default function AdminPageContentPage() {
                         {pageSections.map((s) => (
                           <SortableItem key={s.id} id={s.id}>
                             {({ handleProps, setNodeRef, style }) => (
-                              <Card ref={setNodeRef as any} style={style} className={!s.published ? "opacity-70 border-dashed" : undefined}>
+                              <Card ref={setNodeRef as any} style={style} className={!s.published ? "opacity-60 border-dashed" : undefined}>
                                 <CardHeader>
                                   <CardTitle className="text-base flex items-center justify-between gap-2">
                                     <span className="flex items-center gap-2">
@@ -467,14 +467,17 @@ export default function AdminPageContentPage() {
                                         <GripVertical className="w-4 h-4" />
                                       </button>
                                       {SECTION_LABELS[s.section_key] ?? s.section_key}
-                                      {!s.published && <span className="text-[10px] px-2 py-0.5 rounded bg-muted">مخفي</span>}
+                                      <span className={`text-[10px] px-2 py-0.5 rounded ${s.published ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>
+                                        {s.published ? "منشور" : "مسودة"}
+                                      </span>
                                     </span>
                                     <div className="flex items-center gap-1">
-                                      <label className="flex items-center gap-1 text-xs font-normal mx-2">
-                                        <input type="checkbox" checked={s.published}
-                                          onChange={(e) => update(s.id, { published: e.target.checked })} />
-                                        منشور
-                                      </label>
+                                      <PublishToggleButton
+                                        table="page_content"
+                                        id={s.id}
+                                        published={s.published}
+                                        onToggled={(next) => update(s.id, { published: next })}
+                                      />
                                       <Button type="button" size="icon" variant="ghost" className="text-destructive h-8 w-8"
                                         onClick={async () => {
                                           if (!confirm("حذف هذا القسم نهائياً؟")) return;
