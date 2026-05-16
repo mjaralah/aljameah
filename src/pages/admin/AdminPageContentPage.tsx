@@ -11,9 +11,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import {
-  Loader2, Save, Plus, Trash2, ArrowUp, ArrowDown,
+  Loader2, Save, Plus, Trash2, ArrowUp, ArrowDown, GripVertical,
   Newspaper, ClipboardList, FolderKanban, ExternalLink,
 } from "lucide-react";
+import { SortableList, SortableItem, persistSortOrder } from "@/components/admin/SortableList";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { IconPicker } from "@/components/admin/IconPicker";
