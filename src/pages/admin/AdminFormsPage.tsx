@@ -220,7 +220,7 @@ export default function AdminFormsPage() {
               return (
                 <SortableItem key={f.id} id={f.id} disabled={view === "archived"}>
                   {({ handleProps, setNodeRef, style }) => (
-                    <Card ref={setNodeRef as any} style={style} className={f.archived ? "opacity-70" : ""}>
+                    <Card ref={setNodeRef as any} style={style} className={f.archived ? "opacity-70" : !f.published ? "opacity-60" : ""}>
                       <CardContent className="p-4 flex items-center justify-between gap-3 flex-wrap">
                         {view === "active" && (
                           <button

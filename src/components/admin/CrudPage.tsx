@@ -22,6 +22,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Plus, Pencil, Trash2, Search, Loader2, Eye, EyeOff, GripVertical } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -90,10 +91,11 @@ function SortableRow<T extends { id: string; published?: boolean }>({
     id: row.id,
     disabled: !reorderable,
   });
+  const isHidden = row.published === false;
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
+    opacity: isDragging ? 0.5 : isHidden ? 0.55 : 1,
     background: isDragging ? "hsl(var(--muted))" : undefined,
   };
   return (
@@ -117,13 +119,24 @@ function SortableRow<T extends { id: string; published?: boolean }>({
         </td>
       ))}
       <td className="px-4 py-3">
-        <Badge variant={row.published ? "default" : "secondary"} className="cursor-pointer" onClick={() => onTogglePublish(row)}>
-          {row.published ? (
-            <><Eye className="w-3 h-3 ml-1" />منشور</>
-          ) : (
-            <><EyeOff className="w-3 h-3 ml-1" />مخفي</>
-          )}
-        </Badge>
+        <TooltipProvider delayDuration={200}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Badge
+                variant={row.published ? "default" : "secondary"}
+                className="cursor-pointer"
+                onClick={() => onTogglePublish(row)}
+              >
+                {row.published ? (
+                  <><Eye className="w-3 h-3 ml-1" />منشور</>
+                ) : (
+                  <><EyeOff className="w-3 h-3 ml-1" />مسودة</>
+                )}
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent>{row.published ? "اضغط للإخفاء" : "اضغط للنشر"}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </td>
       <td className="px-4 py-3">
         <div className="flex items-center gap-1 justify-end">
