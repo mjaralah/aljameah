@@ -38,6 +38,8 @@ function MembersTab() {
   return (
     <CrudPage<Member>
       table="board_members"
+      reorderable
+      orderBy={{ column: "sort_order", ascending: true }}
       title="مجلس الإدارة"
       description="إدارة أعضاء مجلس الإدارة"
       searchField="full_name"
