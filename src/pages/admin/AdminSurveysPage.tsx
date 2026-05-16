@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Plus, Pencil, Trash2, ChevronDown, ChevronUp, GripVertical } from "lucide-react";
 import { SortableList, SortableItem, persistSortOrder } from "@/components/admin/SortableList";
-import { PublishToggleButton } from "@/components/admin/PublishToggleButton";
+import { AdminListRow } from "@/components/admin/AdminListRow";
+import { Button as BtnIcon } from "@/components/ui/button";
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
