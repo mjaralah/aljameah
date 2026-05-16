@@ -109,6 +109,7 @@ const SurveysPage = () => {
                   {surveysCount}
                 </Badge>
               </TabsTrigger>
+              {reportsCount > 0 && (
               <TabsTrigger
                 value="reports"
                 className={cn(
