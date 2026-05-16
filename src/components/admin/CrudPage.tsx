@@ -166,41 +166,23 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
     else load();
   }
 
-  async function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-
-    const oldIndex = filtered.findIndex((r) => r.id === active.id);
-    const newIndex = filtered.findIndex((r) => r.id === over.id);
-    if (oldIndex === -1 || newIndex === -1) return;
-
-    const reorderedSubset = arrayMove(filtered, oldIndex, newIndex);
-
-    // Merge back into full rows preserving non-visible rows positions
-    const subsetIds = new Set(filtered.map((r) => r.id));
+  async function handleReorder(newIds: string[]) {
+    // Map newIds (subset = filtered) back into full rows preserving non-visible positions.
+    const subsetIds = new Set(newIds);
+    const reorderedSubset = newIds
+      .map((id) => filtered.find((r) => r.id === id))
+      .filter(Boolean) as T[];
     const newRows: T[] = [];
-    let subsetCursor = 0;
+    let cursor = 0;
     for (const r of rows) {
-      if (subsetIds.has(r.id)) {
-        newRows.push(reorderedSubset[subsetCursor++]);
-      } else {
-        newRows.push(r);
-      }
+      if (subsetIds.has(r.id)) newRows.push(reorderedSubset[cursor++]);
+      else newRows.push(r);
     }
-
-    // Optimistic update
     setRows(newRows);
-
-    // Persist sort_order for the affected subset (10-step gaps)
-    const updates = reorderedSubset.map((r, i) => ({ id: r.id, sort_order: (i + 1) * 10 }));
     try {
-      await Promise.all(
-        updates.map((u) =>
-          supabase.from(table).update({ sort_order: u.sort_order } as never).eq("id", u.id),
-        ),
-      );
+      await persistSortOrder(supabase, table, newIds);
       toast.success("تم تحديث الترتيب");
-    } catch (e) {
+    } catch {
       toast.error("تعذر حفظ الترتيب");
       load();
     }
@@ -208,6 +190,16 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
 
   function setValue<K extends keyof T>(key: K, value: T[K]) {
     setEditing((prev) => ({ ...(prev ?? {}), [key]: value }) as Partial<T>);
+  }
+
+  // Heuristic: pick thumbnail + title + subtitle columns from `columns`
+  const thumbCol = columns.find((c) => isImageKey(String(c.key)));
+  const restCols = columns.filter((c) => c !== thumbCol);
+  const titleCol = restCols[0];
+  const subtitleCols = restCols.slice(1);
+
+  function renderCol(c: typeof columns[number], row: T): ReactNode {
+    return c.render ? c.render(row) : (row[c.key as keyof T] as ReactNode) ?? "—";
   }
 
   return (
@@ -268,65 +260,53 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
           </p>
         )}
 
-        <Card>
-          <CardContent className="p-0">
-            {loading ? (
-              <div className="p-12 flex justify-center">
-                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-              </div>
-            ) : filtered.length === 0 ? (
-              <div className="p-12 text-center text-sm text-muted-foreground">
-                {emptyState}
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={handleDragEnd}
-                >
-                  <table className="w-full text-sm">
-                    <thead className="bg-muted/40 border-b">
-                      <tr>
-                        {reorderable && <th className="w-10" />}
-                        {columns.map((c) => (
-                          <th
-                            key={String(c.key)}
-                            className={`px-4 py-3 text-right font-medium text-muted-foreground ${c.className ?? ""}`}
-                          >
-                            {c.label}
-                          </th>
-                        ))}
-                        <th className="px-4 py-3 text-right font-medium text-muted-foreground w-32">
-                          الحالة
-                        </th>
-                        <th className="px-4 py-3 w-32" />
-                      </tr>
-                    </thead>
-                    <SortableContext
-                      items={filtered.map((r) => r.id)}
-                      strategy={verticalListSortingStrategy}
-                    >
-                      <tbody>
-                        {filtered.map((row) => (
-                          <SortableRow<T>
-                            key={row.id}
-                            row={row}
-                            columns={columns}
-                            reorderable={reorderable}
-                            onEdit={(r) => setEditing(r)}
-                            onDelete={(id) => setDeleteId(id)}
-                            onTogglePublish={togglePublish}
-                          />
-                        ))}
-                      </tbody>
-                    </SortableContext>
-                  </table>
-                </DndContext>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        {loading ? (
+          <Card><CardContent className="p-12 flex justify-center">
+            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+          </CardContent></Card>
+        ) : filtered.length === 0 ? (
+          <Card><CardContent className="p-12 text-center text-sm text-muted-foreground">
+            {emptyState}
+          </CardContent></Card>
+        ) : (
+          <SortableList ids={filtered.map((r) => r.id)} onReorder={handleReorder}>
+            <div className="space-y-2">
+              {filtered.map((row) => (
+                <SortableItem key={row.id} id={row.id} disabled={!reorderable}>
+                  {({ handleProps, setNodeRef, style }) => (
+                    <AdminListRow
+                      ref={setNodeRef as any}
+                      style={style}
+                      id={row.id}
+                      table={table}
+                      showDragHandle={reorderable}
+                      dragHandleProps={handleProps}
+                      thumbnail={thumbCol ? renderCol(thumbCol, row) : undefined}
+                      title={titleCol ? renderCol(titleCol, row) : "—"}
+                      subtitle={
+                        subtitleCols.length > 0 ? (
+                          <span className="flex flex-wrap items-center gap-x-2">
+                            {subtitleCols.map((c, i) => (
+                              <span key={String(c.key)} className="inline-flex items-center gap-1">
+                                {i > 0 && <span className="opacity-50">·</span>}
+                                <span className="opacity-70">{c.label}:</span>
+                                <span>{renderCol(c, row)}</span>
+                              </span>
+                            ))}
+                          </span>
+                        ) : undefined
+                      }
+                      published={!!row.published}
+                      onTogglePublished={() => load()}
+                      onEdit={() => setEditing(row)}
+                      onDelete={() => setDeleteId(row.id)}
+                    />
+                  )}
+                </SortableItem>
+              ))}
+            </div>
+          </SortableList>
+        )}
       </div>
 
       <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
