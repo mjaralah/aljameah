@@ -58,86 +58,8 @@ export type CrudPageProps<T extends { id: string; published?: boolean }> = {
   };
 };
 
-type SortableRowProps<T extends { id: string; published?: boolean }> = {
-  row: T;
-  columns: Column<T>[];
-  reorderable: boolean;
-  onEdit: (r: T) => void;
-  onDelete: (id: string) => void;
-  onTogglePublish: (r: T) => void;
-};
-
-function SortableRow<T extends { id: string; published?: boolean }>({
-  row, columns, reorderable, onEdit, onDelete, onTogglePublish,
-}: SortableRowProps<T>) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: row.id,
-    disabled: !reorderable,
-  });
-  const isHidden = row.published === false;
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : isHidden ? 0.55 : 1,
-    background: isDragging ? "hsl(var(--muted))" : undefined,
-  };
-  return (
-    <tr ref={setNodeRef} style={style} className="border-b last:border-0 hover:bg-muted/20">
-      {reorderable && (
-        <td className="px-2 py-3 w-10">
-          <button
-            type="button"
-            {...attributes}
-            {...listeners}
-            className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground p-1 touch-none"
-            aria-label="سحب لإعادة الترتيب"
-          >
-            <GripVertical className="w-4 h-4" />
-          </button>
-        </td>
-      )}
-      {columns.map((c) => (
-        <td key={String(c.key)} className={`px-4 py-3 ${c.className ?? ""}`}>
-          {c.render ? c.render(row) : String(row[c.key as keyof T] ?? "—")}
-        </td>
-      ))}
-      <td className="px-4 py-3">
-        <TooltipProvider delayDuration={200}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Badge
-                variant={row.published ? "default" : "secondary"}
-                className="cursor-pointer"
-                onClick={() => onTogglePublish(row)}
-              >
-                {row.published ? (
-                  <><Eye className="w-3 h-3 ml-1" />منشور</>
-                ) : (
-                  <><EyeOff className="w-3 h-3 ml-1" />مسودة</>
-                )}
-              </Badge>
-            </TooltipTrigger>
-            <TooltipContent>{row.published ? "اضغط للإخفاء" : "اضغط للنشر"}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </td>
-      <td className="px-4 py-3">
-        <div className="flex items-center gap-1 justify-end">
-          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => onEdit(row)}>
-            <Pencil className="w-4 h-4" />
-          </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="h-8 w-8 text-destructive hover:text-destructive"
-            onClick={() => onDelete(row.id)}
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
-        </div>
-      </td>
-    </tr>
-  );
+function isImageKey(k: string) {
+  return /image_url$|logo_url$|photo_url$|avatar_url$|cover/.test(k);
 }
 
 export function CrudPage<T extends { id: string; published?: boolean }>({
@@ -164,10 +86,6 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
     categoryFilter?.options[0]?.value ?? "",
   );
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
-  );
 
   async function load() {
     setLoading(true);
