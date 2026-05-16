@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,9 +22,26 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Pencil, Trash2, Search, Loader2, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Loader2, Eye, EyeOff, GripVertical } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 export type Column<T> = {
   key: keyof T | string;
@@ -40,17 +57,92 @@ export type CrudPageProps<T extends { id: string; published?: boolean }> = {
   columns: Column<T>[];
   searchField?: keyof T;
   emptyState?: string;
-  /** Render the form fields for add/edit. Receives current values & setter. */
   renderForm: (
     values: Partial<T>,
     setValue: <K extends keyof T>(key: K, value: T[K]) => void,
   ) => ReactNode;
-  /** Validate before save. Return error string or null. */
   validate?: (values: Partial<T>) => string | null;
-  /** Create initial row defaults. */
   createDefaults: () => Partial<T>;
   orderBy?: { column: string; ascending?: boolean };
+  /** Enable drag-and-drop reordering (writes sort_order to DB). */
+  reorderable?: boolean;
+  /** Optional category filter — restricts reordering to one category at a time. */
+  categoryFilter?: {
+    field: keyof T;
+    label?: string;
+    options: { value: string; label: string }[];
+  };
 };
+
+type SortableRowProps<T extends { id: string; published?: boolean }> = {
+  row: T;
+  columns: Column<T>[];
+  reorderable: boolean;
+  onEdit: (r: T) => void;
+  onDelete: (id: string) => void;
+  onTogglePublish: (r: T) => void;
+};
+
+function SortableRow<T extends { id: string; published?: boolean }>({
+  row, columns, reorderable, onEdit, onDelete, onTogglePublish,
+}: SortableRowProps<T>) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: row.id,
+    disabled: !reorderable,
+  });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    background: isDragging ? "hsl(var(--muted))" : undefined,
+  };
+  return (
+    <tr ref={setNodeRef} style={style} className="border-b last:border-0 hover:bg-muted/20">
+      {reorderable && (
+        <td className="px-2 py-3 w-10">
+          <button
+            type="button"
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground p-1 touch-none"
+            aria-label="سحب لإعادة الترتيب"
+          >
+            <GripVertical className="w-4 h-4" />
+          </button>
+        </td>
+      )}
+      {columns.map((c) => (
+        <td key={String(c.key)} className={`px-4 py-3 ${c.className ?? ""}`}>
+          {c.render ? c.render(row) : String(row[c.key as keyof T] ?? "—")}
+        </td>
+      ))}
+      <td className="px-4 py-3">
+        <Badge variant={row.published ? "default" : "secondary"} className="cursor-pointer" onClick={() => onTogglePublish(row)}>
+          {row.published ? (
+            <><Eye className="w-3 h-3 ml-1" />منشور</>
+          ) : (
+            <><EyeOff className="w-3 h-3 ml-1" />مخفي</>
+          )}
+        </Badge>
+      </td>
+      <td className="px-4 py-3">
+        <div className="flex items-center gap-1 justify-end">
+          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => onEdit(row)}>
+            <Pencil className="w-4 h-4" />
+          </Button>
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-8 w-8 text-destructive hover:text-destructive"
+            onClick={() => onDelete(row.id)}
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        </div>
+      </td>
+    </tr>
+  );
+}
 
 export function CrudPage<T extends { id: string; published?: boolean }>({
   table,
@@ -63,6 +155,8 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
   validate,
   createDefaults,
   orderBy = { column: "sort_order", ascending: true },
+  reorderable = false,
+  categoryFilter,
 }: CrudPageProps<T>) {
   const [rows, setRows] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,6 +164,14 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
   const [editing, setEditing] = useState<Partial<T> | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string>(
+    categoryFilter?.options[0]?.value ?? "",
+  );
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
 
   async function load() {
     setLoading(true);
@@ -87,13 +189,18 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [table]);
 
-  const filtered = searchField && search
-    ? rows.filter((r) =>
-        String(r[searchField as keyof T] ?? "")
-          .toLowerCase()
-          .includes(search.toLowerCase()),
-      )
-    : rows;
+  const filtered = useMemo(() => {
+    let r = rows;
+    if (categoryFilter && activeCategory) {
+      r = r.filter((row) => String(row[categoryFilter.field] ?? "") === activeCategory);
+    }
+    if (searchField && search) {
+      r = r.filter((row) =>
+        String(row[searchField as keyof T] ?? "").toLowerCase().includes(search.toLowerCase()),
+      );
+    }
+    return r;
+  }, [rows, search, searchField, categoryFilter, activeCategory]);
 
   async function handleSave() {
     if (!editing) return;
@@ -128,9 +235,8 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
   async function handleDelete() {
     if (!deleteId) return;
     const { error } = await supabase.from(table).delete().eq("id", deleteId);
-    if (error) {
-      toast.error(error.message);
-    } else {
+    if (error) toast.error(error.message);
+    else {
       toast.success("تم الحذف");
       load();
     }
@@ -142,9 +248,46 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
       .from(table)
       .update({ published: !row.published } as never)
       .eq("id", row.id);
-    if (error) {
-      toast.error(error.message);
-    } else {
+    if (error) toast.error(error.message);
+    else load();
+  }
+
+  async function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = filtered.findIndex((r) => r.id === active.id);
+    const newIndex = filtered.findIndex((r) => r.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reorderedSubset = arrayMove(filtered, oldIndex, newIndex);
+
+    // Merge back into full rows preserving non-visible rows positions
+    const subsetIds = new Set(filtered.map((r) => r.id));
+    const newRows: T[] = [];
+    let subsetCursor = 0;
+    for (const r of rows) {
+      if (subsetIds.has(r.id)) {
+        newRows.push(reorderedSubset[subsetCursor++]);
+      } else {
+        newRows.push(r);
+      }
+    }
+
+    // Optimistic update
+    setRows(newRows);
+
+    // Persist sort_order for the affected subset (10-step gaps)
+    const updates = reorderedSubset.map((r, i) => ({ id: r.id, sort_order: (i + 1) * 10 }));
+    try {
+      await Promise.all(
+        updates.map((u) =>
+          supabase.from(table).update({ sort_order: u.sort_order } as never).eq("id", u.id),
+        ),
+      );
+      toast.success("تم تحديث الترتيب");
+    } catch (e) {
+      toast.error("تعذر حفظ الترتيب");
       load();
     }
   }
@@ -165,6 +308,34 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
       }
     >
       <div className="space-y-4">
+        {categoryFilter && (
+          <div className="flex flex-wrap gap-2">
+            {categoryFilter.options.map((opt) => {
+              const count = rows.filter(
+                (r) => String(r[categoryFilter.field] ?? "") === opt.value,
+              ).length;
+              const active = opt.value === activeCategory;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setActiveCategory(opt.value)}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium border transition ${
+                    active
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-background hover:bg-muted border-border text-muted-foreground"
+                  }`}
+                >
+                  {opt.label}
+                  <span className={`ms-2 inline-flex items-center justify-center min-w-5 h-5 px-1 rounded-full text-[10px] ${active ? "bg-primary-foreground/20" : "bg-muted"}`}>
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         {searchField && (
           <div className="relative max-w-sm">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -175,6 +346,12 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
               className="pr-9"
             />
           </div>
+        )}
+
+        {reorderable && filtered.length > 1 && (
+          <p className="text-xs text-muted-foreground">
+            اسحب أيقونة <GripVertical className="inline w-3 h-3" /> لإعادة ترتيب العناصر. يُحفظ الترتيب تلقائياً.
+          </p>
         )}
 
         <Card>
@@ -189,64 +366,49 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead className="bg-muted/40 border-b">
-                    <tr>
-                      {columns.map((c) => (
-                        <th
-                          key={String(c.key)}
-                          className={`px-4 py-3 text-right font-medium text-muted-foreground ${c.className ?? ""}`}
-                        >
-                          {c.label}
-                        </th>
-                      ))}
-                      <th className="px-4 py-3 text-right font-medium text-muted-foreground w-32">
-                        الحالة
-                      </th>
-                      <th className="px-4 py-3 w-32" />
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filtered.map((row) => (
-                      <tr key={row.id} className="border-b last:border-0 hover:bg-muted/20">
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/40 border-b">
+                      <tr>
+                        {reorderable && <th className="w-10" />}
                         {columns.map((c) => (
-                          <td key={String(c.key)} className={`px-4 py-3 ${c.className ?? ""}`}>
-                            {c.render ? c.render(row) : String(row[c.key as keyof T] ?? "—")}
-                          </td>
+                          <th
+                            key={String(c.key)}
+                            className={`px-4 py-3 text-right font-medium text-muted-foreground ${c.className ?? ""}`}
+                          >
+                            {c.label}
+                          </th>
                         ))}
-                        <td className="px-4 py-3">
-                          <Badge variant={row.published ? "default" : "secondary"} className="cursor-pointer" onClick={() => togglePublish(row)}>
-                            {row.published ? (
-                              <><Eye className="w-3 h-3 ml-1" />منشور</>
-                            ) : (
-                              <><EyeOff className="w-3 h-3 ml-1" />مخفي</>
-                            )}
-                          </Badge>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-1 justify-end">
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="h-8 w-8"
-                              onClick={() => setEditing(row)}
-                            >
-                              <Pencil className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="h-8 w-8 text-destructive hover:text-destructive"
-                              onClick={() => setDeleteId(row.id)}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </td>
+                        <th className="px-4 py-3 text-right font-medium text-muted-foreground w-32">
+                          الحالة
+                        </th>
+                        <th className="px-4 py-3 w-32" />
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <SortableContext
+                      items={filtered.map((r) => r.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <tbody>
+                        {filtered.map((row) => (
+                          <SortableRow<T>
+                            key={row.id}
+                            row={row}
+                            columns={columns}
+                            reorderable={reorderable}
+                            onEdit={(r) => setEditing(r)}
+                            onDelete={(id) => setDeleteId(id)}
+                            onTogglePublish={togglePublish}
+                          />
+                        ))}
+                      </tbody>
+                    </SortableContext>
+                  </table>
+                </DndContext>
               </div>
             )}
           </CardContent>
