@@ -236,7 +236,7 @@ export default function AdminSurveysPage() {
                           )}
                         </CardContent>
                       )}
-                    </Card>
+                    </AdminListRow>
                   )}
                 </SortableItem>
               );
