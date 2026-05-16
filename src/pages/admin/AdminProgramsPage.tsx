@@ -24,6 +24,8 @@ export default function AdminProgramsPage() {
   return (
     <CrudPage<Program>
       table="programs"
+      reorderable
+      orderBy={{ column: "sort_order", ascending: true }}
       title="إدارة البرامج"
       description="البرامج والمبادرات التي تقدمها الجمعية"
       searchField="title"
