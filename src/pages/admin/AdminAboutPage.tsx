@@ -349,9 +349,11 @@ export default function AdminAboutPage() {
         );
       }
       case "registration": {
+        const mode = (data.display_mode as string) === "image" ? "image" : "content";
         const rows = (Array.isArray(data.rows) ? data.rows : []) as { label?: string; value?: string }[];
         return (
           <div className="space-y-3">
+            <ModeToggle value={mode} onChange={(v) => updateData(s.id, "display_mode", v)} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <Field label="نص الشارة">
                 <Input value={(data.badge_label as string) ?? ""}
@@ -368,30 +370,40 @@ export default function AdminAboutPage() {
               value={(data.pdf_url as string) ?? null}
               onChange={(url) => updateData(s.id, "pdf_url", url ?? "")}
             />
-            <div className="space-y-2 pt-2 border-t">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">بيانات الشهادة</label>
-                <Button type="button" size="sm" variant="outline"
-                  onClick={() => updateData(s.id, "rows", [...rows, { label: "", value: "" }])}>
-                  <Plus className="w-3.5 h-3.5 ml-1" /> إضافة صف
-                </Button>
+            {mode === "image" ? (
+              <MediaUpload
+                label="صورة الشهادة (PNG / JPG / WEBP)"
+                folder="about/registration"
+                accept="image/png,image/jpeg,image/webp"
+                value={(data.image_url as string) ?? null}
+                onChange={(url) => updateData(s.id, "image_url", url ?? "")}
+              />
+            ) : (
+              <div className="space-y-2 pt-2 border-t">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium">بيانات الشهادة</label>
+                  <Button type="button" size="sm" variant="outline"
+                    onClick={() => updateData(s.id, "rows", [...rows, { label: "", value: "" }])}>
+                    <Plus className="w-3.5 h-3.5 ml-1" /> إضافة صف
+                  </Button>
+                </div>
+                {rows.map((it, i) => (
+                  <RowFrame key={i} index={i}
+                    onRemove={() => updateData(s.id, "rows", rows.filter((_, j) => j !== i))}>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Field label="التسمية">
+                        <Input value={it.label ?? ""}
+                          onChange={(e) => updateData(s.id, "rows", rows.map((x, j) => j === i ? { ...x, label: e.target.value } : x))} />
+                      </Field>
+                      <Field label="القيمة">
+                        <Input value={it.value ?? ""}
+                          onChange={(e) => updateData(s.id, "rows", rows.map((x, j) => j === i ? { ...x, value: e.target.value } : x))} />
+                      </Field>
+                    </div>
+                  </RowFrame>
+                ))}
               </div>
-              {rows.map((it, i) => (
-                <RowFrame key={i} index={i}
-                  onRemove={() => updateData(s.id, "rows", rows.filter((_, j) => j !== i))}>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Field label="التسمية">
-                      <Input value={it.label ?? ""}
-                        onChange={(e) => updateData(s.id, "rows", rows.map((x, j) => j === i ? { ...x, label: e.target.value } : x))} />
-                    </Field>
-                    <Field label="القيمة">
-                      <Input value={it.value ?? ""}
-                        onChange={(e) => updateData(s.id, "rows", rows.map((x, j) => j === i ? { ...x, value: e.target.value } : x))} />
-                    </Field>
-                  </div>
-                </RowFrame>
-              ))}
-            </div>
+            )}
           </div>
         );
       }
