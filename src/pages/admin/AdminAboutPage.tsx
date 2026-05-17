@@ -33,6 +33,8 @@ const KEY_LABELS: Record<string, string> = {
   operational: "الأهداف التشغيلية",
   ceo: "المدير التنفيذي",
   assembly: "الجمعية العمومية",
+  structure: "الهيكل التنظيمي",
+  registration: "شهادة التسجيل",
 };
 
 // مكوّن صف قابل للحذف لإطار موحّد
