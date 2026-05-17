@@ -517,7 +517,7 @@ export default function AdminPageContentPage() {
 
                 {(grouped[page.key] ?? []).length === 0 &&
                   !(QUICK_LINKS[page.key]?.length) && (
-                    <p className="text-sm text-muted-foreground">لا توجد أقسام.</p>
+                    <AdminEmptyState icon={FolderOpen} title="لا توجد أقسام لهذه الصفحة" />
                   )}
               </TabsContent>
             ))}
