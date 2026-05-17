@@ -278,9 +278,121 @@ export default function AdminAboutPage() {
           </div>
         );
       }
+      case "structure": {
+        const nodes = (Array.isArray(data.nodes) ? data.nodes : []) as { title?: string; subtitle?: string }[];
+        const departments = (Array.isArray(data.departments) ? data.departments : []) as { title?: string; desc?: string }[];
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">العُقد الهرمية (من الأعلى للأسفل)</label>
+                <Button type="button" size="sm" variant="outline"
+                  onClick={() => updateData(s.id, "nodes", [...nodes, { title: "", subtitle: "" }])}>
+                  <Plus className="w-3.5 h-3.5 ml-1" /> إضافة عقدة
+                </Button>
+              </div>
+              {nodes.map((it, i) => (
+                <RowFrame key={i} index={i}
+                  onRemove={() => updateData(s.id, "nodes", nodes.filter((_, j) => j !== i))}>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Field label="العنوان">
+                      <Input value={it.title ?? ""}
+                        onChange={(e) => updateData(s.id, "nodes", nodes.map((x, j) => j === i ? { ...x, title: e.target.value } : x))} />
+                    </Field>
+                    <Field label="الوصف الفرعي">
+                      <Input value={it.subtitle ?? ""}
+                        onChange={(e) => updateData(s.id, "nodes", nodes.map((x, j) => j === i ? { ...x, subtitle: e.target.value } : x))} />
+                    </Field>
+                  </div>
+                </RowFrame>
+              ))}
+            </div>
+            <div className="space-y-2 pt-2 border-t">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">الإدارات</label>
+                <Button type="button" size="sm" variant="outline"
+                  onClick={() => updateData(s.id, "departments", [...departments, { title: "", desc: "" }])}>
+                  <Plus className="w-3.5 h-3.5 ml-1" /> إضافة إدارة
+                </Button>
+              </div>
+              {departments.map((it, i) => (
+                <RowFrame key={i} index={i}
+                  onRemove={() => updateData(s.id, "departments", departments.filter((_, j) => j !== i))}>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Field label="اسم الإدارة">
+                      <Input value={it.title ?? ""}
+                        onChange={(e) => updateData(s.id, "departments", departments.map((x, j) => j === i ? { ...x, title: e.target.value } : x))} />
+                    </Field>
+                    <Field label="الوصف">
+                      <Input value={it.desc ?? ""}
+                        onChange={(e) => updateData(s.id, "departments", departments.map((x, j) => j === i ? { ...x, desc: e.target.value } : x))} />
+                    </Field>
+                  </div>
+                </RowFrame>
+              ))}
+            </div>
+          </div>
+        );
+      }
+      case "registration": {
+        const rows = (Array.isArray(data.rows) ? data.rows : []) as { label?: string; value?: string }[];
+        return (
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <Field label="نص الشارة">
+                <Input value={(data.badge_label as string) ?? ""}
+                  onChange={(e) => updateData(s.id, "badge_label", e.target.value)} />
+              </Field>
+              <Field label="العنوان الرئيسي">
+                <Input value={(data.heading as string) ?? ""}
+                  onChange={(e) => updateData(s.id, "heading", e.target.value)} />
+              </Field>
+            </div>
+            <MediaUpload
+              label="ملف الشهادة (PDF) — اختياري"
+              folder="about/registration"
+              value={(data.pdf_url as string) ?? null}
+              onChange={(url) => updateData(s.id, "pdf_url", url ?? "")}
+            />
+            <div className="space-y-2 pt-2 border-t">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">بيانات الشهادة</label>
+                <Button type="button" size="sm" variant="outline"
+                  onClick={() => updateData(s.id, "rows", [...rows, { label: "", value: "" }])}>
+                  <Plus className="w-3.5 h-3.5 ml-1" /> إضافة صف
+                </Button>
+              </div>
+              {rows.map((it, i) => (
+                <RowFrame key={i} index={i}
+                  onRemove={() => updateData(s.id, "rows", rows.filter((_, j) => j !== i))}>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Field label="التسمية">
+                      <Input value={it.label ?? ""}
+                        onChange={(e) => updateData(s.id, "rows", rows.map((x, j) => j === i ? { ...x, label: e.target.value } : x))} />
+                    </Field>
+                    <Field label="القيمة">
+                      <Input value={it.value ?? ""}
+                        onChange={(e) => updateData(s.id, "rows", rows.map((x, j) => j === i ? { ...x, value: e.target.value } : x))} />
+                    </Field>
+                  </div>
+                </RowFrame>
+              ))}
+            </div>
+          </div>
+        );
+      }
       default:
         return null;
     }
+  }
+
+  async function handleReorder(newIds: string[]) {
+    // optimistic reorder
+    setSections((prev) => {
+      const map = new Map(prev.map((x) => [x.id, x]));
+      return newIds.map((id, i) => ({ ...(map.get(id) as Section), sort_order: (i + 1) * 10 }));
+    });
+    await persistSortOrder(supabase, "about_content", newIds);
   }
 
   return (
