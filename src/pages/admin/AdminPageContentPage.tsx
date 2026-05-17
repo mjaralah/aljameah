@@ -12,10 +12,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import {
   Loader2, Save, Plus, Trash2, ArrowUp, ArrowDown, GripVertical,
-  Newspaper, ClipboardList, FolderKanban, ExternalLink,
+  Newspaper, ClipboardList, FolderKanban, ExternalLink, LayoutTemplate, FolderOpen,
 } from "lucide-react";
 import { SortableList, SortableItem, persistSortOrder } from "@/components/admin/SortableList";
 import { AdminListRow } from "@/components/admin/AdminListRow";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { AdminEmptyState } from "@/components/admin/AdminEmptyState";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { IconPicker } from "@/components/admin/IconPicker";
@@ -382,10 +384,13 @@ export default function AdminPageContentPage() {
   };
 
   return (
-    <AdminLayout
-      title="محتوى الصفحات"
-      description="تحرير محتوى صفحات الموقع العامة"
-    >
+    <AdminLayout title="محتوى الصفحات">
+      <AdminPageHeader
+        title="محتوى الصفحات"
+        description="تحرير محتوى صفحات الموقع العامة من مكان واحد"
+        icon={LayoutTemplate}
+      />
+
       {loading ? (
         <div className="p-12 flex justify-center">
           <Loader2 className="w-6 h-6 animate-spin" />
@@ -512,7 +517,7 @@ export default function AdminPageContentPage() {
 
                 {(grouped[page.key] ?? []).length === 0 &&
                   !(QUICK_LINKS[page.key]?.length) && (
-                    <p className="text-sm text-muted-foreground">لا توجد أقسام.</p>
+                    <AdminEmptyState icon={FolderOpen} title="لا توجد أقسام لهذه الصفحة" />
                   )}
               </TabsContent>
             ))}

@@ -1,50 +1,37 @@
 import { ReactNode, useEffect, useMemo, useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
+  Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription,
 } from "@/components/ui/sheet";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { Search, Loader2, Trash2, Eye, Download } from "lucide-react";
+import { Loader2, Trash2, Eye, Download, Inbox, type LucideIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { AdminListToolbar } from "@/components/admin/AdminListToolbar";
+import { AdminEmptyState } from "@/components/admin/AdminEmptyState";
+import { AdminDataTable, type DataTableColumn } from "@/components/admin/AdminDataTable";
 
 const STATUSES = [
-  { value: "new", label: "جديد", variant: "default" as const },
-  { value: "in_review", label: "قيد المراجعة", variant: "secondary" as const },
-  { value: "approved", label: "مقبول", variant: "default" as const },
-  { value: "rejected", label: "مرفوض", variant: "destructive" as const },
-  { value: "archived", label: "مؤرشف", variant: "outline" as const },
+  { value: "new", label: "جديد", tone: "info" as const },
+  { value: "in_review", label: "قيد المراجعة", tone: "warning" as const },
+  { value: "approved", label: "مقبول", tone: "success" as const },
+  { value: "rejected", label: "مرفوض", tone: "destructive" as const },
+  { value: "archived", label: "مؤرشف", tone: "muted" as const },
 ];
 
-const statusLabel = (s: string) => STATUSES.find((x) => x.value === s)?.label ?? s;
-const statusVariant = (s: string) =>
-  STATUSES.find((x) => x.value === s)?.variant ?? ("secondary" as const);
+const statusInfo = (s: string) =>
+  STATUSES.find((x) => x.value === s) ?? { label: s, tone: "muted" as const };
 
 export type RequestField<T> = {
   key: keyof T;
@@ -61,17 +48,12 @@ type RequestRow = {
 };
 
 export function RequestsPage<T extends RequestRow>({
-  table,
-  title,
-  description,
-  searchFields,
-  columns,
-  detailFields,
-  csvHeaders,
+  table, title, description, icon, searchFields, columns, detailFields, csvHeaders,
 }: {
   table: "volunteer_requests" | "membership_requests" | "contact_messages";
   title: string;
   description: string;
+  icon?: LucideIcon;
   searchFields: (keyof T)[];
   columns: { key: keyof T; label: string; render?: (r: T) => ReactNode }[];
   detailFields: RequestField<T>[];
@@ -176,104 +158,73 @@ export function RequestsPage<T extends RequestRow>({
     URL.revokeObjectURL(a.href);
   }
 
+  const dataCols: DataTableColumn<T>[] = [
+    ...columns.map((c) => ({
+      key: String(c.key),
+      label: c.label,
+      render: c.render ? (r: T) => c.render!(r) : undefined,
+    })),
+    {
+      key: "created_at",
+      label: "التاريخ",
+      width: "140px",
+      render: (r: T) => (
+        <span className="text-muted-foreground text-xs">
+          {new Date(r.created_at).toLocaleDateString("ar-SA")}
+        </span>
+      ),
+    },
+  ];
+
   return (
-    <AdminLayout
-      title={title}
-      description={description}
-      actions={
-        <Button size="sm" variant="outline" onClick={exportCSV}>
-          <Download className="w-4 h-4 ml-1" />
-          تصدير CSV
-        </Button>
-      }
-    >
-      <div className="space-y-4">
-        {/* Status tabs */}
-        <div className="flex flex-wrap gap-2">
-          <FilterChip
-            label="الكل"
-            count={counts.all}
-            active={statusFilter === "all"}
-            onClick={() => setStatusFilter("all")}
-          />
-          {STATUSES.map((s) => (
-            <FilterChip
-              key={s.value}
-              label={s.label}
-              count={counts[s.value] ?? 0}
-              active={statusFilter === s.value}
-              onClick={() => setStatusFilter(s.value)}
-            />
-          ))}
-        </div>
+    <AdminLayout title={title}>
+      <AdminPageHeader
+        title={title}
+        description={description}
+        icon={icon ?? Inbox}
+        action={
+          <Button variant="outline" onClick={exportCSV}>
+            <Download className="w-4 h-4 ml-1" />
+            تصدير CSV
+          </Button>
+        }
+        searchValue={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="بحث في الطلبات..."
+      />
 
-        <div className="relative max-w-sm">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="بحث..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pr-9"
-          />
-        </div>
+      <AdminListToolbar
+        countLabel={!loading ? `${filtered.length} طلباً` : undefined}
+        chips={[
+          { value: "all", label: "الكل", count: counts.all ?? 0 },
+          ...STATUSES.map((s) => ({ value: s.value, label: s.label, count: counts[s.value] ?? 0 })),
+        ]}
+        activeChip={statusFilter}
+        onChipChange={setStatusFilter}
+      />
 
-        <Card>
-          <CardContent className="p-0">
-            {loading ? (
-              <div className="p-12 flex justify-center">
-                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-              </div>
-            ) : filtered.length === 0 ? (
-              <div className="p-12 text-center text-sm text-muted-foreground">
-                لا توجد طلبات بعد.
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead className="bg-muted/40 border-b">
-                    <tr>
-                      {columns.map((c) => (
-                        <th key={String(c.key)} className="px-4 py-3 text-right font-medium text-muted-foreground">
-                          {c.label}
-                        </th>
-                      ))}
-                      <th className="px-4 py-3 text-right font-medium text-muted-foreground">التاريخ</th>
-                      <th className="px-4 py-3 text-right font-medium text-muted-foreground w-32">الحالة</th>
-                      <th className="px-4 py-3 w-20" />
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filtered.map((r) => (
-                      <tr
-                        key={r.id}
-                        className="border-b last:border-0 hover:bg-muted/20 cursor-pointer"
-                        onClick={() => setSelected(r)}
-                      >
-                        {columns.map((c) => (
-                          <td key={String(c.key)} className="px-4 py-3">
-                            {c.render ? c.render(r) : String(r[c.key] ?? "—")}
-                          </td>
-                        ))}
-                        <td className="px-4 py-3 text-muted-foreground text-xs">
-                          {new Date(r.created_at).toLocaleDateString("ar-SA")}
-                        </td>
-                        <td className="px-4 py-3">
-                          <Badge variant={statusVariant(r.status)}>{statusLabel(r.status)}</Badge>
-                        </td>
-                        <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setSelected(r)}>
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+      <AdminDataTable<T>
+        rows={filtered}
+        loading={loading}
+        columns={dataCols}
+        statusColumn={{
+          key: "status",
+          label: "الحالة",
+          getStatus: (r) => statusInfo(r.status),
+        }}
+        actions={[
+          { icon: Eye, label: "عرض التفاصيل", onClick: (r) => setSelected(r), variant: "view" },
+          { icon: Trash2, label: "حذف", onClick: (r) => setDeleteId(r.id), variant: "delete" },
+        ]}
+        onRowClick={(r) => setSelected(r)}
+        emptyState={
+          <AdminEmptyState
+            icon={Inbox}
+            title={rows.length === 0 ? "لا توجد طلبات بعد" : "لا توجد طلبات تطابق الفلتر"}
+            description={rows.length === 0 ? "ستظهر الطلبات الواردة هنا فور وصولها." : "جرّب تغيير الحالة أو البحث."}
+          />
+        }
+      />
 
       <Sheet open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
         <SheetContent dir="rtl" side="left" className="w-full sm:max-w-xl overflow-y-auto">
@@ -330,7 +281,7 @@ export function RequestsPage<T extends RequestRow>({
                 </div>
 
                 <div className="pt-4 border-t flex justify-end">
-                  <Button variant="outline" size="sm" className="text-destructive" onClick={() => setDeleteId(selected.id)}>
+                  <Button variant="outline" size="sm" className="text-destructive border-destructive/30 bg-destructive/5 hover:bg-destructive/10" onClick={() => setDeleteId(selected.id)}>
                     <Trash2 className="w-4 h-4 ml-1" />
                     حذف الطلب
                   </Button>
@@ -356,19 +307,5 @@ export function RequestsPage<T extends RequestRow>({
         </AlertDialogContent>
       </AlertDialog>
     </AdminLayout>
-  );
-}
-
-function FilterChip({ label, count, active, onClick }: { label: string; count: number; active: boolean; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
-        active ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted border-border"
-      }`}
-    >
-      {label}
-      <span className={`mr-1.5 text-xs ${active ? "opacity-90" : "text-muted-foreground"}`}>({count})</span>
-    </button>
   );
 }
