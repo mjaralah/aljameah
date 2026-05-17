@@ -464,31 +464,44 @@ const About = () => {
 
             {/* الهيكل التنظيمي */}
             <SectionBlock id="structure" icon={Network} title={getTitle("structure", "الهيكل التنظيمي")}>
-              <p>{get("structure", "هيكلٌ مرنٌ يضمن وضوح المسؤوليات وفعالية اتخاذ القرار:")}</p>
-              <div className="mt-6 space-y-3">
-                {structureData.nodes.map((n, i) => (
-                  <div key={i}>
-                    <OrgNode level={i} title={n.title} subtitle={n.subtitle} />
-                    {i < structureData.nodes.length - 1 && <OrgConnector />}
-                  </div>
-                ))}
-                {structureData.departments.length > 0 && (
-                  <>
-                    <OrgConnector />
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                      {structureData.departments.map((d) => (
-                        <div
-                          key={d.title}
-                          className="bg-card border border-border rounded-xl p-4 text-center hover:border-accent transition-smooth"
-                        >
-                          <h5 className="font-bold text-primary text-sm mb-1">{d.title}</h5>
-                          <p className="text-xs text-muted-foreground">{d.desc}</p>
+              {structureData.display_mode === "image" && structureData.image_url ? (
+                <div className="mt-2 rounded-2xl border border-border bg-card p-3 sm:p-4">
+                  <img
+                    src={structureData.image_url}
+                    alt={getTitle("structure", "الهيكل التنظيمي")}
+                    loading="lazy"
+                    className="w-full h-auto max-h-[640px] object-contain mx-auto rounded-lg"
+                  />
+                </div>
+              ) : (
+                <>
+                  <p>{get("structure", "هيكلٌ مرنٌ يضمن وضوح المسؤوليات وفعالية اتخاذ القرار:")}</p>
+                  <div className="mt-6 space-y-3">
+                    {structureData.nodes.map((n, i) => (
+                      <div key={i}>
+                        <OrgNode level={i} title={n.title} subtitle={n.subtitle} />
+                        {i < structureData.nodes.length - 1 && <OrgConnector />}
+                      </div>
+                    ))}
+                    {structureData.departments.length > 0 && (
+                      <>
+                        <OrgConnector />
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                          {structureData.departments.map((d) => (
+                            <div
+                              key={d.title}
+                              className="bg-card border border-border rounded-xl p-4 text-center hover:border-accent transition-smooth"
+                            >
+                              <h5 className="font-bold text-primary text-sm mb-1">{d.title}</h5>
+                              <p className="text-xs text-muted-foreground">{d.desc}</p>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
+                      </>
+                    )}
+                  </div>
+                </>
+              )}
             </SectionBlock>
 
             {/* شهادة التسجيل */}
@@ -505,16 +518,27 @@ const About = () => {
                   <h3 className="text-xl font-bold text-primary mb-4">
                     {registrationData.heading}
                   </h3>
-                  <dl className="grid sm:grid-cols-2 gap-4 text-sm">
-                    {registrationData.rows.map((r) => (
-                      <InfoRow
-                        key={r.label}
-                        label={r.label}
-                        value={r.value}
-                        valueClass={r.value === "ساري" ? "text-success" : ""}
+                  {registrationData.display_mode === "image" && registrationData.image_url ? (
+                    <div className="rounded-xl border border-border bg-background/60 p-3 sm:p-4">
+                      <img
+                        src={registrationData.image_url}
+                        alt={registrationData.heading || "شهادة التسجيل"}
+                        loading="lazy"
+                        className="w-full h-auto max-h-[720px] object-contain mx-auto rounded-lg"
                       />
-                    ))}
-                  </dl>
+                    </div>
+                  ) : (
+                    <dl className="grid sm:grid-cols-2 gap-4 text-sm">
+                      {registrationData.rows.map((r) => (
+                        <InfoRow
+                          key={r.label}
+                          label={r.label}
+                          value={r.value}
+                          valueClass={r.value === "ساري" ? "text-success" : ""}
+                        />
+                      ))}
+                    </dl>
+                  )}
                   {registrationData.pdf_url && (
                     <Button asChild className="mt-6 bg-primary hover:bg-primary/90">
                       <a href={registrationData.pdf_url} target="_blank" rel="noopener noreferrer">
