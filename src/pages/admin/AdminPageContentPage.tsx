@@ -384,10 +384,13 @@ export default function AdminPageContentPage() {
   };
 
   return (
-    <AdminLayout
-      title="محتوى الصفحات"
-      description="تحرير محتوى صفحات الموقع العامة"
-    >
+    <AdminLayout title="محتوى الصفحات">
+      <AdminPageHeader
+        title="محتوى الصفحات"
+        description="تحرير محتوى صفحات الموقع العامة من مكان واحد"
+        icon={LayoutTemplate}
+      />
+
       {loading ? (
         <div className="p-12 flex justify-center">
           <Loader2 className="w-6 h-6 animate-spin" />
