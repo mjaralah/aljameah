@@ -57,6 +57,26 @@ const Field = ({ label, children }: { label: string; children: React.ReactNode }
   </div>
 );
 
+const ModeToggle = ({ value, onChange }: { value: "content" | "image"; onChange: (v: "content" | "image") => void }) => (
+  <div className="flex items-center gap-1 p-1 rounded-lg bg-muted w-fit">
+    {([
+      { v: "content", label: "محتوى منظم" },
+      { v: "image", label: "صورة مضمّنة" },
+    ] as const).map((opt) => (
+      <button
+        key={opt.v}
+        type="button"
+        onClick={() => onChange(opt.v)}
+        className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
+          value === opt.v ? "bg-background shadow-sm font-medium text-foreground" : "text-muted-foreground hover:text-foreground"
+        }`}
+      >
+        {opt.label}
+      </button>
+    ))}
+  </div>
+);
+
 export default function AdminAboutPage() {
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
@@ -279,65 +299,81 @@ export default function AdminAboutPage() {
         );
       }
       case "structure": {
+        const mode = (data.display_mode as string) === "image" ? "image" : "content";
         const nodes = (Array.isArray(data.nodes) ? data.nodes : []) as { title?: string; subtitle?: string }[];
         const departments = (Array.isArray(data.departments) ? data.departments : []) as { title?: string; desc?: string }[];
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">العُقد الهرمية (من الأعلى للأسفل)</label>
-                <Button type="button" size="sm" variant="outline"
-                  onClick={() => updateData(s.id, "nodes", [...nodes, { title: "", subtitle: "" }])}>
-                  <Plus className="w-3.5 h-3.5 ml-1" /> إضافة عقدة
-                </Button>
-              </div>
-              {nodes.map((it, i) => (
-                <RowFrame key={i} index={i}
-                  onRemove={() => updateData(s.id, "nodes", nodes.filter((_, j) => j !== i))}>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Field label="العنوان">
-                      <Input value={it.title ?? ""}
-                        onChange={(e) => updateData(s.id, "nodes", nodes.map((x, j) => j === i ? { ...x, title: e.target.value } : x))} />
-                    </Field>
-                    <Field label="الوصف الفرعي">
-                      <Input value={it.subtitle ?? ""}
-                        onChange={(e) => updateData(s.id, "nodes", nodes.map((x, j) => j === i ? { ...x, subtitle: e.target.value } : x))} />
-                    </Field>
+            <ModeToggle value={mode} onChange={(v) => updateData(s.id, "display_mode", v)} />
+            {mode === "image" ? (
+              <MediaUpload
+                label="صورة الهيكل التنظيمي (PNG / JPG / WEBP)"
+                folder="about/structure"
+                accept="image/png,image/jpeg,image/webp"
+                value={(data.image_url as string) ?? null}
+                onChange={(url) => updateData(s.id, "image_url", url ?? "")}
+              />
+            ) : (
+              <>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium">العُقد الهرمية (من الأعلى للأسفل)</label>
+                    <Button type="button" size="sm" variant="outline"
+                      onClick={() => updateData(s.id, "nodes", [...nodes, { title: "", subtitle: "" }])}>
+                      <Plus className="w-3.5 h-3.5 ml-1" /> إضافة عقدة
+                    </Button>
                   </div>
-                </RowFrame>
-              ))}
-            </div>
-            <div className="space-y-2 pt-2 border-t">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">الإدارات</label>
-                <Button type="button" size="sm" variant="outline"
-                  onClick={() => updateData(s.id, "departments", [...departments, { title: "", desc: "" }])}>
-                  <Plus className="w-3.5 h-3.5 ml-1" /> إضافة إدارة
-                </Button>
-              </div>
-              {departments.map((it, i) => (
-                <RowFrame key={i} index={i}
-                  onRemove={() => updateData(s.id, "departments", departments.filter((_, j) => j !== i))}>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Field label="اسم الإدارة">
-                      <Input value={it.title ?? ""}
-                        onChange={(e) => updateData(s.id, "departments", departments.map((x, j) => j === i ? { ...x, title: e.target.value } : x))} />
-                    </Field>
-                    <Field label="الوصف">
-                      <Input value={it.desc ?? ""}
-                        onChange={(e) => updateData(s.id, "departments", departments.map((x, j) => j === i ? { ...x, desc: e.target.value } : x))} />
-                    </Field>
+                  {nodes.map((it, i) => (
+                    <RowFrame key={i} index={i}
+                      onRemove={() => updateData(s.id, "nodes", nodes.filter((_, j) => j !== i))}>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Field label="العنوان">
+                          <Input value={it.title ?? ""}
+                            onChange={(e) => updateData(s.id, "nodes", nodes.map((x, j) => j === i ? { ...x, title: e.target.value } : x))} />
+                        </Field>
+                        <Field label="الوصف الفرعي">
+                          <Input value={it.subtitle ?? ""}
+                            onChange={(e) => updateData(s.id, "nodes", nodes.map((x, j) => j === i ? { ...x, subtitle: e.target.value } : x))} />
+                        </Field>
+                      </div>
+                    </RowFrame>
+                  ))}
+                </div>
+                <div className="space-y-2 pt-2 border-t">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium">الإدارات</label>
+                    <Button type="button" size="sm" variant="outline"
+                      onClick={() => updateData(s.id, "departments", [...departments, { title: "", desc: "" }])}>
+                      <Plus className="w-3.5 h-3.5 ml-1" /> إضافة إدارة
+                    </Button>
                   </div>
-                </RowFrame>
-              ))}
-            </div>
+                  {departments.map((it, i) => (
+                    <RowFrame key={i} index={i}
+                      onRemove={() => updateData(s.id, "departments", departments.filter((_, j) => j !== i))}>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Field label="اسم الإدارة">
+                          <Input value={it.title ?? ""}
+                            onChange={(e) => updateData(s.id, "departments", departments.map((x, j) => j === i ? { ...x, title: e.target.value } : x))} />
+                        </Field>
+                        <Field label="الوصف">
+                          <Input value={it.desc ?? ""}
+                            onChange={(e) => updateData(s.id, "departments", departments.map((x, j) => j === i ? { ...x, desc: e.target.value } : x))} />
+                        </Field>
+                      </div>
+                    </RowFrame>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         );
       }
       case "registration": {
+        const mode = (data.display_mode as string) === "image" ? "image" : "content";
         const rows = (Array.isArray(data.rows) ? data.rows : []) as { label?: string; value?: string }[];
         return (
           <div className="space-y-3">
+            <ModeToggle value={mode} onChange={(v) => updateData(s.id, "display_mode", v)} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <Field label="نص الشارة">
                 <Input value={(data.badge_label as string) ?? ""}
@@ -354,30 +390,40 @@ export default function AdminAboutPage() {
               value={(data.pdf_url as string) ?? null}
               onChange={(url) => updateData(s.id, "pdf_url", url ?? "")}
             />
-            <div className="space-y-2 pt-2 border-t">
-              <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">بيانات الشهادة</label>
-                <Button type="button" size="sm" variant="outline"
-                  onClick={() => updateData(s.id, "rows", [...rows, { label: "", value: "" }])}>
-                  <Plus className="w-3.5 h-3.5 ml-1" /> إضافة صف
-                </Button>
+            {mode === "image" ? (
+              <MediaUpload
+                label="صورة الشهادة (PNG / JPG / WEBP)"
+                folder="about/registration"
+                accept="image/png,image/jpeg,image/webp"
+                value={(data.image_url as string) ?? null}
+                onChange={(url) => updateData(s.id, "image_url", url ?? "")}
+              />
+            ) : (
+              <div className="space-y-2 pt-2 border-t">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium">بيانات الشهادة</label>
+                  <Button type="button" size="sm" variant="outline"
+                    onClick={() => updateData(s.id, "rows", [...rows, { label: "", value: "" }])}>
+                    <Plus className="w-3.5 h-3.5 ml-1" /> إضافة صف
+                  </Button>
+                </div>
+                {rows.map((it, i) => (
+                  <RowFrame key={i} index={i}
+                    onRemove={() => updateData(s.id, "rows", rows.filter((_, j) => j !== i))}>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Field label="التسمية">
+                        <Input value={it.label ?? ""}
+                          onChange={(e) => updateData(s.id, "rows", rows.map((x, j) => j === i ? { ...x, label: e.target.value } : x))} />
+                      </Field>
+                      <Field label="القيمة">
+                        <Input value={it.value ?? ""}
+                          onChange={(e) => updateData(s.id, "rows", rows.map((x, j) => j === i ? { ...x, value: e.target.value } : x))} />
+                      </Field>
+                    </div>
+                  </RowFrame>
+                ))}
               </div>
-              {rows.map((it, i) => (
-                <RowFrame key={i} index={i}
-                  onRemove={() => updateData(s.id, "rows", rows.filter((_, j) => j !== i))}>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Field label="التسمية">
-                      <Input value={it.label ?? ""}
-                        onChange={(e) => updateData(s.id, "rows", rows.map((x, j) => j === i ? { ...x, label: e.target.value } : x))} />
-                    </Field>
-                    <Field label="القيمة">
-                      <Input value={it.value ?? ""}
-                        onChange={(e) => updateData(s.id, "rows", rows.map((x, j) => j === i ? { ...x, value: e.target.value } : x))} />
-                    </Field>
-                  </div>
-                </RowFrame>
-              ))}
-            </div>
+            )}
           </div>
         );
       }
