@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Save, Plus, Trash2, Users, ExternalLink, EyeOff, Eye } from "lucide-react";
+import { Loader2, Save, Plus, Trash2, Users, ExternalLink, EyeOff, Eye, GripVertical } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { IconPicker } from "@/components/admin/IconPicker";
 import { MediaUpload } from "@/components/admin/MediaUpload";
+import { SortableList, SortableItem, persistSortOrder } from "@/components/admin/SortableList";
 
 type AnyData = Record<string, unknown> | null;
 
@@ -32,6 +33,8 @@ const KEY_LABELS: Record<string, string> = {
   operational: "الأهداف التشغيلية",
   ceo: "المدير التنفيذي",
   assembly: "الجمعية العمومية",
+  structure: "الهيكل التنظيمي",
+  registration: "شهادة التسجيل",
 };
 
 // مكوّن صف قابل للحذف لإطار موحّد
@@ -275,9 +278,121 @@ export default function AdminAboutPage() {
           </div>
         );
       }
+      case "structure": {
+        const nodes = (Array.isArray(data.nodes) ? data.nodes : []) as { title?: string; subtitle?: string }[];
+        const departments = (Array.isArray(data.departments) ? data.departments : []) as { title?: string; desc?: string }[];
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">العُقد الهرمية (من الأعلى للأسفل)</label>
+                <Button type="button" size="sm" variant="outline"
+                  onClick={() => updateData(s.id, "nodes", [...nodes, { title: "", subtitle: "" }])}>
+                  <Plus className="w-3.5 h-3.5 ml-1" /> إضافة عقدة
+                </Button>
+              </div>
+              {nodes.map((it, i) => (
+                <RowFrame key={i} index={i}
+                  onRemove={() => updateData(s.id, "nodes", nodes.filter((_, j) => j !== i))}>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Field label="العنوان">
+                      <Input value={it.title ?? ""}
+                        onChange={(e) => updateData(s.id, "nodes", nodes.map((x, j) => j === i ? { ...x, title: e.target.value } : x))} />
+                    </Field>
+                    <Field label="الوصف الفرعي">
+                      <Input value={it.subtitle ?? ""}
+                        onChange={(e) => updateData(s.id, "nodes", nodes.map((x, j) => j === i ? { ...x, subtitle: e.target.value } : x))} />
+                    </Field>
+                  </div>
+                </RowFrame>
+              ))}
+            </div>
+            <div className="space-y-2 pt-2 border-t">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">الإدارات</label>
+                <Button type="button" size="sm" variant="outline"
+                  onClick={() => updateData(s.id, "departments", [...departments, { title: "", desc: "" }])}>
+                  <Plus className="w-3.5 h-3.5 ml-1" /> إضافة إدارة
+                </Button>
+              </div>
+              {departments.map((it, i) => (
+                <RowFrame key={i} index={i}
+                  onRemove={() => updateData(s.id, "departments", departments.filter((_, j) => j !== i))}>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Field label="اسم الإدارة">
+                      <Input value={it.title ?? ""}
+                        onChange={(e) => updateData(s.id, "departments", departments.map((x, j) => j === i ? { ...x, title: e.target.value } : x))} />
+                    </Field>
+                    <Field label="الوصف">
+                      <Input value={it.desc ?? ""}
+                        onChange={(e) => updateData(s.id, "departments", departments.map((x, j) => j === i ? { ...x, desc: e.target.value } : x))} />
+                    </Field>
+                  </div>
+                </RowFrame>
+              ))}
+            </div>
+          </div>
+        );
+      }
+      case "registration": {
+        const rows = (Array.isArray(data.rows) ? data.rows : []) as { label?: string; value?: string }[];
+        return (
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <Field label="نص الشارة">
+                <Input value={(data.badge_label as string) ?? ""}
+                  onChange={(e) => updateData(s.id, "badge_label", e.target.value)} />
+              </Field>
+              <Field label="العنوان الرئيسي">
+                <Input value={(data.heading as string) ?? ""}
+                  onChange={(e) => updateData(s.id, "heading", e.target.value)} />
+              </Field>
+            </div>
+            <MediaUpload
+              label="ملف الشهادة (PDF) — اختياري"
+              folder="about/registration"
+              value={(data.pdf_url as string) ?? null}
+              onChange={(url) => updateData(s.id, "pdf_url", url ?? "")}
+            />
+            <div className="space-y-2 pt-2 border-t">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium">بيانات الشهادة</label>
+                <Button type="button" size="sm" variant="outline"
+                  onClick={() => updateData(s.id, "rows", [...rows, { label: "", value: "" }])}>
+                  <Plus className="w-3.5 h-3.5 ml-1" /> إضافة صف
+                </Button>
+              </div>
+              {rows.map((it, i) => (
+                <RowFrame key={i} index={i}
+                  onRemove={() => updateData(s.id, "rows", rows.filter((_, j) => j !== i))}>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Field label="التسمية">
+                      <Input value={it.label ?? ""}
+                        onChange={(e) => updateData(s.id, "rows", rows.map((x, j) => j === i ? { ...x, label: e.target.value } : x))} />
+                    </Field>
+                    <Field label="القيمة">
+                      <Input value={it.value ?? ""}
+                        onChange={(e) => updateData(s.id, "rows", rows.map((x, j) => j === i ? { ...x, value: e.target.value } : x))} />
+                    </Field>
+                  </div>
+                </RowFrame>
+              ))}
+            </div>
+          </div>
+        );
+      }
       default:
         return null;
     }
+  }
+
+  async function handleReorder(newIds: string[]) {
+    // optimistic reorder
+    setSections((prev) => {
+      const map = new Map(prev.map((x) => [x.id, x]));
+      return newIds.map((id, i) => ({ ...(map.get(id) as Section), sort_order: (i + 1) * 10 }));
+    });
+    await persistSortOrder(supabase, "about_content", newIds);
   }
 
   return (
@@ -306,47 +421,67 @@ export default function AdminAboutPage() {
             </CardContent>
           </Card>
 
-          {sections.map((s) => (
-            <Card key={s.id} className={!s.published ? "opacity-70 border-dashed" : undefined}>
-              <CardHeader>
-                <CardTitle className="text-base flex items-center justify-between gap-2">
-                  <span>
-                    {KEY_LABELS[s.section_key] ?? s.section_key}
-                    <span className="text-xs text-muted-foreground font-normal mr-2">({s.section_key})</span>
-                    {!s.published && <span className="text-[10px] mr-2 px-2 py-0.5 rounded bg-muted">مخفي</span>}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <Button type="button" size="sm" variant="ghost" onClick={() => togglePublished(s)} title={s.published ? "إخفاء" : "إظهار"}>
-                      {s.published ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </Button>
-                    <Button type="button" size="sm" variant="ghost" className="text-destructive" onClick={() => remove(s)} title="حذف">
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+          <p className="text-xs text-muted-foreground">اسحب البطاقات من المقبض لإعادة ترتيب الأقسام في صفحة "من نحن".</p>
+          <SortableList ids={sections.map((s) => s.id)} onReorder={handleReorder}>
+            {sections.map((s) => (
+              <SortableItem key={s.id} id={s.id}>
+                {({ handleProps, setNodeRef, style }) => (
+                  <div ref={setNodeRef} style={style}>
+                    <Card className={!s.published ? "opacity-70 border-dashed" : undefined}>
+                      <CardHeader>
+                        <CardTitle className="text-base flex items-center justify-between gap-2">
+                          <span className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              {...handleProps}
+                              className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground p-1 -m-1"
+                              title="اسحب لإعادة الترتيب"
+                              aria-label="مقبض السحب"
+                            >
+                              <GripVertical className="w-4 h-4" />
+                            </button>
+                            <span>
+                              {KEY_LABELS[s.section_key] ?? s.section_key}
+                              <span className="text-xs text-muted-foreground font-normal mr-2">({s.section_key})</span>
+                              {!s.published && <span className="text-[10px] mr-2 px-2 py-0.5 rounded bg-muted">مخفي</span>}
+                            </span>
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <Button type="button" size="sm" variant="ghost" onClick={() => togglePublished(s)} title={s.published ? "إخفاء" : "إظهار"}>
+                              {s.published ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </Button>
+                            <Button type="button" size="sm" variant="ghost" className="text-destructive" onClick={() => remove(s)} title="حذف">
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <Field label="العنوان">
+                          <Input value={s.title ?? ""} onChange={(e) => update(s.id, { title: e.target.value })} />
+                        </Field>
+                        <Field label="النص">
+                          <Textarea rows={5} value={s.content ?? ""} onChange={(e) => update(s.id, { content: e.target.value })} />
+                        </Field>
+                        {s.data !== null && renderStructured(s)}
+                        <div className="flex justify-between items-center pt-2">
+                          <label className="flex items-center gap-2 text-sm">
+                            <input type="checkbox" checked={s.published}
+                              onChange={(e) => update(s.id, { published: e.target.checked })} />
+                            منشور
+                          </label>
+                          <Button onClick={() => save(s)} disabled={savingId === s.id} size="sm">
+                            {savingId === s.id ? <Loader2 className="w-4 h-4 ml-1 animate-spin" /> : <Save className="w-4 h-4 ml-1" />}
+                            حفظ القسم
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Field label="العنوان">
-                  <Input value={s.title ?? ""} onChange={(e) => update(s.id, { title: e.target.value })} />
-                </Field>
-                <Field label="النص">
-                  <Textarea rows={5} value={s.content ?? ""} onChange={(e) => update(s.id, { content: e.target.value })} />
-                </Field>
-                {s.data !== null && renderStructured(s)}
-                <div className="flex justify-between items-center pt-2">
-                  <label className="flex items-center gap-2 text-sm">
-                    <input type="checkbox" checked={s.published}
-                      onChange={(e) => update(s.id, { published: e.target.checked })} />
-                    منشور
-                  </label>
-                  <Button onClick={() => save(s)} disabled={savingId === s.id} size="sm">
-                    {savingId === s.id ? <Loader2 className="w-4 h-4 ml-1 animate-spin" /> : <Save className="w-4 h-4 ml-1" />}
-                    حفظ القسم
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                )}
+              </SortableItem>
+            ))}
+          </SortableList>
         </div>
       )}
     </AdminLayout>
