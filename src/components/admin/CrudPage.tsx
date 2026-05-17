@@ -2,15 +2,6 @@ import { ReactNode, useEffect, useMemo, useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,11 +12,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Search, Loader2, GripVertical } from "lucide-react";
+import { Plus, Loader2, GripVertical, FolderOpen, type LucideIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { SortableList, SortableItem, persistSortOrder } from "@/components/admin/SortableList";
 import { AdminListRow } from "@/components/admin/AdminListRow";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { AdminEmptyState } from "@/components/admin/AdminEmptyState";
+import { AdminListToolbar } from "@/components/admin/AdminListToolbar";
+import { AdminDialog } from "@/components/admin/AdminDialog";
 
 export type Column<T> = {
   key: keyof T | string;
@@ -38,6 +33,7 @@ export type CrudPageProps<T extends { id: string; published?: boolean }> = {
   table: "news" | "programs" | "board_members" | "partners" | "hero_slides" | "custom_pages" | "governance_documents" | "about_content" | "surveys" | "legal_pages";
   title: string;
   description?: string;
+  icon?: LucideIcon;
   columns: Column<T>[];
   searchField?: keyof T;
   emptyState?: string;
@@ -66,6 +62,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
   table,
   title,
   description,
+  icon,
   columns,
   searchField,
   emptyState = "لا توجد عناصر بعد. ابدأ بإضافة عنصر جديد.",
@@ -85,7 +82,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
   const [activeCategory, setActiveCategory] = useState<string>(
     categoryFilter?.options[0]?.value ?? "",
   );
-
+  const [publishedFilter, setPublishedFilter] = useState<"all" | "published" | "draft">("all");
 
   async function load() {
     setLoading(true);
@@ -108,13 +105,18 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
     if (categoryFilter && activeCategory) {
       r = r.filter((row) => String(row[categoryFilter.field] ?? "") === activeCategory);
     }
+    if (publishedFilter === "published") r = r.filter((row) => row.published);
+    else if (publishedFilter === "draft") r = r.filter((row) => !row.published);
     if (searchField && search) {
       r = r.filter((row) =>
         String(row[searchField as keyof T] ?? "").toLowerCase().includes(search.toLowerCase()),
       );
     }
     return r;
-  }, [rows, search, searchField, categoryFilter, activeCategory]);
+  }, [rows, search, searchField, categoryFilter, activeCategory, publishedFilter]);
+
+  const publishedCount = rows.filter((r) => r.published).length;
+  const draftCount = rows.length - publishedCount;
 
   async function handleSave() {
     if (!editing) return;
@@ -157,17 +159,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
     setDeleteId(null);
   }
 
-  async function togglePublish(row: T) {
-    const { error } = await supabase
-      .from(table)
-      .update({ published: !row.published } as never)
-      .eq("id", row.id);
-    if (error) toast.error(error.message);
-    else load();
-  }
-
   async function handleReorder(newIds: string[]) {
-    // Map newIds (subset = filtered) back into full rows preserving non-visible positions.
     const subsetIds = new Set(newIds);
     const reorderedSubset = newIds
       .map((id) => filtered.find((r) => r.id === id))
@@ -192,7 +184,6 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
     setEditing((prev) => ({ ...(prev ?? {}), [key]: value }) as Partial<T>);
   }
 
-  // Heuristic: pick thumbnail + title + subtitle columns from `columns`
   const thumbCol = columns.find((c) => isImageKey(String(c.key)));
   const restCols = columns.filter((c) => c !== thumbCol);
   const titleCol = restCols[0];
@@ -203,136 +194,134 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
   }
 
   return (
-    <AdminLayout
-      title={title}
-      description={description}
-      actions={
-        <Button onClick={() => setEditing(createDefaults())} size="sm">
-          <Plus className="w-4 h-4 ml-1" />
-          إضافة
-        </Button>
-      }
-    >
-      <div className="space-y-4">
-        {categoryFilter && (
-          <div className="flex flex-wrap gap-2">
-            {categoryFilter.options.map((opt) => {
-              const count = rows.filter(
-                (r) => String(r[categoryFilter.field] ?? "") === opt.value,
-              ).length;
-              const active = opt.value === activeCategory;
-              return (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => setActiveCategory(opt.value)}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium border transition ${
-                    active
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-background hover:bg-muted border-border text-muted-foreground"
-                  }`}
-                >
-                  {opt.label}
-                  <span className={`ms-2 inline-flex items-center justify-center min-w-5 h-5 px-1 rounded-full text-[10px] ${active ? "bg-primary-foreground/20" : "bg-muted"}`}>
-                    {count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        {searchField && (
-          <div className="relative max-w-sm">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="بحث..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pr-9"
-            />
-          </div>
-        )}
-
-        {reorderable && filtered.length > 1 && (
-          <p className="text-xs text-muted-foreground">
-            اسحب أيقونة <GripVertical className="inline w-3 h-3" /> لإعادة ترتيب العناصر. يُحفظ الترتيب تلقائياً.
-          </p>
-        )}
-
-        {loading ? (
-          <Card><CardContent className="p-12 flex justify-center">
-            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-          </CardContent></Card>
-        ) : filtered.length === 0 ? (
-          <Card><CardContent className="p-12 text-center text-sm text-muted-foreground">
-            {emptyState}
-          </CardContent></Card>
-        ) : (
-          <SortableList ids={filtered.map((r) => r.id)} onReorder={handleReorder}>
-            <div className="space-y-2">
-              {filtered.map((row) => (
-                <SortableItem key={row.id} id={row.id} disabled={!reorderable}>
-                  {({ handleProps, setNodeRef, style }) => (
-                    <AdminListRow
-                      ref={setNodeRef as any}
-                      style={style}
-                      id={row.id}
-                      table={table}
-                      showDragHandle={reorderable}
-                      dragHandleProps={handleProps}
-                      thumbnail={thumbCol ? renderCol(thumbCol, row) : undefined}
-                      title={titleCol ? renderCol(titleCol, row) : "—"}
-                      subtitle={
-                        subtitleCols.length > 0 ? (
-                          <span className="flex flex-wrap items-center gap-x-2">
-                            {subtitleCols.map((c, i) => (
-                              <span key={String(c.key)} className="inline-flex items-center gap-1">
-                                {i > 0 && <span className="opacity-50">·</span>}
-                                <span className="opacity-70">{c.label}:</span>
-                                <span>{renderCol(c, row)}</span>
-                              </span>
-                            ))}
-                          </span>
-                        ) : undefined
-                      }
-                      published={!!row.published}
-                      onTogglePublished={() => load()}
-                      onEdit={() => setEditing(row)}
-                      onDelete={() => setDeleteId(row.id)}
-                    />
-                  )}
-                </SortableItem>
-              ))}
+    <AdminLayout title={title}>
+      <AdminPageHeader
+        title={title}
+        description={description}
+        icon={icon}
+        action={
+          <Button onClick={() => setEditing(createDefaults())}>
+            <Plus className="w-4 h-4 ml-1" />
+            إضافة
+          </Button>
+        }
+        searchValue={searchField ? search : undefined}
+        onSearchChange={searchField ? setSearch : undefined}
+        extra={
+          categoryFilter && (
+            <div className="flex flex-wrap gap-1.5">
+              {categoryFilter.options.map((opt) => {
+                const count = rows.filter(
+                  (r) => String(r[categoryFilter.field] ?? "") === opt.value,
+                ).length;
+                const active = opt.value === activeCategory;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setActiveCategory(opt.value)}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium border transition ${
+                      active
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background hover:bg-muted border-border text-muted-foreground"
+                    }`}
+                  >
+                    {opt.label}
+                    <span className={`ms-2 inline-flex items-center justify-center min-w-5 h-5 px-1 rounded-full text-[10px] ${active ? "bg-primary-foreground/20" : "bg-muted"}`}>
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
-          </SortableList>
-        )}
-      </div>
+          )
+        }
+      />
 
-      <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
-        <DialogContent dir="rtl" className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {editing?.id ? "تعديل" : "إضافة جديد"}
-            </DialogTitle>
-            <DialogDescription>
-              املأ الحقول التالية واحفظ.
-            </DialogDescription>
-          </DialogHeader>
-          {editing && (
-            <div className="space-y-4 py-2">
-              {renderForm(editing, setValue)}
-            </div>
-          )}
-          <DialogFooter className="gap-2 sm:gap-2">
-            <Button variant="outline" onClick={() => setEditing(null)}>إلغاء</Button>
-            <Button onClick={handleSave} disabled={saving}>
-              {saving && <Loader2 className="w-4 h-4 ml-1 animate-spin" />}
-              حفظ
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <AdminListToolbar
+        countLabel={!loading ? `${filtered.length} عنصراً` : undefined}
+        chips={
+          rows.length > 0
+            ? [
+                { value: "all", label: "الكل", count: rows.length },
+                { value: "published", label: "منشور", count: publishedCount },
+                { value: "draft", label: "مسودة", count: draftCount },
+              ]
+            : undefined
+        }
+        activeChip={publishedFilter}
+        onChipChange={(v) => setPublishedFilter(v as typeof publishedFilter)}
+      />
+
+      {reorderable && filtered.length > 1 && (
+        <p className="text-xs text-muted-foreground mb-3 px-1">
+          اسحب أيقونة <GripVertical className="inline w-3 h-3" /> لإعادة ترتيب العناصر. يُحفظ الترتيب تلقائياً.
+        </p>
+      )}
+
+      {loading ? (
+        <Card><CardContent className="p-12 flex justify-center">
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        </CardContent></Card>
+      ) : filtered.length === 0 ? (
+        <AdminEmptyState
+          icon={FolderOpen}
+          title={rows.length === 0 ? emptyState : "لا توجد عناصر تطابق الفلتر"}
+          description={rows.length === 0 ? "اضغط على زر «إضافة» في الأعلى لإنشاء أول عنصر." : "جرّب تغيير الفلتر أو البحث."}
+          actionLabel={rows.length === 0 ? "إضافة عنصر" : undefined}
+          onAction={rows.length === 0 ? () => setEditing(createDefaults()) : undefined}
+        />
+      ) : (
+        <SortableList ids={filtered.map((r) => r.id)} onReorder={handleReorder}>
+          <div className="space-y-2">
+            {filtered.map((row) => (
+              <SortableItem key={row.id} id={row.id} disabled={!reorderable}>
+                {({ handleProps, setNodeRef, style }) => (
+                  <AdminListRow
+                    ref={setNodeRef as any}
+                    style={style}
+                    id={row.id}
+                    table={table}
+                    showDragHandle={reorderable}
+                    dragHandleProps={handleProps}
+                    thumbnail={thumbCol ? renderCol(thumbCol, row) : undefined}
+                    title={titleCol ? renderCol(titleCol, row) : "—"}
+                    subtitle={
+                      subtitleCols.length > 0 ? (
+                        <span className="flex flex-wrap items-center gap-x-2">
+                          {subtitleCols.map((c, i) => (
+                            <span key={String(c.key)} className="inline-flex items-center gap-1">
+                              {i > 0 && <span className="opacity-50">·</span>}
+                              <span className="opacity-70">{c.label}:</span>
+                              <span>{renderCol(c, row)}</span>
+                            </span>
+                          ))}
+                        </span>
+                      ) : undefined
+                    }
+                    published={!!row.published}
+                    onTogglePublished={() => load()}
+                    onEdit={() => setEditing(row)}
+                    onDelete={() => setDeleteId(row.id)}
+                  />
+                )}
+              </SortableItem>
+            ))}
+          </div>
+        </SortableList>
+      )}
+
+      <AdminDialog
+        open={!!editing}
+        onOpenChange={(o) => !o && setEditing(null)}
+        title={editing?.id ? "تعديل" : "إضافة جديد"}
+        description="املأ الحقول التالية واحفظ."
+        onSave={handleSave}
+        saving={saving}
+        size="lg"
+      >
+        {editing && renderForm(editing, setValue)}
+      </AdminDialog>
 
       <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && setDeleteId(null)}>
         <AlertDialogContent dir="rtl">
