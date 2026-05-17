@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { MediaUpload } from "@/components/admin/MediaUpload";
-import { Loader2, Save } from "lucide-react";
+import { Loader2, Save, Settings as SettingsIcon, Palette, Phone, Share2, Image as ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import { SectionHeader } from "@/components/admin/SectionHeader";
 
 type Settings = {
   id: string;
