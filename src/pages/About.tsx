@@ -104,6 +104,32 @@ const About = () => {
   const dbAssemblyCards = getData<{ cards: { title: string; body: string }[] }>("assembly", { cards: [] }).cards;
   const dbFoundingStats = getData<{ stats: { value: string; label: string }[] }>("founding", { stats: [] }).stats;
   const ceoData = getData<{ name: string; title: string; photo_url: string | null }>("ceo", { name: "أ. فيصل عبدالعزيز", title: "المدير التنفيذي", photo_url: null });
+  const structureData = getData<{ nodes: { title: string; subtitle: string }[]; departments: { title: string; desc: string }[] }>("structure", {
+    nodes: [
+      { title: "الجمعية العمومية", subtitle: "السلطة العليا" },
+      { title: "مجلس الإدارة", subtitle: "الإشراف والحوكمة" },
+      { title: "المدير التنفيذي", subtitle: "القيادة التنفيذية" },
+    ],
+    departments: [
+      { title: "إدارة البرامج", desc: "تنفيذ المبادرات والمشاريع" },
+      { title: "الإدارة المالية", desc: "المحاسبة والتدقيق" },
+      { title: "الموارد البشرية", desc: "التوظيف والتطوير" },
+      { title: "العلاقات والإعلام", desc: "الشراكات والتواصل" },
+    ],
+  });
+  const registrationData = getData<{ badge_label: string; heading: string; rows: { label: string; value: string }[]; pdf_url: string }>("registration", {
+    badge_label: "جهة مرخّصة وموثّقة",
+    heading: "شهادة تسجيل سارية المفعول",
+    rows: [
+      { label: "رقم التسجيل", value: "1234/2020" },
+      { label: "جهة الإصدار", value: "المركز الوطني لتنمية القطاع غير الربحي" },
+      { label: "تاريخ التأسيس", value: "1442/05/15هـ" },
+      { label: "حالة الترخيص", value: "ساري" },
+      { label: "نوع النشاط", value: "جمعية خيرية متعددة الأغراض" },
+      { label: "المقر الرئيسي", value: "الرياض، المملكة العربية السعودية" },
+    ],
+    pdf_url: "",
+  });
 
   // مزج بيانات قاعدة البيانات مع الاحتياطية
   const boardItems = (dbBoard && dbBoard.length > 0)
