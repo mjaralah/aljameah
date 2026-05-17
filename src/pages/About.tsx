@@ -463,30 +463,66 @@ const About = () => {
             </SectionBlock>
 
             {/* الهيكل التنظيمي */}
-            <SectionBlock id="structure" icon={Network} title="الهيكل التنظيمي">
-              <p>هيكلٌ مرنٌ يضمن وضوح المسؤوليات وفعالية اتخاذ القرار:</p>
+            <SectionBlock id="structure" icon={Network} title={getTitle("structure", "الهيكل التنظيمي")}>
+              <p>{get("structure", "هيكلٌ مرنٌ يضمن وضوح المسؤوليات وفعالية اتخاذ القرار:")}</p>
               <div className="mt-6 space-y-3">
-                <OrgNode level={0} title="الجمعية العمومية" subtitle="السلطة العليا" />
-                <OrgConnector />
-                <OrgNode level={1} title="مجلس الإدارة" subtitle="الإشراف والحوكمة" />
-                <OrgConnector />
-                <OrgNode level={2} title="المدير التنفيذي" subtitle="القيادة التنفيذية" />
-                <OrgConnector />
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                  {[
-                    { t: "إدارة البرامج", d: "تنفيذ المبادرات والمشاريع" },
-                    { t: "الإدارة المالية", d: "المحاسبة والتدقيق" },
-                    { t: "الموارد البشرية", d: "التوظيف والتطوير" },
-                    { t: "العلاقات والإعلام", d: "الشراكات والتواصل" },
-                  ].map((d) => (
-                    <div
-                      key={d.t}
-                      className="bg-card border border-border rounded-xl p-4 text-center hover:border-accent transition-smooth"
-                    >
-                      <h5 className="font-bold text-primary text-sm mb-1">{d.t}</h5>
-                      <p className="text-xs text-muted-foreground">{d.d}</p>
+                {structureData.nodes.map((n, i) => (
+                  <div key={i}>
+                    <OrgNode level={i} title={n.title} subtitle={n.subtitle} />
+                    {i < structureData.nodes.length - 1 && <OrgConnector />}
+                  </div>
+                ))}
+                {structureData.departments.length > 0 && (
+                  <>
+                    <OrgConnector />
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                      {structureData.departments.map((d) => (
+                        <div
+                          key={d.title}
+                          className="bg-card border border-border rounded-xl p-4 text-center hover:border-accent transition-smooth"
+                        >
+                          <h5 className="font-bold text-primary text-sm mb-1">{d.title}</h5>
+                          <p className="text-xs text-muted-foreground">{d.desc}</p>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </>
+                )}
+              </div>
+            </SectionBlock>
+
+            {/* شهادة التسجيل */}
+            <SectionBlock id="registration" icon={BadgeCheck} title={getTitle("registration", "شهادة التسجيل")}>
+              <div className="relative overflow-hidden bg-gradient-to-br from-card to-accent-soft border-2 border-accent/40 rounded-2xl p-6 md:p-8">
+                <div className="absolute top-4 left-4 opacity-10">
+                  <Award className="h-32 w-32 text-accent" />
+                </div>
+                <div className="relative">
+                  <Badge className="bg-success text-success-foreground mb-4">
+                    <BadgeCheck className="h-3.5 w-3.5 ml-1" />
+                    {registrationData.badge_label}
+                  </Badge>
+                  <h3 className="text-xl font-bold text-primary mb-4">
+                    {registrationData.heading}
+                  </h3>
+                  <dl className="grid sm:grid-cols-2 gap-4 text-sm">
+                    {registrationData.rows.map((r) => (
+                      <InfoRow
+                        key={r.label}
+                        label={r.label}
+                        value={r.value}
+                        valueClass={r.value === "ساري" ? "text-success" : ""}
+                      />
+                    ))}
+                  </dl>
+                  {registrationData.pdf_url && (
+                    <Button asChild className="mt-6 bg-primary hover:bg-primary/90">
+                      <a href={registrationData.pdf_url} target="_blank" rel="noopener noreferrer">
+                        <FileDown className="h-4 w-4 ml-2" />
+                        تحميل نسخة الشهادة (PDF)
+                      </a>
+                    </Button>
+                  )}
                 </div>
               </div>
             </SectionBlock>
