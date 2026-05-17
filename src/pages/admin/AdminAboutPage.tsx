@@ -421,47 +421,67 @@ export default function AdminAboutPage() {
             </CardContent>
           </Card>
 
-          {sections.map((s) => (
-            <Card key={s.id} className={!s.published ? "opacity-70 border-dashed" : undefined}>
-              <CardHeader>
-                <CardTitle className="text-base flex items-center justify-between gap-2">
-                  <span>
-                    {KEY_LABELS[s.section_key] ?? s.section_key}
-                    <span className="text-xs text-muted-foreground font-normal mr-2">({s.section_key})</span>
-                    {!s.published && <span className="text-[10px] mr-2 px-2 py-0.5 rounded bg-muted">مخفي</span>}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <Button type="button" size="sm" variant="ghost" onClick={() => togglePublished(s)} title={s.published ? "إخفاء" : "إظهار"}>
-                      {s.published ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </Button>
-                    <Button type="button" size="sm" variant="ghost" className="text-destructive" onClick={() => remove(s)} title="حذف">
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+          <p className="text-xs text-muted-foreground">اسحب البطاقات من المقبض لإعادة ترتيب الأقسام في صفحة "من نحن".</p>
+          <SortableList ids={sections.map((s) => s.id)} onReorder={handleReorder}>
+            {sections.map((s) => (
+              <SortableItem key={s.id} id={s.id}>
+                {({ handleProps, setNodeRef, style }) => (
+                  <div ref={setNodeRef} style={style}>
+                    <Card className={!s.published ? "opacity-70 border-dashed" : undefined}>
+                      <CardHeader>
+                        <CardTitle className="text-base flex items-center justify-between gap-2">
+                          <span className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              {...handleProps}
+                              className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground p-1 -m-1"
+                              title="اسحب لإعادة الترتيب"
+                              aria-label="مقبض السحب"
+                            >
+                              <GripVertical className="w-4 h-4" />
+                            </button>
+                            <span>
+                              {KEY_LABELS[s.section_key] ?? s.section_key}
+                              <span className="text-xs text-muted-foreground font-normal mr-2">({s.section_key})</span>
+                              {!s.published && <span className="text-[10px] mr-2 px-2 py-0.5 rounded bg-muted">مخفي</span>}
+                            </span>
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <Button type="button" size="sm" variant="ghost" onClick={() => togglePublished(s)} title={s.published ? "إخفاء" : "إظهار"}>
+                              {s.published ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </Button>
+                            <Button type="button" size="sm" variant="ghost" className="text-destructive" onClick={() => remove(s)} title="حذف">
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <Field label="العنوان">
+                          <Input value={s.title ?? ""} onChange={(e) => update(s.id, { title: e.target.value })} />
+                        </Field>
+                        <Field label="النص">
+                          <Textarea rows={5} value={s.content ?? ""} onChange={(e) => update(s.id, { content: e.target.value })} />
+                        </Field>
+                        {s.data !== null && renderStructured(s)}
+                        <div className="flex justify-between items-center pt-2">
+                          <label className="flex items-center gap-2 text-sm">
+                            <input type="checkbox" checked={s.published}
+                              onChange={(e) => update(s.id, { published: e.target.checked })} />
+                            منشور
+                          </label>
+                          <Button onClick={() => save(s)} disabled={savingId === s.id} size="sm">
+                            {savingId === s.id ? <Loader2 className="w-4 h-4 ml-1 animate-spin" /> : <Save className="w-4 h-4 ml-1" />}
+                            حفظ القسم
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Field label="العنوان">
-                  <Input value={s.title ?? ""} onChange={(e) => update(s.id, { title: e.target.value })} />
-                </Field>
-                <Field label="النص">
-                  <Textarea rows={5} value={s.content ?? ""} onChange={(e) => update(s.id, { content: e.target.value })} />
-                </Field>
-                {s.data !== null && renderStructured(s)}
-                <div className="flex justify-between items-center pt-2">
-                  <label className="flex items-center gap-2 text-sm">
-                    <input type="checkbox" checked={s.published}
-                      onChange={(e) => update(s.id, { published: e.target.checked })} />
-                    منشور
-                  </label>
-                  <Button onClick={() => save(s)} disabled={savingId === s.id} size="sm">
-                    {savingId === s.id ? <Loader2 className="w-4 h-4 ml-1 animate-spin" /> : <Save className="w-4 h-4 ml-1" />}
-                    حفظ القسم
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                )}
+              </SortableItem>
+            ))}
+          </SortableList>
         </div>
       )}
     </AdminLayout>
