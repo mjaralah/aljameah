@@ -123,17 +123,28 @@ export default function AdminSurveysPage() {
   }
 
   return (
-    <AdminLayout
-      title="الاستبيانات"
-      description="إدارة الاستبيانات وأسئلتها"
-      actions={
-        <Button size="sm" onClick={() => setEditing({ status: "active", show_public_results: true, published: true, sort_order: 0 })}>
-          <Plus className="w-4 h-4 ml-1" /> استبيان جديد
-        </Button>
-      }
-    >
+    <AdminLayout title="الاستبيانات">
+      <AdminPageHeader
+        title="الاستبيانات"
+        description="إدارة الاستبيانات وأسئلتها"
+        icon={ClipboardList}
+        action={
+          <Button onClick={() => setEditing({ status: "active", show_public_results: true, published: true, sort_order: 0 })}>
+            <Plus className="w-4 h-4 ml-1" /> استبيان جديد
+          </Button>
+        }
+      />
+
       {loading ? (
         <div className="p-12 flex justify-center"><Loader2 className="w-6 h-6 animate-spin" /></div>
+      ) : surveys.length === 0 ? (
+        <AdminEmptyState
+          icon={ClipboardList}
+          title="لا توجد استبيانات بعد"
+          description="ابدأ بإنشاء استبيانك الأول لجمع آراء المستفيدين."
+          actionLabel="استبيان جديد"
+          onAction={() => setEditing({ status: "active", show_public_results: true, published: true, sort_order: 0 })}
+        />
       ) : (
         <div className="space-y-4">
           {surveys.length > 1 && (
