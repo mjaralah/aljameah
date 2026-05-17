@@ -551,34 +551,6 @@ const About = () => {
               </div>
             </SectionBlock>
 
-            {/* شهادة التسجيل */}
-            <SectionBlock id="registration" icon={BadgeCheck} title="شهادة التسجيل">
-              <div className="relative overflow-hidden bg-gradient-to-br from-card to-accent-soft border-2 border-accent/40 rounded-2xl p-6 md:p-8">
-                <div className="absolute top-4 left-4 opacity-10">
-                  <Award className="h-32 w-32 text-accent" />
-                </div>
-                <div className="relative">
-                  <Badge className="bg-success text-success-foreground mb-4">
-                    <BadgeCheck className="h-3.5 w-3.5 ml-1" />
-                    جهة مرخّصة وموثّقة
-                  </Badge>
-                  <h3 className="text-xl font-bold text-primary mb-4">
-                    شهادة تسجيل سارية المفعول
-                  </h3>
-                  <dl className="grid sm:grid-cols-2 gap-4 text-sm">
-                    <InfoRow label="رقم التسجيل" value="1234/2020" />
-                    <InfoRow label="جهة الإصدار" value="المركز الوطني لتنمية القطاع غير الربحي" />
-                    <InfoRow label="تاريخ التأسيس" value="1442/05/15هـ" />
-                    <InfoRow label="حالة الترخيص" value="ساري" valueClass="text-success" />
-                    <InfoRow label="نوع النشاط" value="جمعية خيرية متعددة الأغراض" />
-                    <InfoRow label="المقر الرئيسي" value="الرياض، المملكة العربية السعودية" />
-                  </dl>
-                  <Button className="mt-6 bg-primary hover:bg-primary/90">
-                    تحميل نسخة الشهادة (PDF)
-                  </Button>
-                </div>
-              </div>
-            </SectionBlock>
           </div>
         </div>
       </section>
