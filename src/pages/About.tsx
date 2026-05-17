@@ -104,7 +104,7 @@ const About = () => {
   const dbAssemblyCards = getData<{ cards: { title: string; body: string }[] }>("assembly", { cards: [] }).cards;
   const dbFoundingStats = getData<{ stats: { value: string; label: string }[] }>("founding", { stats: [] }).stats;
   const ceoData = getData<{ name: string; title: string; photo_url: string | null }>("ceo", { name: "أ. فيصل عبدالعزيز", title: "المدير التنفيذي", photo_url: null });
-  const structureData = getData<{ nodes: { title: string; subtitle: string }[]; departments: { title: string; desc: string }[] }>("structure", {
+  const structureData = getData<{ display_mode?: string; image_url?: string; nodes: { title: string; subtitle: string }[]; departments: { title: string; desc: string }[] }>("structure", {
     nodes: [
       { title: "الجمعية العمومية", subtitle: "السلطة العليا" },
       { title: "مجلس الإدارة", subtitle: "الإشراف والحوكمة" },
@@ -117,7 +117,7 @@ const About = () => {
       { title: "العلاقات والإعلام", desc: "الشراكات والتواصل" },
     ],
   });
-  const registrationData = getData<{ badge_label: string; heading: string; rows: { label: string; value: string }[]; pdf_url: string }>("registration", {
+  const registrationData = getData<{ display_mode?: string; image_url?: string; badge_label: string; heading: string; rows: { label: string; value: string }[]; pdf_url: string }>("registration", {
     badge_label: "جهة مرخّصة وموثّقة",
     heading: "شهادة تسجيل سارية المفعول",
     rows: [
