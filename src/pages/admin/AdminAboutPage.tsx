@@ -57,6 +57,26 @@ const Field = ({ label, children }: { label: string; children: React.ReactNode }
   </div>
 );
 
+const ModeToggle = ({ value, onChange }: { value: "content" | "image"; onChange: (v: "content" | "image") => void }) => (
+  <div className="flex items-center gap-1 p-1 rounded-lg bg-muted w-fit">
+    {([
+      { v: "content", label: "محتوى منظم" },
+      { v: "image", label: "صورة مضمّنة" },
+    ] as const).map((opt) => (
+      <button
+        key={opt.v}
+        type="button"
+        onClick={() => onChange(opt.v)}
+        className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
+          value === opt.v ? "bg-background shadow-sm font-medium text-foreground" : "text-muted-foreground hover:text-foreground"
+        }`}
+      >
+        {opt.label}
+      </button>
+    ))}
+  </div>
+);
+
 export default function AdminAboutPage() {
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
