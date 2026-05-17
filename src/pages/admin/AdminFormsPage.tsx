@@ -192,25 +192,39 @@ export default function AdminFormsPage() {
 
   return (
     <AdminLayout title="نماذج الخدمات الإلكترونية">
-      <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
-        <p className="text-muted-foreground text-sm">جميع النماذج: نماذج التطوع والعضوية والتواصل النظامية + النماذج المخصصة. يمكنك التعديل والإخفاء والأرشفة والحذف.</p>
-        <Button onClick={() => setEditing({ ...emptyForm(), sort_order: forms.length })}>
-          <Plus className="h-4 w-4 me-2" /> نموذج جديد
-        </Button>
-      </div>
+      <AdminPageHeader
+        title="نماذج الخدمات الإلكترونية"
+        description="جميع النماذج: نماذج التطوع والعضوية والتواصل النظامية + النماذج المخصصة. يمكنك التعديل والإخفاء والأرشفة والحذف."
+        icon={FileInput}
+        action={
+          <Button onClick={() => setEditing({ ...emptyForm(), sort_order: forms.length })}>
+            <Plus className="h-4 w-4 ml-1" /> نموذج جديد
+          </Button>
+        }
+      />
 
-      <Tabs value={view} onValueChange={(v) => setView(v as any)} className="mb-4">
-        <TabsList>
-          <TabsTrigger value="active">النشطة ({activeCount})</TabsTrigger>
-          <TabsTrigger value="archived">الأرشيف ({archivedCount})</TabsTrigger>
-        </TabsList>
-      </Tabs>
+      <AdminListToolbar
+        chips={[
+          { value: "active", label: "النشطة", count: activeCount },
+          { value: "archived", label: "الأرشيف", count: archivedCount },
+        ]}
+        activeChip={view}
+        onChipChange={(v) => setView(v as any)}
+      />
 
       {loading ? (
         <div className="flex justify-center p-12"><Loader2 className="h-6 w-6 animate-spin" /></div>
       ) : (
         <div className="grid gap-3">
-          {visibleForms.length === 0 && <Card><CardContent className="p-8 text-center text-muted-foreground">{view === "archived" ? "لا توجد نماذج مؤرشفة." : "لا توجد نماذج بعد. ابدأ بإضافة نموذج جديد."}</CardContent></Card>}
+          {visibleForms.length === 0 && (
+            <AdminEmptyState
+              icon={ClipboardList}
+              title={view === "archived" ? "لا توجد نماذج مؤرشفة" : "لا توجد نماذج بعد"}
+              description={view === "archived" ? "النماذج التي تنقلها للأرشيف ستظهر هنا." : "ابدأ بإضافة نموذج جديد لجمع طلبات المستفيدين."}
+              actionLabel={view === "active" ? "نموذج جديد" : undefined}
+              onAction={view === "active" ? () => setEditing({ ...emptyForm(), sort_order: forms.length }) : undefined}
+            />
+          )}
           {view === "active" && visibleForms.length > 1 && (
             <p className="text-xs text-muted-foreground">اسحب أيقونة <GripVertical className="inline w-3 h-3" /> لإعادة ترتيب النماذج.</p>
           )}
