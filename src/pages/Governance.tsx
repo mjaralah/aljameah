@@ -161,7 +161,7 @@ const Governance = () => {
                     active={activeKey === s.key}
                     onClick={() => setActiveKey(s.key)}
                     icon={s.icon}
-                    label={t.pages.governance[s.labelKey] as string}
+                    label={s.label}
                     count={s.docs.length}
                     Chevron={Chevron}
                   />
