@@ -17,15 +17,15 @@ const NewsDetail = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["public", "news", "detail", slug],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("news")
-        .select("*")
-        .eq("published", true)
-        .or(`slug.eq.${slug},id.eq.${slug}`)
-        .maybeSingle();
+      const decoded = (() => { try { return decodeURIComponent(slug); } catch { return slug; } })();
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(decoded);
+      let q = supabase.from("news").select("*").eq("published", true);
+      q = isUuid ? q.eq("id", decoded) : q.eq("slug", decoded);
+      const { data, error } = await q.maybeSingle();
       if (error) throw error;
       return data as DBNews | null;
     },
+    enabled: !!slug,
   });
 
   const fallback = fallbackNews.find((n) => n.id === slug);
