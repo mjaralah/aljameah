@@ -244,6 +244,50 @@ export default function AdminSettingsPage() {
             </div>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardContent className="p-5 md:p-6">
+            <SectionHeader
+              icon={ThumbsUp}
+              title='أداة "هل كانت هذه الصفحة مفيدة؟"'
+              description="تحكم بإظهار أو إخفاء أداة تقييم الصفحة لكل صفحة من صفحات الموقع."
+            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {FEEDBACK_PAGES.map((p) => (
+                <div key={p.key} className="flex items-center justify-between rounded-lg border p-3 bg-muted/30">
+                  <Label htmlFor={`fb-${p.key}`} className="m-0 cursor-pointer">{p.label}</Label>
+                  <Switch
+                    id={`fb-${p.key}`}
+                    checked={isOn("feedback_visibility", p.key)}
+                    onCheckedChange={(v) => toggleVis("feedback_visibility", p.key, v)}
+                  />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-5 md:p-6">
+            <SectionHeader
+              icon={EyeOff}
+              title="نشر / إخفاء الصفحات الرئيسية"
+              description="إيقاف نشر صفحة كاملة سيُظهر للزوار رسالة 'غير متاحة حالياً'. الطاقم يستمر برؤية الصفحات."
+            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {PUBLIC_PAGES.map((p) => (
+                <div key={p.key} className="flex items-center justify-between rounded-lg border p-3 bg-muted/30">
+                  <Label htmlFor={`pg-${p.key}`} className="m-0 cursor-pointer">{p.label}</Label>
+                  <Switch
+                    id={`pg-${p.key}`}
+                    checked={isOn("pages_visibility", p.key)}
+                    onCheckedChange={(v) => toggleVis("pages_visibility", p.key, v)}
+                  />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </AdminLayout>
   );
