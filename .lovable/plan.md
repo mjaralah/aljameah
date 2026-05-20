@@ -1,31 +1,32 @@
-# إضافة صفحة تفاصيل الخبر
+# استبدال حقول الأيقونة النصية بمنتقي الأيقونات
 
-## المشكلة
-زر "قراءة الخبر" في صفحة المركز الإعلامي وفي قسم "آخر الأخبار" بالصفحة الرئيسية لا يعمل، لأنه عبارة عن `<button>` بدون `onClick` ولا يوجد مسار (route) لصفحة تفاصيل الخبر.
+## الهدف
+توحيد تجربة اختيار الأيقونات في لوحة التحكم باستخدام `IconPicker` المرئي بدل كتابة اسم الأيقونة يدويًا.
 
-## الحل
-إضافة صفحة تفاصيل خبر مستقلة وربط جميع أزرار "قراءة الخبر" بها.
+## الحالة الحالية
+- `IconPicker` موجود ويُستخدم في: `AdminAboutPage` (القيم/المبادئ) و`AdminPageContentPage` (الميزات/البطاقات).
+- لا يزال هناك حقول إدخال نصية للأيقونة في:
+  - `AdminProgramsPage.tsx` (السطر 95) — حقل أيقونة البرنامج.
+  - `AdminFormsPage.tsx` (السطر 353) — حقل أيقونة النموذج.
+- مكتبة `IconPicker` الحالية تحتوي 27 أيقونة فقط، وتنقصها أيقونات شائعة الاستخدام مثل `GraduationCap`, `FileText`, `Stethoscope`, `Home`, `Briefcase`, `Activity`, `Building`, `Megaphone`, `Calendar`, `Mail`, `Phone`, `MapPin`, `Music`, `Camera`, `Utensils`, `Baby`, `Accessibility`, `HelpingHand`, `Scale`, `Newspaper`, `BookMarked`, `ClipboardList`.
 
-### 1. صفحة جديدة `src/pages/NewsDetail.tsx`
-- مسار: `/media/:slug` (مع دعم `id` كاحتياط).
-- تجلب الخبر من قاعدة البيانات عبر `slug` (أو `id` للبيانات الاحتياطية).
-- تعرض: صورة الغلاف، التصنيف، التاريخ، العنوان، المحتوى الكامل (`content`) منسقاً، وزر رجوع إلى المركز الإعلامي.
-- حالة التحميل + حالة "الخبر غير موجود" مع زر العودة.
-- تصميم متسق مع باقي الصفحات (PageHero + container + Card).
+## التغييرات المقترحة
 
-### 2. تسجيل المسار في `src/App.tsx`
-```tsx
-<Route path="/media/:slug" element={<NewsDetail />} />
-```
+### 1) توسيع `IconPicker`
+- إضافة ~22 أيقونة جديدة للمكتبة لتغطية المجالات الخيرية (تعليم، صحة، إغاثة، أيتام، شباب، تنمية).
+- لا تغيير في واجهة المكوّن (نفس `value` / `onChange`).
 
-### 3. تحديث الأزرار لتكون روابط (`Link`)
-- `src/pages/Media.tsx` (السطر 122): تحويل `<button>` إلى `<Link to={`/media/${slug}`}>`، وجعل البطاقة بأكملها قابلة للنقر اختيارياً.
-- `src/components/home/NewsPreview.tsx`: تحويل رابط "اقرأ المزيد" من `/media` إلى `/media/${slug}`.
+### 2) `AdminProgramsPage.tsx`
+- استيراد `IconPicker`.
+- استبدال `<Input value={v.icon}>` بـ `<IconPicker value={v.icon} onChange={(n) => set("icon", n)} />`.
 
-### 4. تمرير `slug` في العناصر
-- إضافة `slug` إلى نوع `Item` في `Media.tsx` و `NewsPreview.tsx` وتعبئتها من `DBNews.slug` (للبيانات الاحتياطية: استخدام `id`).
+### 3) `AdminFormsPage.tsx`
+- استيراد `IconPicker`.
+- استبدال `<Input value={value.icon}>` بـ `<IconPicker value={value.icon} onChange={(n) => update("icon", n)} />`.
 
-## ملاحظات تقنية
-- الـ hook `useNews` موجود ويعيد قائمة الأخبار المنشورة فقط؛ سننشئ `useNewsBySlug(slug)` بسيط داخل `usePublicContent.ts` أو نعيد الاستخدام من القائمة المحملة.
-- المحتوى (`content`) يُفترض أنه HTML/نص — سيتم عرضه بـ `whitespace-pre-line` للنص أو `dangerouslySetInnerHTML` إن كان HTML. سنبدأ بـ `whitespace-pre-line` الآمن.
-- لا تغييرات على قاعدة البيانات.
+## خارج النطاق
+- صفحات تعرض الأيقونات للعموم لا تحتاج تعديل (تستخدم نفس أسماء Lucide).
+- لا تغييرات في قاعدة البيانات (الحقل لا يزال نصيًا).
+
+## التكلفة
+تعديل بسيط في 3 ملفات، بدون تبعيات جديدة.
