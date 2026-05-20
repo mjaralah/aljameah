@@ -32,8 +32,9 @@ export const PartnersCarousel = () => {
           spaceBetween={24}
           breakpoints={{ 640: { slidesPerView: 3 }, 1024: { slidesPerView: 5 } }}
         >
-          {[...items, ...items].map((p, i) => (
-            <SwiperSlide key={`${p.id}-${i}`}>
+          {items.map((p) => (
+            <SwiperSlide key={p.id}>
+
               <a
                 href={p.url || "#"}
                 target={p.url ? "_blank" : undefined}
