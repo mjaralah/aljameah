@@ -31,6 +31,7 @@ import { board as fallbackBoard } from "@/data/board";
 import { useBoardMembers, useBoardSettings, useAboutContent, type DBAboutSection } from "@/hooks/usePublicContent";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ceoPortrait from "@/assets/ceo-portrait.jpg";
+import { CustomAboutSection } from "@/components/about/CustomAboutSection";
 
 type Section = {
   id: string;
@@ -551,9 +552,18 @@ const About = () => {
               </div>
             </SectionBlock>
 
+            {/* الأقسام المخصّصة المُضافة من اللوحة */}
+            {(dbAbout ?? [])
+              .filter((s) => s.section_key.startsWith("custom:"))
+              .sort((a, b) => a.sort_order - b.sort_order)
+              .map((s) => (
+                <CustomAboutSection key={s.id} id={s.section_key} data={s.data as any} />
+              ))}
+
           </div>
         </div>
       </section>
+
 
       <PageFeedback pageKey="about" />
     </>

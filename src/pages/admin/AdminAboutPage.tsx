@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { IconPicker } from "@/components/admin/IconPicker";
 import { MediaUpload } from "@/components/admin/MediaUpload";
 import { SortableList, SortableItem, persistSortOrder } from "@/components/admin/SortableList";
+import CustomSectionsManager from "@/components/admin/about/CustomSectionsManager";
 
 type AnyData = Record<string, unknown> | null;
 
@@ -86,7 +87,8 @@ export default function AdminAboutPage() {
     setLoading(true);
     const { data, error } = await supabase.from("about_content").select("*").order("sort_order");
     if (error) toast.error(error.message);
-    setSections((data ?? []) as Section[]);
+    // استبعاد الأقسام المخصّصة — تُدار في CustomSectionsManager
+    setSections(((data ?? []) as Section[]).filter((s) => !s.section_key.startsWith("custom:")));
     setLoading(false);
   }
   useEffect(() => { load(); }, []);
@@ -466,6 +468,8 @@ export default function AdminAboutPage() {
               </Button>
             </CardContent>
           </Card>
+
+          <CustomSectionsManager />
 
           <p className="text-xs text-muted-foreground">اسحب البطاقات من المقبض لإعادة ترتيب الأقسام في صفحة "من نحن".</p>
           <SortableList ids={sections.map((s) => s.id)} onReorder={handleReorder}>
