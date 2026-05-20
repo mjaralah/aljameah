@@ -18,6 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { IconPicker } from "@/components/admin/IconPicker";
 
 type FieldType = "text" | "textarea" | "email" | "phone" | "number" | "date" | "select" | "checkbox";
 interface Field {
@@ -349,8 +350,8 @@ function FormEditor({ value, onChange, onCancel, onSave, saving }: {
                   <Textarea rows={2} value={value.description ?? ""} onChange={(e) => update("description", e.target.value)} />
                 </div>
                 <div>
-                  <Label>أيقونة (Lucide)</Label>
-                  <Input dir="ltr" value={value.icon ?? ""} onChange={(e) => update("icon", e.target.value)} placeholder="FileText" />
+                  <Label>أيقونة</Label>
+                  <IconPicker value={value.icon ?? ""} onChange={(name) => update("icon", name)} />
                 </div>
                 <div>
                   <Label>الفئة المستهدفة</Label>
