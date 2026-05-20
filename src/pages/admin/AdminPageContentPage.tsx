@@ -21,6 +21,7 @@ import { AdminEmptyState } from "@/components/admin/AdminEmptyState";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { IconPicker } from "@/components/admin/IconPicker";
+import { MediaUpload } from "@/components/admin/MediaUpload";
 
 type Section = {
   id: string;
