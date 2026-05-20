@@ -10,13 +10,25 @@ import { VolunteerCta } from "@/components/home/VolunteerCta";
 import { PageFeedback } from "@/components/layout/PageFeedback";
 import { usePageContent } from "@/hooks/usePublicContent";
 
+// مفاتيح أقسام الصفحة الرئيسية الموجودة في DB (page_content)
+const HOME_SECTIONS = [
+  "hero",
+  "stats",
+  "about_preview",
+  "programs",
+  "satisfaction",
+  "news",
+  "partners",
+  "volunteer_cta",
+] as const;
+
 const Index = () => {
   const { data, isLoading } = usePageContent("home");
 
-  // الأقسام المنشورة فقط (RLS يُرجع المنشور فقط للعموم).
-  // إذا لم تتوفر بيانات بعد أو لم تكن هناك صفوف في DB، نعرض كل شيء افتراضياً.
+  // أثناء التحميل لا نُظهر شيئاً لتجنّب وميض الأقسام المخفية.
+  // RLS يُرجع المنشور فقط للعموم؛ فإذا غاب القسم من النتائج يعني أنه مُخفى.
   const present = new Set((data ?? []).map((s) => s.section_key));
-  const has = (key: string) => isLoading || !data || data.length === 0 || present.has(key);
+  const has = (key: typeof HOME_SECTIONS[number]) => !isLoading && present.has(key);
 
   return (
     <>
