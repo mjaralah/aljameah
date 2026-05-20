@@ -331,6 +331,42 @@ export type Database = {
         }
         Relationships: []
       }
+      governance_categories: {
+        Row: {
+          created_at: string
+          icon: string | null
+          id: string
+          label_ar: string
+          label_en: string
+          published: boolean
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          label_ar: string
+          label_en: string
+          published?: boolean
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          label_ar?: string
+          label_en?: string
+          published?: boolean
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       governance_documents: {
         Row: {
           category: string | null
