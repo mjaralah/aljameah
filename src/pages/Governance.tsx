@@ -15,6 +15,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
+  Folder,
+  type LucideIcon,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,7 +33,7 @@ import {
   eventsReports,
   financials,
 } from "@/data/governance";
-import { useGovernanceDocs, usePageContent } from "@/hooks/usePublicContent";
+import { useGovernanceDocs, usePageContent, useGovernanceCategories } from "@/hooks/usePublicContent";
 import { PageHero } from "@/components/layout/PageHero";
 import { PageFeedback } from "@/components/layout/PageFeedback";
 import { cn } from "@/lib/utils";
@@ -40,10 +42,24 @@ type DocItem = { id: string; year: number; title: { ar: string; en: string } | s
 
 type Section = {
   key: string;
-  labelKey: keyof ReturnType<typeof useLanguage>["t"]["pages"]["governance"];
-  icon: React.FC<{ className?: string }>;
+  label: string;
+  icon: LucideIcon;
   docs: DocItem[];
 };
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  ShieldCheck, ScrollText, Target, TrendingUp, HandCoins, Wallet, FileBarChart, CalendarDays, BookMarked, FileText, Folder,
+};
+
+const FALLBACK_DOCS: Record<string, DocItem[]> = {
+  policies, regulations, plans,
+  investments: investmentDecisions,
+  aid: aidReports,
+  financialReports,
+  annualReport: annualReports,
+  events: eventsReports,
+};
+
 
 const Governance = () => {
   const { t, tx, lang } = useLanguage();
