@@ -22,6 +22,7 @@ import VolunteerService from "./pages/eservices/VolunteerService.tsx";
 import MembershipService from "./pages/eservices/MembershipService.tsx";
 import Contact from "./pages/Contact.tsx";
 import { PublicRouteGuard } from "@/components/layout/PublicRouteGuard";
+import { ScrollToTop } from "@/components/layout/ScrollToTop";
 
 // Admin
 import AdminLogin from "./pages/admin/AdminLogin.tsx";
@@ -111,6 +112,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <ScrollToTop />
             <Routes>
               {/* Admin routes — standalone, no public Layout */}
               <Route path="/admin/login" element={<AdminLogin />} />
