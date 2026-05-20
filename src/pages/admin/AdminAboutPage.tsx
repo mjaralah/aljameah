@@ -87,7 +87,8 @@ export default function AdminAboutPage() {
     setLoading(true);
     const { data, error } = await supabase.from("about_content").select("*").order("sort_order");
     if (error) toast.error(error.message);
-    setSections((data ?? []) as Section[]);
+    // استبعاد الأقسام المخصّصة — تُدار في CustomSectionsManager
+    setSections(((data ?? []) as Section[]).filter((s) => !s.section_key.startsWith("custom:")));
     setLoading(false);
   }
   useEffect(() => { load(); }, []);
