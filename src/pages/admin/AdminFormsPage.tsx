@@ -18,6 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { IconPicker } from "@/components/admin/IconPicker";
 
 type FieldType = "text" | "textarea" | "email" | "phone" | "number" | "date" | "select" | "checkbox";
 interface Field {
