@@ -469,6 +469,8 @@ export default function AdminAboutPage() {
             </CardContent>
           </Card>
 
+          <CustomSectionsManager />
+
           <p className="text-xs text-muted-foreground">اسحب البطاقات من المقبض لإعادة ترتيب الأقسام في صفحة "من نحن".</p>
           <SortableList ids={sections.map((s) => s.id)} onReorder={handleReorder}>
             {sections.map((s) => (
