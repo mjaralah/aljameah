@@ -350,8 +350,8 @@ function FormEditor({ value, onChange, onCancel, onSave, saving }: {
                   <Textarea rows={2} value={value.description ?? ""} onChange={(e) => update("description", e.target.value)} />
                 </div>
                 <div>
-                  <Label>أيقونة (Lucide)</Label>
-                  <Input dir="ltr" value={value.icon ?? ""} onChange={(e) => update("icon", e.target.value)} placeholder="FileText" />
+                  <Label>أيقونة</Label>
+                  <IconPicker value={value.icon ?? ""} onChange={(name) => update("icon", name)} />
                 </div>
                 <div>
                   <Label>الفئة المستهدفة</Label>
