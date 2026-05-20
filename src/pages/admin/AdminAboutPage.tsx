@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { IconPicker } from "@/components/admin/IconPicker";
 import { MediaUpload } from "@/components/admin/MediaUpload";
 import { SortableList, SortableItem, persistSortOrder } from "@/components/admin/SortableList";
+import CustomSectionsManager from "@/components/admin/about/CustomSectionsManager";
 
 type AnyData = Record<string, unknown> | null;
 
