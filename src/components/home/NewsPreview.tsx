@@ -73,7 +73,7 @@ export const NewsPreview = () => {
               </div>
               <h3 className="font-bold text-primary mb-2 line-clamp-2">{n.title}</h3>
               <p className="text-sm text-muted-foreground line-clamp-3 mb-3">{n.excerpt}</p>
-              <Link to="/media" className="text-sm font-semibold text-accent hover:underline inline-flex items-center gap-1">
+              <Link to={`/media/${n.slug}`} className="text-sm font-semibold text-accent hover:underline inline-flex items-center gap-1">
                 {t.news.readMore}
                 <ArrowLeft className={dir === "rtl" ? "h-3.5 w-3.5" : "h-3.5 w-3.5 rotate-180"} />
               </Link>
