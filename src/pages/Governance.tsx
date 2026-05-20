@@ -99,19 +99,30 @@ const Governance = () => {
     return map;
   }, [dbDocs]);
 
-  const sections: Section[] = useMemo(
-    () => [
-      { key: "policies", labelKey: "policies", icon: ShieldCheck, docs: dbByCategory.policies?.length ? dbByCategory.policies : policies },
-      { key: "regulations", labelKey: "regulations", icon: ScrollText, docs: dbByCategory.regulations?.length ? dbByCategory.regulations : regulations },
-      { key: "plans", labelKey: "plans", icon: Target, docs: dbByCategory.plans?.length ? dbByCategory.plans : plans },
-      { key: "investments", labelKey: "investments", icon: TrendingUp, docs: dbByCategory.investments?.length ? dbByCategory.investments : investmentDecisions },
-      { key: "aid", labelKey: "aid", icon: HandCoins, docs: dbByCategory.aid?.length ? dbByCategory.aid : aidReports },
-      { key: "financialReports", labelKey: "financialReports", icon: Wallet, docs: dbByCategory.financialReports?.length ? dbByCategory.financialReports : financialReports },
-      { key: "annualReport", labelKey: "annualReport", icon: FileBarChart, docs: dbByCategory.annualReport?.length ? dbByCategory.annualReport : annualReports },
-      { key: "events", labelKey: "events", icon: CalendarDays, docs: dbByCategory.events?.length ? dbByCategory.events : eventsReports },
-    ],
-    [dbByCategory]
-  );
+  const sections: Section[] = useMemo(() => {
+    const cats = dbCategories ?? [];
+    if (cats.length === 0) {
+      // Fallback to hardcoded sections when DB has no categories yet
+      return [
+        { key: "policies", label: t.pages.governance.policies as string, icon: ShieldCheck, docs: dbByCategory.policies?.length ? dbByCategory.policies : policies },
+        { key: "regulations", label: t.pages.governance.regulations as string, icon: ScrollText, docs: dbByCategory.regulations?.length ? dbByCategory.regulations : regulations },
+        { key: "plans", label: t.pages.governance.plans as string, icon: Target, docs: dbByCategory.plans?.length ? dbByCategory.plans : plans },
+        { key: "investments", label: t.pages.governance.investments as string, icon: TrendingUp, docs: dbByCategory.investments?.length ? dbByCategory.investments : investmentDecisions },
+        { key: "aid", label: t.pages.governance.aid as string, icon: HandCoins, docs: dbByCategory.aid?.length ? dbByCategory.aid : aidReports },
+        { key: "financialReports", label: t.pages.governance.financialReports as string, icon: Wallet, docs: dbByCategory.financialReports?.length ? dbByCategory.financialReports : financialReports },
+        { key: "annualReport", label: t.pages.governance.annualReport as string, icon: FileBarChart, docs: dbByCategory.annualReport?.length ? dbByCategory.annualReport : annualReports },
+        { key: "events", label: t.pages.governance.events as string, icon: CalendarDays, docs: dbByCategory.events?.length ? dbByCategory.events : eventsReports },
+      ];
+    }
+    return cats.map((c) => {
+      const label = lang === "ar" ? c.label_ar : c.label_en;
+      const Icon = (c.icon && ICON_MAP[c.icon]) || Folder;
+      const docs = dbByCategory[c.slug]?.length
+        ? dbByCategory[c.slug]
+        : (FALLBACK_DOCS[c.slug] ?? []);
+      return { key: c.slug, label, icon: Icon, docs };
+    });
+  }, [dbCategories, dbByCategory, lang, t]);
 
   const active = sections.find((s) => s.key === activeKey);
   const Chevron = lang === "ar" ? ChevronLeft : ChevronRight;
