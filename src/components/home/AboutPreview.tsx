@@ -37,7 +37,7 @@ export const AboutPreview = () => {
             <span className="font-bold text-sm">{t.brand.verified}</span>
           </div>
           <p className="text-xs text-muted-foreground">
-            {t.brand.registration}: {t.brand.regNumber}
+            {t.brand.registration}: {regNumber}
           </p>
         </div>
       </div>
