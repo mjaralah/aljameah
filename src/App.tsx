@@ -13,6 +13,7 @@ import StubPage from "./pages/StubPage.tsx";
 import Programs from "./pages/Programs.tsx";
 import Governance from "./pages/Governance.tsx";
 import Media from "./pages/Media.tsx";
+import NewsDetail from "./pages/NewsDetail.tsx";
 import SurveysPage from "./pages/Surveys.tsx";
 import SurveyResults from "./pages/SurveyResults.tsx";
 import About from "./pages/About.tsx";
