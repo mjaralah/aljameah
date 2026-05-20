@@ -13,6 +13,7 @@ import StubPage from "./pages/StubPage.tsx";
 import Programs from "./pages/Programs.tsx";
 import Governance from "./pages/Governance.tsx";
 import Media from "./pages/Media.tsx";
+import NewsDetail from "./pages/NewsDetail.tsx";
 import SurveysPage from "./pages/Surveys.tsx";
 import SurveyResults from "./pages/SurveyResults.tsx";
 import About from "./pages/About.tsx";
@@ -77,6 +78,7 @@ const PublicRoutes = () => (
       <Route path="/programs" element={<Programs />} />
       <Route path="/governance" element={<Governance />} />
       <Route path="/media" element={<Media />} />
+      <Route path="/media/:slug" element={<NewsDetail />} />
       <Route path="/e-services" element={<EServicesIndex />} />
       <Route path="/e-services/volunteer" element={<VolunteerService />} />
       <Route path="/e-services/membership" element={<MembershipService />} />

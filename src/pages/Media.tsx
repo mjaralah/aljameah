@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { ArrowLeft, Calendar, Search } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ import news1 from "@/assets/news-1.jpg";
 
 type Item = {
   id: string;
+  slug: string;
   title: string;
   excerpt: string;
   image: string;
@@ -33,6 +35,7 @@ const Media = () => {
     if (dbNews && dbNews.length > 0) {
       return dbNews.map((n) => ({
         id: n.id,
+        slug: n.slug || n.id,
         title: n.title,
         excerpt: n.excerpt ?? "",
         image: n.cover_image_url || news1,
@@ -42,6 +45,7 @@ const Media = () => {
     }
     return fallbackNews.map((n) => ({
       id: n.id,
+      slug: n.id,
       title: tx(n.title),
       excerpt: tx(n.excerpt),
       image: n.image,
@@ -119,10 +123,13 @@ const Media = () => {
                   </div>
                   <h3 className="font-bold text-primary mb-2 line-clamp-2">{n.title}</h3>
                   <p className="text-sm text-muted-foreground line-clamp-3 mb-4 flex-1">{n.excerpt}</p>
-                  <button className="text-sm font-semibold text-accent hover:underline inline-flex items-center gap-1 self-start">
+                  <Link
+                    to={`/media/${n.slug}`}
+                    className="text-sm font-semibold text-accent hover:underline inline-flex items-center gap-1 self-start"
+                  >
                     {t.pages.media.readArticle}
                     <ArrowLeft className={dir === "rtl" ? "h-3.5 w-3.5" : "h-3.5 w-3.5 rotate-180"} />
-                  </button>
+                  </Link>
                 </div>
               </Card>
             ))}
