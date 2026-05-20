@@ -31,6 +31,7 @@ import { board as fallbackBoard } from "@/data/board";
 import { useBoardMembers, useBoardSettings, useAboutContent, type DBAboutSection } from "@/hooks/usePublicContent";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ceoPortrait from "@/assets/ceo-portrait.jpg";
+import { CustomAboutSection } from "@/components/about/CustomAboutSection";
 
 type Section = {
   id: string;
