@@ -8,25 +8,19 @@ import { PartnersCarousel } from "@/components/home/PartnersCarousel";
 import { SatisfactionIndicators } from "@/components/home/SatisfactionIndicators";
 import { VolunteerCta } from "@/components/home/VolunteerCta";
 import { PageFeedback } from "@/components/layout/PageFeedback";
-import { usePageContent } from "@/hooks/usePublicContent";
+import { usePageContent, useCustomBlocks } from "@/hooks/usePublicContent";
+import { SectionRenderer, type BlockSection } from "@/components/blocks/SectionRenderer";
 
-// مفاتيح أقسام الصفحة الرئيسية الموجودة في DB (page_content)
+// مفاتيح أقسام الصفحة الرئيسية النظامية الموجودة في DB (page_content)
 const HOME_SECTIONS = [
-  "hero",
-  "stats",
-  "about_preview",
-  "programs",
-  "satisfaction",
-  "news",
-  "partners",
-  "volunteer_cta",
+  "hero", "stats", "about_preview", "programs",
+  "satisfaction", "news", "partners", "volunteer_cta",
 ] as const;
 
 const Index = () => {
   const { data, isLoading } = usePageContent("home");
+  const { data: customBlocks } = useCustomBlocks("home");
 
-  // أثناء التحميل لا نُظهر شيئاً لتجنّب وميض الأقسام المخفية.
-  // RLS يُرجع المنشور فقط للعموم؛ فإذا غاب القسم من النتائج يعني أنه مُخفى.
   const present = new Set((data ?? []).map((s) => s.section_key));
   const has = (key: typeof HOME_SECTIONS[number]) => !isLoading && present.has(key);
 
@@ -40,6 +34,9 @@ const Index = () => {
       {has("news") && <NewsPreview />}
       {has("partners") && <PartnersCarousel />}
       {has("volunteer_cta") && <VolunteerCta />}
+      {(customBlocks ?? []).map((s) => (
+        <SectionRenderer key={s.id} section={s as unknown as BlockSection} />
+      ))}
       <PageFeedback pageKey="home" />
     </>
   );

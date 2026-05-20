@@ -45,6 +45,7 @@ import AdminLegalPagesPage from "./pages/admin/AdminLegalPagesPage.tsx";
 import AdminPageContentPage from "./pages/admin/AdminPageContentPage.tsx";
 import AdminFormsPage from "./pages/admin/AdminFormsPage.tsx";
 import CustomFormPage from "./pages/eservices/CustomFormPage.tsx";
+import CustomPage from "./pages/CustomPage.tsx";
 import { ProtectedAdminRoute } from "./components/admin/ProtectedAdminRoute.tsx";
 
 const queryClient = new QueryClient();
@@ -94,6 +95,7 @@ const PublicRoutes = () => (
       <Route path="/cookie-policy" element={<Stub titleKey="cookies" pageKey="cookies" />} />
       <Route path="/accessibility-statement" element={<Stub titleKey="accessibility" pageKey="accessibility" />} />
       <Route path="/sitemap" element={<Stub titleKey="sitemap" pageKey="sitemap" />} />
+      <Route path="/p/:slug" element={<CustomPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   </Layout>
