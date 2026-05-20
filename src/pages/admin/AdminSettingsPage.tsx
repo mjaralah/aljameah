@@ -5,12 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { MediaUpload } from "@/components/admin/MediaUpload";
-import { Loader2, Save, Settings as SettingsIcon, Palette, Phone, Share2, Image as ImageIcon } from "lucide-react";
+import { Loader2, Save, Settings as SettingsIcon, Palette, Phone, Share2, Image as ImageIcon, ThumbsUp, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { SectionHeader } from "@/components/admin/SectionHeader";
+
+type VisibilityMap = Record<string, boolean>;
 
 type Settings = {
   id: string;
@@ -27,7 +30,31 @@ type Settings = {
   social_linkedin: string | null;
   social_youtube: string | null;
   footer_text: string | null;
+  feedback_visibility: VisibilityMap | null;
+  pages_visibility: VisibilityMap | null;
 };
+
+const FEEDBACK_PAGES: { key: string; label: string }[] = [
+  { key: "home", label: "الصفحة الرئيسية" },
+  { key: "about", label: "من نحن" },
+  { key: "programs", label: "البرامج والخدمات" },
+  { key: "governance", label: "الحوكمة" },
+  { key: "media", label: "المركز الإعلامي" },
+  { key: "surveys", label: "الاستبيانات" },
+  { key: "eservices", label: "الخدمات الإلكترونية" },
+  { key: "contact", label: "تواصل معنا" },
+];
+
+const PUBLIC_PAGES: { key: string; label: string }[] = [
+  { key: "home", label: "الصفحة الرئيسية" },
+  { key: "about", label: "من نحن" },
+  { key: "programs", label: "البرامج والخدمات" },
+  { key: "governance", label: "الحوكمة" },
+  { key: "media", label: "المركز الإعلامي" },
+  { key: "surveys", label: "الاستبيانات" },
+  { key: "eservices", label: "الخدمات الإلكترونية" },
+  { key: "contact", label: "تواصل معنا" },
+];
 
 export default function AdminSettingsPage() {
   const [s, setS] = useState<Partial<Settings> | null>(null);
