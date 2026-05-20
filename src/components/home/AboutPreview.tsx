@@ -13,12 +13,13 @@ export const AboutPreview = () => {
   const body = sec?.content || t.about.body;
   const ctaLabel = sec?.data?.cta_label || t.about.learnMore;
   const ctaUrl = sec?.data?.cta_url || "/about";
+  const imageUrl = sec?.data?.image_url || aboutImg;
   return (
     <section className="container py-16 md:py-24 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center" aria-label="about-preview">
       <div className="relative order-2 lg:order-1">
         <div className="absolute -inset-3 rounded-3xl bg-gradient-gold opacity-20 blur-xl" aria-hidden />
         <img
-          src={aboutImg}
+          src={imageUrl}
           alt={t.about.title}
           loading="lazy"
           width={1200}
