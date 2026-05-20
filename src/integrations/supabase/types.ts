@@ -685,9 +685,11 @@ export type Database = {
           contact_email: string | null
           contact_phone: string | null
           favicon_url: string | null
+          feedback_visibility: Json
           footer_text: string | null
           id: string
           logo_url: string | null
+          pages_visibility: Json
           primary_color: string | null
           secondary_color: string | null
           site_name: string | null
@@ -702,9 +704,11 @@ export type Database = {
           contact_email?: string | null
           contact_phone?: string | null
           favicon_url?: string | null
+          feedback_visibility?: Json
           footer_text?: string | null
           id?: string
           logo_url?: string | null
+          pages_visibility?: Json
           primary_color?: string | null
           secondary_color?: string | null
           site_name?: string | null
@@ -719,9 +723,11 @@ export type Database = {
           contact_email?: string | null
           contact_phone?: string | null
           favicon_url?: string | null
+          feedback_visibility?: Json
           footer_text?: string | null
           id?: string
           logo_url?: string | null
+          pages_visibility?: Json
           primary_color?: string | null
           secondary_color?: string | null
           site_name?: string | null
