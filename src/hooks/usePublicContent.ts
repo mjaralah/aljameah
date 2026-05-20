@@ -91,6 +91,8 @@ export type DBSiteSettings = {
   social_linkedin: string | null;
   social_youtube: string | null;
   footer_text: string | null;
+  feedback_visibility: Record<string, boolean> | null;
+  pages_visibility: Record<string, boolean> | null;
 };
 
 const STALE = 1000 * 60 * 2; // 2 دقيقة
