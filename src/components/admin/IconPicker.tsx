@@ -4,6 +4,10 @@ import {
   Heart, ShieldCheck, Handshake, Lightbulb, Star, Award, Target, Users, Sparkles,
   HandHeart, BookOpen, Globe, Compass, Flag, Trophy, Smile, Sun, Leaf, Gem,
   CheckCircle2, ThumbsUp, Eye, Brain, Rocket, Zap, Crown, Gift,
+  GraduationCap, FileText, Stethoscope, Home, Briefcase, Activity, Building2,
+  Megaphone, Calendar, Mail, Phone, MapPin, Music, Camera, Utensils, Baby,
+  Accessibility, HelpingHand, Scale, Newspaper, BookMarked, ClipboardList,
+  FileInput, Droplets, Wheat, Tent, Cross, Pill, Wallet, PiggyBank, School,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
