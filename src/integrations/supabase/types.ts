@@ -271,7 +271,12 @@ export type Database = {
       custom_pages: {
         Row: {
           content: string | null
+          content_en: string | null
+          cover_image_url: string | null
           created_at: string
+          hero_cta_label: string | null
+          hero_cta_url: string | null
+          hero_subtitle: string | null
           id: string
           meta_description: string | null
           parent_slug: string | null
@@ -279,12 +284,19 @@ export type Database = {
           show_in_menu: boolean
           slug: string
           sort_order: number
+          template: string
           title: string
+          title_en: string | null
           updated_at: string
         }
         Insert: {
           content?: string | null
+          content_en?: string | null
+          cover_image_url?: string | null
           created_at?: string
+          hero_cta_label?: string | null
+          hero_cta_url?: string | null
+          hero_subtitle?: string | null
           id?: string
           meta_description?: string | null
           parent_slug?: string | null
@@ -292,12 +304,19 @@ export type Database = {
           show_in_menu?: boolean
           slug: string
           sort_order?: number
+          template?: string
           title: string
+          title_en?: string | null
           updated_at?: string
         }
         Update: {
           content?: string | null
+          content_en?: string | null
+          cover_image_url?: string | null
           created_at?: string
+          hero_cta_label?: string | null
+          hero_cta_url?: string | null
+          hero_subtitle?: string | null
           id?: string
           meta_description?: string | null
           parent_slug?: string | null
@@ -305,7 +324,9 @@ export type Database = {
           show_in_menu?: boolean
           slug?: string
           sort_order?: number
+          template?: string
           title?: string
+          title_en?: string | null
           updated_at?: string
         }
         Relationships: []

@@ -4,13 +4,15 @@ import { Heart, Menu, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useMenuPages } from "@/hooks/usePublicContent";
 import { cn } from "@/lib/utils";
 
 // رأس الصفحة بالشعار والتنقل الرئيسي
 export const Header = () => {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const { data: menuPages } = useMenuPages();
 
   const links = [
     { to: "/", label: t.nav.home },
@@ -21,6 +23,10 @@ export const Header = () => {
     { to: "/e-services", label: t.nav.eservices },
     { to: "/surveys", label: t.nav.surveys },
     { to: "/contact", label: t.nav.contact },
+    ...(menuPages ?? []).map((p) => ({
+      to: `/p/${p.slug}`,
+      label: (lang === "en" ? p.title_en : null) || p.title,
+    })),
   ];
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>

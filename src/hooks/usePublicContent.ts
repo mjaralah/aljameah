@@ -332,3 +332,40 @@ export function useLegalPage(slug: string) {
     },
   });
 }
+
+// أقسام البلوكات المخصّصة لصفحة محدّدة (للصفحات النظامية مثل home)
+export function useCustomBlocks(pageKey: string) {
+  return useQuery({
+    queryKey: ["public", "page_content_blocks", pageKey],
+    staleTime: STALE,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("page_content")
+        .select("*")
+        .eq("page_key", pageKey)
+        .eq("published", true)
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      // فقط الأقسام التي تحمل block_type (الأقسام المخصّصة)
+      return ((data ?? []) as any[]).filter((s) => s.data && s.data.block_type);
+    },
+  });
+}
+
+// قائمة الصفحات المخصّصة الظاهرة في القائمة العلوية
+export function useMenuPages() {
+  return useQuery({
+    queryKey: ["public", "menu_pages"],
+    staleTime: STALE,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("custom_pages")
+        .select("id,slug,title,title_en,parent_slug,sort_order")
+        .eq("published", true)
+        .eq("show_in_menu", true)
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as { id: string; slug: string; title: string; title_en: string | null; parent_slug: string | null; sort_order: number }[];
+    },
+  });
+}
