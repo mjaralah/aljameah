@@ -14,6 +14,7 @@ import news1 from "@/assets/news-1.jpg";
 
 type Item = {
   id: string;
+  slug: string;
   title: string;
   excerpt: string;
   image: string;
