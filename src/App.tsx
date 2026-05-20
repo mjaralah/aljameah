@@ -112,6 +112,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <ScrollToTop />
             <Routes>
               {/* Admin routes — standalone, no public Layout */}
               <Route path="/admin/login" element={<AdminLogin />} />
