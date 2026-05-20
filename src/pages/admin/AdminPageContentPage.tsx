@@ -66,6 +66,23 @@ const SECTION_LABELS: Record<string, string> = {
   benefits: "المزايا",
 };
 
+const BLOCK_LABEL: Record<string, string> = {
+  text_media: "نص + صورة + زر",
+  cards_grid: "شبكة بطاقات",
+  stats: "إحصائيات وعدّادات",
+  gallery: "معرض صور",
+  carousel: "كاروسيل/سلايدر",
+  video: "فيديو",
+  accordion: "أسئلة شائعة",
+  cta_banner: "شريط دعوة (CTA)",
+  rich_text: "نص حر",
+};
+
+function sectionLabel(s: { section_key: string; data?: any }) {
+  if (s.data?.block_type) return BLOCK_LABEL[s.data.block_type] ?? "قسم مخصّص";
+  return SECTION_LABELS[s.section_key] ?? s.section_key;
+}
+
 const AUDIENCES = [
   { value: "individuals", label: "للأفراد" },
   { value: "entities", label: "للجهات" },
