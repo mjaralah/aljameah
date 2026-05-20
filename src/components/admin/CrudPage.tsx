@@ -311,7 +311,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
                     style={style}
                     id={row.id}
                     table={table}
-                    showDragHandle={reorderable}
+                    showDragHandle={reorderable && !allView}
                     dragHandleProps={handleProps}
                     thumbnail={thumbCol ? renderCol(thumbCol, row) : undefined}
                     title={titleCol ? renderCol(titleCol, row) : "—"}
@@ -333,7 +333,8 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
                     onEdit={() => setEditing(row)}
                     onDelete={() => setDeleteId(row.id)}
                   />
-                )}
+                  );
+                }}
               </SortableItem>
             ))}
           </div>
