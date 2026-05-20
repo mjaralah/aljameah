@@ -184,7 +184,7 @@ const Governance = () => {
             ) : active ? (
               <DocsPanel
                 key={active.key}
-                title={t.pages.governance[active.labelKey] as string}
+                title={active.label}
                 icon={active.icon}
                 docs={active.docs}
                 tx={tx}
