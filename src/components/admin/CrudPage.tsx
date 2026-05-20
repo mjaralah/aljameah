@@ -109,7 +109,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
 
   const filtered = useMemo(() => {
     let r = rows;
-    if (categoryFilter && activeCategory) {
+    if (categoryFilter && activeCategory && activeCategory !== "__all__") {
       r = r.filter((row) => String(row[categoryFilter.field] ?? "") === activeCategory);
     }
     if (publishedFilter === "published") r = r.filter((row) => row.published);
