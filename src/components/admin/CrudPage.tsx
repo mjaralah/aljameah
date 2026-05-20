@@ -280,7 +280,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
         onChipChange={(v) => setPublishedFilter(v as typeof publishedFilter)}
       />
 
-      {reorderable && filtered.length > 1 && (
+      {reorderable && filtered.length > 1 && activeCategory !== "__all__" && (
         <p className="text-xs text-muted-foreground mb-3 px-1">
           اسحب أيقونة <GripVertical className="inline w-3 h-3" /> لإعادة ترتيب العناصر. يُحفظ الترتيب تلقائياً.
         </p>
