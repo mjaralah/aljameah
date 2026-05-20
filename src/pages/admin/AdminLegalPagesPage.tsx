@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { Loader2, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -64,7 +65,11 @@ export default function AdminLegalPagesPage() {
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-1 block">المحتوى</label>
-                  <Textarea rows={10} value={p.content ?? ""} onChange={(e) => update(p.id, { content: e.target.value })} />
+                  <RichTextEditor
+                    value={p.content ?? ""}
+                    onChange={(html) => update(p.id, { content: html })}
+                    minHeight={280}
+                  />
                 </div>
                 <div className="flex justify-end">
                   <Button onClick={() => save(p)} disabled={savingId === p.id} size="sm">

@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageHero } from "@/components/layout/PageHero";
 import { PageFeedback } from "@/components/layout/PageFeedback";
+import { SafeHtml } from "@/components/SafeHtml";
 import type { DBNews } from "@/hooks/usePublicContent";
 
 const NewsDetail = () => {
@@ -131,9 +132,9 @@ const NewsDetail = () => {
         )}
 
         {article.content && (
-          <div className="prose prose-lg max-w-none text-foreground leading-loose whitespace-pre-line">
-            {article.content}
-          </div>
+          /<[a-z][\s\S]*>/i.test(article.content)
+            ? <SafeHtml html={article.content} />
+            : <div className="prose prose-lg max-w-none text-foreground leading-loose whitespace-pre-line">{article.content}</div>
         )}
       </article>
 

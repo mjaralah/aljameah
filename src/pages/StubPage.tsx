@@ -6,6 +6,7 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumb";
 import { PageFeedback } from "@/components/layout/PageFeedback";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useLegalPage } from "@/hooks/usePublicContent";
+import { SafeHtml } from "@/components/SafeHtml";
 
 const LEGAL_SLUGS = ["privacy-policy", "terms-of-use", "cookie-policy", "accessibility-statement"];
 
@@ -22,9 +23,9 @@ export const StubPage = ({ titleKey, pageKey }: { titleKey: string; pageKey: str
         <Breadcrumbs items={[{ label: legal.title }]} />
         <section className="container py-12 md:py-16 max-w-3xl">
           <h1 className="text-3xl md:text-4xl font-extrabold text-primary mb-6">{legal.title}</h1>
-          <div className="prose prose-sm md:prose-base max-w-none whitespace-pre-wrap leading-loose text-foreground/90">
-            {legal.content}
-          </div>
+          {/<[a-z][\s\S]*>/i.test(legal.content ?? "")
+            ? <SafeHtml html={legal.content ?? ""} className="prose-sm md:prose-base text-foreground/90" />
+            : <div className="prose prose-sm md:prose-base max-w-none whitespace-pre-wrap leading-loose text-foreground/90">{legal.content}</div>}
         </section>
         <PageFeedback pageKey={pageKey} />
       </>
