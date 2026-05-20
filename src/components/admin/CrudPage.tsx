@@ -302,8 +302,10 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
         <SortableList ids={filtered.map((r) => r.id)} onReorder={handleReorder}>
           <div className="space-y-2">
             {filtered.map((row) => (
-              <SortableItem key={row.id} id={row.id} disabled={!reorderable}>
-                {({ handleProps, setNodeRef, style }) => (
+              <SortableItem key={row.id} id={row.id} disabled={!reorderable || activeCategory === "__all__"}>
+                {({ handleProps, setNodeRef, style }) => {
+                  const allView = activeCategory === "__all__";
+                  return (
                   <AdminListRow
                     ref={setNodeRef as any}
                     style={style}
