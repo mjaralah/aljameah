@@ -65,6 +65,7 @@ const Governance = () => {
   const { t, tx, lang } = useLanguage();
   const [activeKey, setActiveKey] = useState<string>("overview");
   const { data: dbDocs } = useGovernanceDocs();
+  const { data: dbCategories } = useGovernanceCategories();
   const { data: pageData } = usePageContent("governance");
   const introSection = pageData?.find((s) => s.section_key === "intro");
   const finSection = pageData?.find((s) => s.section_key === "financials");
