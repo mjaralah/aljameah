@@ -78,6 +78,7 @@ const PublicRoutes = () => (
       <Route path="/programs" element={<Programs />} />
       <Route path="/governance" element={<Governance />} />
       <Route path="/media" element={<Media />} />
+      <Route path="/media/:slug" element={<NewsDetail />} />
       <Route path="/e-services" element={<EServicesIndex />} />
       <Route path="/e-services/volunteer" element={<VolunteerService />} />
       <Route path="/e-services/membership" element={<MembershipService />} />
