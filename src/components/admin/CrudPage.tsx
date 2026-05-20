@@ -58,6 +58,7 @@ export type CrudPageProps<T extends { id: string; published?: boolean }> = {
     /** Extra slot rendered next to the category tabs (e.g. "Manage categories" button). */
     extraAction?: ReactNode;
   };
+};
 
 
 function isImageKey(k: string) {
