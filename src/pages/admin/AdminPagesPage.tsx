@@ -2,6 +2,7 @@ import { CrudPage } from "@/components/admin/CrudPage";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 
 type CustomPage = {
   id: string;
@@ -79,8 +80,12 @@ export default function AdminPagesPage() {
             <Textarea rows={2} value={v.meta_description ?? ""} onChange={(e) => set("meta_description", e.target.value)} />
           </div>
           <div>
-            <Label>المحتوى (يدعم Markdown أو HTML)</Label>
-            <Textarea rows={10} value={v.content ?? ""} onChange={(e) => set("content", e.target.value)} />
+            <Label>المحتوى</Label>
+            <RichTextEditor
+              value={v.content ?? ""}
+              onChange={(html) => set("content", html)}
+              minHeight={300}
+            />
           </div>
           <div className="grid grid-cols-3 gap-4">
             <div>

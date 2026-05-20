@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MediaUpload } from "@/components/admin/MediaUpload";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 
 type News = {
   id: string;
@@ -85,7 +86,12 @@ export default function AdminNewsPage() {
           </div>
           <div>
             <Label>المحتوى الكامل</Label>
-            <Textarea rows={8} value={v.content ?? ""} onChange={(e) => set("content", e.target.value)} />
+            <RichTextEditor
+              value={v.content ?? ""}
+              onChange={(html) => set("content", html)}
+              placeholder="اكتب نص الخبر هنا — يمكنك تنسيقه بالعناوين والقوائم والروابط..."
+              minHeight={260}
+            />
           </div>
           <MediaUpload
             label="صورة الغلاف"
