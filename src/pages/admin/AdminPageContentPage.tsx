@@ -497,84 +497,108 @@ export default function AdminPageContentPage() {
 
                 {(() => {
                   const pageSections = (grouped[page.key] ?? []).filter((s) => !(page.key === "eservices" && s.section_key === "services_list"));
-                  if (pageSections.length === 0) return null;
                   return (
                     <>
-                      {pageSections.length > 1 && (
-                        <p className="text-xs text-muted-foreground">اسحب أيقونة <GripVertical className="inline w-3 h-3" /> لإعادة ترتيب الأقسام.</p>
-                      )}
-                      <SortableList
-                        ids={pageSections.map((s) => s.id)}
-                        onReorder={async (newIds) => {
-                          // optimistic local reorder
-                          const idIndex = new Map(newIds.map((id, i) => [id, i]));
-                          setSections((arr) => arr.map((s) =>
-                            idIndex.has(s.id) ? { ...s, sort_order: (idIndex.get(s.id)! + 1) * 10 } : s,
-                          ));
-                          try { await persistSortOrder(supabase, "page_content", newIds); toast.success("تم تحديث الترتيب"); }
-                          catch { toast.error("تعذر حفظ الترتيب"); load(); }
-                        }}
-                      >
-                        {pageSections.map((s) => (
-                          <SortableItem key={s.id} id={s.id}>
-                            {({ handleProps, setNodeRef, style }) => (
-                              <AdminListRow
-                                ref={setNodeRef as any}
-                                style={style}
-                                id={s.id}
-                                table="page_content"
-                                dragHandleProps={handleProps}
-                                title={SECTION_LABELS[s.section_key] ?? s.section_key}
-                                subtitle={s.title ?? undefined}
-                                published={s.published}
-                                onTogglePublished={(next) => update(s.id, { published: next })}
-                                onDelete={async () => {
-                                  if (!confirm("حذف هذا القسم نهائياً؟")) return;
-                                  const { error } = await supabase.from("page_content").delete().eq("id", s.id);
-                                  if (error) toast.error(error.message);
-                                  else { toast.success("تم الحذف"); load(); }
-                                }}
-                              >
-                                <CardContent className="space-y-3 border-t pt-4">
-                                  <div>
-                                    <Label>العنوان</Label>
-                                    <Input value={s.title ?? ""}
-                                      onChange={(e) => update(s.id, { title: e.target.value })} />
-                                  </div>
-                                  {s.section_key !== "map" &&
-                                    s.section_key !== "services_list" &&
-                                    s.section_key !== "sections" && (
-                                      <div>
-                                        <Label>النص</Label>
-                                        <Textarea rows={4} value={s.content ?? ""}
-                                          onChange={(e) => update(s.id, { content: e.target.value })} />
-                                      </div>
-                                    )}
-                                  {renderStructured(s)}
-                                  <div className="flex justify-end">
-                                    <Button onClick={() => save(s)} disabled={savingId === s.id} size="sm">
-                                      {savingId === s.id ? (
-                                        <Loader2 className="w-4 h-4 ml-1 animate-spin" />
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-muted-foreground">
+                          {pageSections.length > 1 && <>اسحب أيقونة <GripVertical className="inline w-3 h-3" /> لإعادة ترتيب الأقسام.</>}
+                        </p>
+                        <Button size="sm" onClick={() => addBlockSection(page.key)}>
+                          <Plus className="w-4 h-4 ml-1" />
+                          إضافة قسم جديد
+                        </Button>
+                      </div>
+
+                      {pageSections.length > 0 && (
+                        <SortableList
+                          ids={pageSections.map((s) => s.id)}
+                          onReorder={async (newIds) => {
+                            const idIndex = new Map(newIds.map((id, i) => [id, i]));
+                            setSections((arr) => arr.map((s) =>
+                              idIndex.has(s.id) ? { ...s, sort_order: (idIndex.get(s.id)! + 1) * 10 } : s,
+                            ));
+                            try { await persistSortOrder(supabase, "page_content", newIds); toast.success("تم تحديث الترتيب"); }
+                            catch { toast.error("تعذر حفظ الترتيب"); load(); }
+                          }}
+                        >
+                          {pageSections.map((s) => {
+                            const isBlock = !!s.data?.block_type;
+                            return (
+                              <SortableItem key={s.id} id={s.id}>
+                                {({ handleProps, setNodeRef, style }) => (
+                                  <AdminListRow
+                                    ref={setNodeRef as any}
+                                    style={style}
+                                    id={s.id}
+                                    table="page_content"
+                                    dragHandleProps={handleProps}
+                                    title={
+                                      <span className="inline-flex items-center gap-2">
+                                        {isBlock && <Blocks className="w-3.5 h-3.5 text-primary" />}
+                                        {sectionLabel(s)}
+                                      </span>
+                                    }
+                                    subtitle={s.title ?? (isBlock ? (s.data?.title_ar || s.data?.title_en) : undefined)}
+                                    published={s.published}
+                                    onTogglePublished={(next) => update(s.id, { published: next })}
+                                    onDelete={async () => {
+                                      if (!confirm("حذف هذا القسم نهائياً؟")) return;
+                                      const { error } = await supabase.from("page_content").delete().eq("id", s.id);
+                                      if (error) toast.error(error.message);
+                                      else { toast.success("تم الحذف"); load(); }
+                                    }}
+                                  >
+                                    <CardContent className="space-y-3 border-t pt-4">
+                                      {isBlock ? (
+                                        <BlockEditor
+                                          data={s.data || {}}
+                                          onChange={(next) => update(s.id, { data: next })}
+                                          folder={`page/${page.key}`}
+                                        />
                                       ) : (
-                                        <Save className="w-4 h-4 ml-1" />
+                                        <>
+                                          <div>
+                                            <Label>العنوان</Label>
+                                            <Input value={s.title ?? ""}
+                                              onChange={(e) => update(s.id, { title: e.target.value })} />
+                                          </div>
+                                          {s.section_key !== "map" &&
+                                            s.section_key !== "services_list" &&
+                                            s.section_key !== "sections" && (
+                                              <div>
+                                                <Label>النص</Label>
+                                                <Textarea rows={4} value={s.content ?? ""}
+                                                  onChange={(e) => update(s.id, { content: e.target.value })} />
+                                              </div>
+                                            )}
+                                          {renderStructured(s)}
+                                        </>
                                       )}
-                                      حفظ
-                                    </Button>
-                                  </div>
-                                </CardContent>
-                              </AdminListRow>
-                            )}
-                          </SortableItem>
-                        ))}
-                      </SortableList>
+                                      <div className="flex justify-end">
+                                        <Button onClick={() => save(s)} disabled={savingId === s.id} size="sm">
+                                          {savingId === s.id ? (
+                                            <Loader2 className="w-4 h-4 ml-1 animate-spin" />
+                                          ) : (
+                                            <Save className="w-4 h-4 ml-1" />
+                                          )}
+                                          حفظ
+                                        </Button>
+                                      </div>
+                                    </CardContent>
+                                  </AdminListRow>
+                                )}
+                              </SortableItem>
+                            );
+                          })}
+                        </SortableList>
+                      )}
+
+                      {pageSections.length === 0 && !(QUICK_LINKS[page.key]?.length) && (
+                        <AdminEmptyState icon={FolderOpen} title="لا توجد أقسام بعد — اضغط ‘إضافة قسم جديد’ لبدء البناء" />
+                      )}
                     </>
                   );
                 })()}
-
-                {(grouped[page.key] ?? []).length === 0 &&
-                  !(QUICK_LINKS[page.key]?.length) && (
-                    <AdminEmptyState icon={FolderOpen} title="لا توجد أقسام لهذه الصفحة" />
-                  )}
               </TabsContent>
             ))}
           </Tabs>
