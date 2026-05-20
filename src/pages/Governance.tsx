@@ -15,6 +15,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
+  Folder,
+  type LucideIcon,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,7 +33,7 @@ import {
   eventsReports,
   financials,
 } from "@/data/governance";
-import { useGovernanceDocs, usePageContent } from "@/hooks/usePublicContent";
+import { useGovernanceDocs, usePageContent, useGovernanceCategories } from "@/hooks/usePublicContent";
 import { PageHero } from "@/components/layout/PageHero";
 import { PageFeedback } from "@/components/layout/PageFeedback";
 import { cn } from "@/lib/utils";
@@ -40,15 +42,30 @@ type DocItem = { id: string; year: number; title: { ar: string; en: string } | s
 
 type Section = {
   key: string;
-  labelKey: keyof ReturnType<typeof useLanguage>["t"]["pages"]["governance"];
-  icon: React.FC<{ className?: string }>;
+  label: string;
+  icon: LucideIcon;
   docs: DocItem[];
 };
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  ShieldCheck, ScrollText, Target, TrendingUp, HandCoins, Wallet, FileBarChart, CalendarDays, BookMarked, FileText, Folder,
+};
+
+const FALLBACK_DOCS: Record<string, DocItem[]> = {
+  policies, regulations, plans,
+  investments: investmentDecisions,
+  aid: aidReports,
+  financialReports,
+  annualReport: annualReports,
+  events: eventsReports,
+};
+
 
 const Governance = () => {
   const { t, tx, lang } = useLanguage();
   const [activeKey, setActiveKey] = useState<string>("overview");
   const { data: dbDocs } = useGovernanceDocs();
+  const { data: dbCategories } = useGovernanceCategories();
   const { data: pageData } = usePageContent("governance");
   const introSection = pageData?.find((s) => s.section_key === "intro");
   const finSection = pageData?.find((s) => s.section_key === "financials");
@@ -82,19 +99,30 @@ const Governance = () => {
     return map;
   }, [dbDocs]);
 
-  const sections: Section[] = useMemo(
-    () => [
-      { key: "policies", labelKey: "policies", icon: ShieldCheck, docs: dbByCategory.policies?.length ? dbByCategory.policies : policies },
-      { key: "regulations", labelKey: "regulations", icon: ScrollText, docs: dbByCategory.regulations?.length ? dbByCategory.regulations : regulations },
-      { key: "plans", labelKey: "plans", icon: Target, docs: dbByCategory.plans?.length ? dbByCategory.plans : plans },
-      { key: "investments", labelKey: "investments", icon: TrendingUp, docs: dbByCategory.investments?.length ? dbByCategory.investments : investmentDecisions },
-      { key: "aid", labelKey: "aid", icon: HandCoins, docs: dbByCategory.aid?.length ? dbByCategory.aid : aidReports },
-      { key: "financialReports", labelKey: "financialReports", icon: Wallet, docs: dbByCategory.financialReports?.length ? dbByCategory.financialReports : financialReports },
-      { key: "annualReport", labelKey: "annualReport", icon: FileBarChart, docs: dbByCategory.annualReport?.length ? dbByCategory.annualReport : annualReports },
-      { key: "events", labelKey: "events", icon: CalendarDays, docs: dbByCategory.events?.length ? dbByCategory.events : eventsReports },
-    ],
-    [dbByCategory]
-  );
+  const sections: Section[] = useMemo(() => {
+    const cats = dbCategories ?? [];
+    if (cats.length === 0) {
+      // Fallback to hardcoded sections when DB has no categories yet
+      return [
+        { key: "policies", label: t.pages.governance.policies as string, icon: ShieldCheck, docs: dbByCategory.policies?.length ? dbByCategory.policies : policies },
+        { key: "regulations", label: t.pages.governance.regulations as string, icon: ScrollText, docs: dbByCategory.regulations?.length ? dbByCategory.regulations : regulations },
+        { key: "plans", label: t.pages.governance.plans as string, icon: Target, docs: dbByCategory.plans?.length ? dbByCategory.plans : plans },
+        { key: "investments", label: t.pages.governance.investments as string, icon: TrendingUp, docs: dbByCategory.investments?.length ? dbByCategory.investments : investmentDecisions },
+        { key: "aid", label: t.pages.governance.aid as string, icon: HandCoins, docs: dbByCategory.aid?.length ? dbByCategory.aid : aidReports },
+        { key: "financialReports", label: t.pages.governance.financialReports as string, icon: Wallet, docs: dbByCategory.financialReports?.length ? dbByCategory.financialReports : financialReports },
+        { key: "annualReport", label: t.pages.governance.annualReport as string, icon: FileBarChart, docs: dbByCategory.annualReport?.length ? dbByCategory.annualReport : annualReports },
+        { key: "events", label: t.pages.governance.events as string, icon: CalendarDays, docs: dbByCategory.events?.length ? dbByCategory.events : eventsReports },
+      ];
+    }
+    return cats.map((c) => {
+      const label = lang === "ar" ? c.label_ar : c.label_en;
+      const Icon = (c.icon && ICON_MAP[c.icon]) || Folder;
+      const docs = dbByCategory[c.slug]?.length
+        ? dbByCategory[c.slug]
+        : (FALLBACK_DOCS[c.slug] ?? []);
+      return { key: c.slug, label, icon: Icon, docs };
+    });
+  }, [dbCategories, dbByCategory, lang, t]);
 
   const active = sections.find((s) => s.key === activeKey);
   const Chevron = lang === "ar" ? ChevronLeft : ChevronRight;
@@ -133,7 +161,7 @@ const Governance = () => {
                     active={activeKey === s.key}
                     onClick={() => setActiveKey(s.key)}
                     icon={s.icon}
-                    label={t.pages.governance[s.labelKey] as string}
+                    label={s.label}
                     count={s.docs.length}
                     Chevron={Chevron}
                   />
@@ -156,7 +184,7 @@ const Governance = () => {
             ) : active ? (
               <DocsPanel
                 key={active.key}
-                title={t.pages.governance[active.labelKey] as string}
+                title={active.label}
                 icon={active.icon}
                 docs={active.docs}
                 tx={tx}
@@ -327,7 +355,7 @@ const OverviewPanel = ({
                   <Icon className="h-5 w-5" />
                 </div>
                 <h3 className="font-bold text-foreground mb-1 group-hover:text-primary transition-smooth">
-                  {t.pages.governance[s.labelKey] as string}
+                  {s.label}
                 </h3>
                 <p className="text-xs text-muted-foreground">
                   {s.docs.length} {t.pages.governance.docsCount}

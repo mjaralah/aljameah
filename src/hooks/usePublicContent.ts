@@ -209,6 +209,32 @@ export function useGovernanceDocs() {
   });
 }
 
+export type DBGovernanceCategory = {
+  id: string;
+  slug: string;
+  label_ar: string;
+  label_en: string;
+  icon: string | null;
+  sort_order: number;
+  published: boolean;
+};
+
+export function useGovernanceCategories() {
+  return useQuery({
+    queryKey: ["public", "governance_categories"],
+    staleTime: STALE,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("governance_categories")
+        .select("*")
+        .eq("published", true)
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as DBGovernanceCategory[];
+    },
+  });
+}
+
 export function useSiteSettings() {
   return useQuery({
     queryKey: ["public", "site_settings"],

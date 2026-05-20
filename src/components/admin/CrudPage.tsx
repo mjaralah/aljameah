@@ -51,8 +51,15 @@ export type CrudPageProps<T extends { id: string; published?: boolean }> = {
     field: keyof T;
     label?: string;
     options: { value: string; label: string }[];
+    /** Show an "All" tab that disables filter and allows search across categories. */
+    includeAll?: boolean;
+    /** Label for the "All" tab. */
+    allLabel?: string;
+    /** Extra slot rendered next to the category tabs (e.g. "Manage categories" button). */
+    extraAction?: ReactNode;
   };
 };
+
 
 function isImageKey(k: string) {
   return /image_url$|logo_url$|photo_url$|avatar_url$|cover/.test(k);
@@ -80,7 +87,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>(
-    categoryFilter?.options[0]?.value ?? "",
+    categoryFilter?.includeAll ? "__all__" : (categoryFilter?.options[0]?.value ?? ""),
   );
   const [publishedFilter, setPublishedFilter] = useState<"all" | "published" | "draft">("all");
 
@@ -102,7 +109,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
 
   const filtered = useMemo(() => {
     let r = rows;
-    if (categoryFilter && activeCategory) {
+    if (categoryFilter && activeCategory && activeCategory !== "__all__") {
       r = r.filter((row) => String(row[categoryFilter.field] ?? "") === activeCategory);
     }
     if (publishedFilter === "published") r = r.filter((row) => row.published);
@@ -209,7 +216,26 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
         onSearchChange={searchField ? setSearch : undefined}
         extra={
           categoryFilter && (
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap items-center gap-1.5">
+              {categoryFilter.includeAll && (() => {
+                const active = activeCategory === "__all__";
+                return (
+                  <button
+                    type="button"
+                    onClick={() => setActiveCategory("__all__")}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium border transition ${
+                      active
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background hover:bg-muted border-border text-muted-foreground"
+                    }`}
+                  >
+                    {categoryFilter.allLabel ?? "الكل"}
+                    <span className={`ms-2 inline-flex items-center justify-center min-w-5 h-5 px-1 rounded-full text-[10px] ${active ? "bg-primary-foreground/20" : "bg-muted"}`}>
+                      {rows.length}
+                    </span>
+                  </button>
+                );
+              })()}
               {categoryFilter.options.map((opt) => {
                 const count = rows.filter(
                   (r) => String(r[categoryFilter.field] ?? "") === opt.value,
@@ -233,6 +259,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
                   </button>
                 );
               })}
+              {categoryFilter.extraAction}
             </div>
           )
         }
@@ -253,7 +280,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
         onChipChange={(v) => setPublishedFilter(v as typeof publishedFilter)}
       />
 
-      {reorderable && filtered.length > 1 && (
+      {reorderable && filtered.length > 1 && activeCategory !== "__all__" && (
         <p className="text-xs text-muted-foreground mb-3 px-1">
           اسحب أيقونة <GripVertical className="inline w-3 h-3" /> لإعادة ترتيب العناصر. يُحفظ الترتيب تلقائياً.
         </p>
@@ -275,14 +302,16 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
         <SortableList ids={filtered.map((r) => r.id)} onReorder={handleReorder}>
           <div className="space-y-2">
             {filtered.map((row) => (
-              <SortableItem key={row.id} id={row.id} disabled={!reorderable}>
-                {({ handleProps, setNodeRef, style }) => (
+              <SortableItem key={row.id} id={row.id} disabled={!reorderable || activeCategory === "__all__"}>
+                {({ handleProps, setNodeRef, style }) => {
+                  const allView = activeCategory === "__all__";
+                  return (
                   <AdminListRow
                     ref={setNodeRef as any}
                     style={style}
                     id={row.id}
                     table={table}
-                    showDragHandle={reorderable}
+                    showDragHandle={reorderable && !allView}
                     dragHandleProps={handleProps}
                     thumbnail={thumbCol ? renderCol(thumbCol, row) : undefined}
                     title={titleCol ? renderCol(titleCol, row) : "—"}
@@ -304,7 +333,8 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
                     onEdit={() => setEditing(row)}
                     onDelete={() => setDeleteId(row.id)}
                   />
-                )}
+                  );
+                }}
               </SortableItem>
             ))}
           </div>
