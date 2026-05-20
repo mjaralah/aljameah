@@ -47,6 +47,7 @@ const PAGES: { key: string; label: string; description: string }[] = [
 ];
 
 const SECTION_LABELS: Record<string, string> = {
+  hero: "شريط البطل (Hero)",
   intro: "المقدمة",
   hours: "ساعات العمل",
   map: "الخريطة والعنوان",
@@ -54,7 +55,10 @@ const SECTION_LABELS: Record<string, string> = {
   sections: "الأقسام الإعلامية",
   stats: "عدّاد الأرقام",
   about_preview: "نبذة عن الجمعية",
+  programs: "شبكة البرامج",
   satisfaction: "مؤشرات رضا المستفيدين",
+  news: "آخر الأخبار",
+  partners: "شركاء النجاح",
   volunteer_cta: "دعوة التطوع",
   financials: "المؤشرات المالية",
   benefits: "المزايا",

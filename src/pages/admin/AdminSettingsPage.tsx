@@ -5,12 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { MediaUpload } from "@/components/admin/MediaUpload";
-import { Loader2, Save, Settings as SettingsIcon, Palette, Phone, Share2, Image as ImageIcon } from "lucide-react";
+import { Loader2, Save, Settings as SettingsIcon, Palette, Phone, Share2, Image as ImageIcon, ThumbsUp, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { SectionHeader } from "@/components/admin/SectionHeader";
+
+type VisibilityMap = Record<string, boolean>;
 
 type Settings = {
   id: string;
@@ -27,7 +30,31 @@ type Settings = {
   social_linkedin: string | null;
   social_youtube: string | null;
   footer_text: string | null;
+  feedback_visibility: VisibilityMap | null;
+  pages_visibility: VisibilityMap | null;
 };
+
+const FEEDBACK_PAGES: { key: string; label: string }[] = [
+  { key: "home", label: "الصفحة الرئيسية" },
+  { key: "about", label: "من نحن" },
+  { key: "programs", label: "البرامج والخدمات" },
+  { key: "governance", label: "الحوكمة" },
+  { key: "media", label: "المركز الإعلامي" },
+  { key: "surveys", label: "الاستبيانات" },
+  { key: "eservices", label: "الخدمات الإلكترونية" },
+  { key: "contact", label: "تواصل معنا" },
+];
+
+const PUBLIC_PAGES: { key: string; label: string }[] = [
+  { key: "home", label: "الصفحة الرئيسية" },
+  { key: "about", label: "من نحن" },
+  { key: "programs", label: "البرامج والخدمات" },
+  { key: "governance", label: "الحوكمة" },
+  { key: "media", label: "المركز الإعلامي" },
+  { key: "surveys", label: "الاستبيانات" },
+  { key: "eservices", label: "الخدمات الإلكترونية" },
+  { key: "contact", label: "تواصل معنا" },
+];
 
 export default function AdminSettingsPage() {
   const [s, setS] = useState<Partial<Settings> | null>(null);
@@ -42,10 +69,21 @@ export default function AdminSettingsPage() {
         .limit(1)
         .maybeSingle();
       if (error) toast.error(error.message);
-      setS(data ?? {});
+      setS((data ?? {}) as Partial<Settings>);
       setLoading(false);
     })();
   }, []);
+
+  function toggleVis(field: "feedback_visibility" | "pages_visibility", key: string, value: boolean) {
+    setS((p) => ({
+      ...(p ?? {}),
+      [field]: { ...((p?.[field] as VisibilityMap) ?? {}), [key]: value },
+    }));
+  }
+  function isOn(field: "feedback_visibility" | "pages_visibility", key: string) {
+    const map = (s?.[field] as VisibilityMap | null | undefined) ?? {};
+    return map[key] !== false; // افتراضياً نشط
+  }
 
   async function save() {
     if (!s) return;
@@ -203,6 +241,50 @@ export default function AdminSettingsPage() {
                 <Label>نص التذييل (Footer)</Label>
                 <Textarea rows={2} value={s.footer_text ?? ""} onChange={(e) => set("footer_text", e.target.value)} />
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-5 md:p-6">
+            <SectionHeader
+              icon={ThumbsUp}
+              title='أداة "هل كانت هذه الصفحة مفيدة؟"'
+              description="تحكم بإظهار أو إخفاء أداة تقييم الصفحة لكل صفحة من صفحات الموقع."
+            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {FEEDBACK_PAGES.map((p) => (
+                <div key={p.key} className="flex items-center justify-between rounded-lg border p-3 bg-muted/30">
+                  <Label htmlFor={`fb-${p.key}`} className="m-0 cursor-pointer">{p.label}</Label>
+                  <Switch
+                    id={`fb-${p.key}`}
+                    checked={isOn("feedback_visibility", p.key)}
+                    onCheckedChange={(v) => toggleVis("feedback_visibility", p.key, v)}
+                  />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-5 md:p-6">
+            <SectionHeader
+              icon={EyeOff}
+              title="نشر / إخفاء الصفحات الرئيسية"
+              description="إيقاف نشر صفحة كاملة سيُظهر للزوار رسالة 'غير متاحة حالياً'. الطاقم يستمر برؤية الصفحات."
+            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {PUBLIC_PAGES.map((p) => (
+                <div key={p.key} className="flex items-center justify-between rounded-lg border p-3 bg-muted/30">
+                  <Label htmlFor={`pg-${p.key}`} className="m-0 cursor-pointer">{p.label}</Label>
+                  <Switch
+                    id={`pg-${p.key}`}
+                    checked={isOn("pages_visibility", p.key)}
+                    onCheckedChange={(v) => toggleVis("pages_visibility", p.key, v)}
+                  />
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>

@@ -4,12 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { programs as fallbackPrograms } from "@/data";
-import { usePrograms } from "@/hooks/usePublicContent";
+import { usePrograms, usePageContent } from "@/hooks/usePublicContent";
 
 // شبكة البرامج — أيقونات ديناميكية من lucide
 export const ProgramsGrid = () => {
   const { t, tx } = useLanguage();
   const { data: dbPrograms } = usePrograms();
+  const { data: pageData } = usePageContent("home");
+  const sec = pageData?.find((s) => s.section_key === "programs");
+  const heading = sec?.title || t.programs.subtitle;
+  const eyebrow = (sec?.data?.eyebrow as string | undefined) || t.programs.title;
 
   const items = dbPrograms && dbPrograms.length > 0
     ? dbPrograms.map((p) => ({
@@ -31,8 +35,8 @@ export const ProgramsGrid = () => {
     <section className="bg-secondary/40 py-16 md:py-24" aria-label="programs">
       <div className="container">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-accent font-bold text-sm uppercase tracking-wider">{t.programs.title}</span>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-primary mt-2 mb-3">{t.programs.subtitle}</h2>
+          <span className="text-accent font-bold text-sm uppercase tracking-wider">{eyebrow}</span>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-primary mt-2 mb-3">{heading}</h2>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
           {items.map((p) => {
