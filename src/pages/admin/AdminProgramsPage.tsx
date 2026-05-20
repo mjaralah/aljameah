@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MediaUpload } from "@/components/admin/MediaUpload";
+import { IconPicker } from "@/components/admin/IconPicker";
 
 type Program = {
   id: string;
