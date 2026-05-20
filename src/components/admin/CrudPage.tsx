@@ -216,7 +216,26 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
         onSearchChange={searchField ? setSearch : undefined}
         extra={
           categoryFilter && (
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap items-center gap-1.5">
+              {categoryFilter.includeAll && (() => {
+                const active = activeCategory === "__all__";
+                return (
+                  <button
+                    type="button"
+                    onClick={() => setActiveCategory("__all__")}
+                    className={`px-3 py-1.5 rounded-md text-xs font-medium border transition ${
+                      active
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background hover:bg-muted border-border text-muted-foreground"
+                    }`}
+                  >
+                    {categoryFilter.allLabel ?? "الكل"}
+                    <span className={`ms-2 inline-flex items-center justify-center min-w-5 h-5 px-1 rounded-full text-[10px] ${active ? "bg-primary-foreground/20" : "bg-muted"}`}>
+                      {rows.length}
+                    </span>
+                  </button>
+                );
+              })()}
               {categoryFilter.options.map((opt) => {
                 const count = rows.filter(
                   (r) => String(r[categoryFilter.field] ?? "") === opt.value,
@@ -240,6 +259,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
                   </button>
                 );
               })}
+              {categoryFilter.extraAction}
             </div>
           )
         }
