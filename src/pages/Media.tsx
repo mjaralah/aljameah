@@ -123,10 +123,13 @@ const Media = () => {
                   </div>
                   <h3 className="font-bold text-primary mb-2 line-clamp-2">{n.title}</h3>
                   <p className="text-sm text-muted-foreground line-clamp-3 mb-4 flex-1">{n.excerpt}</p>
-                  <button className="text-sm font-semibold text-accent hover:underline inline-flex items-center gap-1 self-start">
+                  <Link
+                    to={`/media/${n.slug}`}
+                    className="text-sm font-semibold text-accent hover:underline inline-flex items-center gap-1 self-start"
+                  >
                     {t.pages.media.readArticle}
                     <ArrowLeft className={dir === "rtl" ? "h-3.5 w-3.5" : "h-3.5 w-3.5 rotate-180"} />
-                  </button>
+                  </Link>
                 </div>
               </Card>
             ))}
