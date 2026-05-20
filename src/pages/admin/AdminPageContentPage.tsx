@@ -134,6 +134,29 @@ export default function AdminPageContentPage() {
     else toast.success("تم الحفظ");
   }
 
+  async function addBlockSection(pageKey: string) {
+    const pageSections = sections.filter((x) => x.page_key === pageKey);
+    const sort = pageSections.length
+      ? Math.max(...pageSections.map((x) => x.sort_order)) + 10
+      : 10;
+    const { data, error } = await supabase
+      .from("page_content")
+      .insert({
+        page_key: pageKey,
+        section_key: `block_${Date.now()}`,
+        title: null,
+        content: null,
+        data: { block_type: "text_media" },
+        sort_order: sort,
+        published: true,
+      })
+      .select()
+      .single();
+    if (error) return toast.error(error.message);
+    setSections((arr) => [...arr, data as Section]);
+    toast.success("تم إضافة قسم جديد — حرّره ثم اضغط حفظ");
+  }
+
   const grouped = useMemo(() => {
     const map: Record<string, Section[]> = {};
     for (const s of sections) (map[s.page_key] ??= []).push(s);
