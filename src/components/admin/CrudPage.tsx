@@ -51,8 +51,14 @@ export type CrudPageProps<T extends { id: string; published?: boolean }> = {
     field: keyof T;
     label?: string;
     options: { value: string; label: string }[];
+    /** Show an "All" tab that disables filter and allows search across categories. */
+    includeAll?: boolean;
+    /** Label for the "All" tab. */
+    allLabel?: string;
+    /** Extra slot rendered next to the category tabs (e.g. "Manage categories" button). */
+    extraAction?: ReactNode;
   };
-};
+
 
 function isImageKey(k: string) {
   return /image_url$|logo_url$|photo_url$|avatar_url$|cover/.test(k);
