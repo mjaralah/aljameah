@@ -2,13 +2,17 @@
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
+import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import {
   Bold, Italic, Strikethrough, Heading2, Heading3,
   List, ListOrdered, Quote, Link as LinkIcon, Undo2, Redo2, Eraser,
+  Image as ImageIcon, Loader2,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 type Props = {
   value: string;
@@ -39,6 +43,9 @@ const Btn = ({
 );
 
 const Toolbar = ({ editor }: { editor: Editor }) => {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
   const setLink = () => {
     const prev = editor.getAttributes("link").href as string | undefined;
     const url = window.prompt("رابط (URL):", prev ?? "https://");
@@ -48,6 +55,30 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
       return;
     }
     editor.chain().focus().extendMarkRange("link").setLink({ href: url, target: "_blank", rel: "noopener noreferrer" }).run();
+  };
+
+  const insertImageByUrl = () => {
+    const url = window.prompt("رابط الصورة (URL):", "https://");
+    if (!url) return;
+    editor.chain().focus().setImage({ src: url }).run();
+  };
+
+  const uploadImage = async (file: File) => {
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `editor/${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage.from("site-media").upload(path, file, { cacheControl: "3600", upsert: false });
+      if (error) throw error;
+      const { data } = supabase.storage.from("site-media").getPublicUrl(path);
+      editor.chain().focus().setImage({ src: data.publicUrl, alt: file.name }).run();
+      toast.success("تم إدراج الصورة");
+    } catch (err) {
+      toast.error((err as Error).message);
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
   };
 
   return (
@@ -64,10 +95,26 @@ const Toolbar = ({ editor }: { editor: Editor }) => {
       <Btn title="اقتباس" active={editor.isActive("blockquote")} onClick={() => editor.chain().focus().toggleBlockquote().run()}><Quote className="h-4 w-4" /></Btn>
       <div className="w-px h-5 bg-border mx-1" />
       <Btn title="رابط" active={editor.isActive("link")} onClick={setLink}><LinkIcon className="h-4 w-4" /></Btn>
+      <Btn title="رفع صورة من الجهاز" disabled={uploading} onClick={() => fileRef.current?.click()}>
+        {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
+      </Btn>
+      <Btn title="إدراج صورة عبر رابط" onClick={insertImageByUrl}>
+        <span className="text-[10px] font-bold">URL</span>
+      </Btn>
       <Btn title="إزالة التنسيق" onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()}><Eraser className="h-4 w-4" /></Btn>
       <div className="flex-1" />
       <Btn title="تراجع" disabled={!editor.can().undo()} onClick={() => editor.chain().focus().undo().run()}><Undo2 className="h-4 w-4" /></Btn>
       <Btn title="إعادة" disabled={!editor.can().redo()} onClick={() => editor.chain().focus().redo().run()}><Redo2 className="h-4 w-4" /></Btn>
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) uploadImage(f);
+        }}
+      />
     </div>
   );
 };
@@ -77,6 +124,7 @@ export function RichTextEditor({ value, onChange, placeholder = "ابدأ الك
     extensions: [
       StarterKit.configure({ heading: { levels: [2, 3] } }),
       Link.configure({ openOnClick: false, autolink: true, HTMLAttributes: { class: "text-primary underline" } }),
+      Image.configure({ inline: false, allowBase64: false, HTMLAttributes: { class: "rounded-lg my-3 max-w-full h-auto" } }),
       Placeholder.configure({ placeholder }),
     ],
     content: value || "",
@@ -88,6 +136,31 @@ export function RichTextEditor({ value, onChange, placeholder = "ابدأ الك
           "prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground",
           "prose-a:text-primary prose-blockquote:border-r-4 prose-blockquote:border-l-0 prose-blockquote:pr-4 prose-blockquote:pl-0",
         ),
+      },
+      handleDrop: (view, event) => {
+        const file = event.dataTransfer?.files?.[0];
+        if (file && file.type.startsWith("image/")) {
+          event.preventDefault();
+          (async () => {
+            try {
+              const ext = file.name.split(".").pop();
+              const path = `editor/${crypto.randomUUID()}.${ext}`;
+              const { error } = await supabase.storage.from("site-media").upload(path, file, { cacheControl: "3600", upsert: false });
+              if (error) throw error;
+              const { data } = supabase.storage.from("site-media").getPublicUrl(path);
+              const { schema } = view.state;
+              const coords = view.posAtCoords({ left: event.clientX, top: event.clientY });
+              const node = schema.nodes.image.create({ src: data.publicUrl, alt: file.name });
+              const tr = view.state.tr.insert(coords?.pos ?? 0, node);
+              view.dispatch(tr);
+              toast.success("تم إدراج الصورة");
+            } catch (err) {
+              toast.error((err as Error).message);
+            }
+          })();
+          return true;
+        }
+        return false;
       },
     },
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
@@ -120,6 +193,8 @@ export function RichTextEditor({ value, onChange, placeholder = "ابدأ الك
         .tiptap ul, .tiptap ol { padding-inline-start: 1.5rem; }
         .tiptap h2 { font-size: 1.25rem; font-weight: 700; margin: 0.75rem 0 0.5rem; }
         .tiptap h3 { font-size: 1.1rem; font-weight: 700; margin: 0.6rem 0 0.4rem; }
+        .tiptap img { display: block; max-width: 100%; height: auto; border-radius: 0.5rem; }
+        .tiptap img.ProseMirror-selectednode { outline: 2px solid hsl(var(--primary)); }
       `}</style>
     </div>
   );
