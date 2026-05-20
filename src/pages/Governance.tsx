@@ -355,7 +355,7 @@ const OverviewPanel = ({
                   <Icon className="h-5 w-5" />
                 </div>
                 <h3 className="font-bold text-foreground mb-1 group-hover:text-primary transition-smooth">
-                  {t.pages.governance[s.labelKey] as string}
+                  {s.label}
                 </h3>
                 <p className="text-xs text-muted-foreground">
                   {s.docs.length} {t.pages.governance.docsCount}
