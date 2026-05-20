@@ -1,10 +1,16 @@
 import { BadgeCheck } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAboutContent } from "@/hooks/usePublicContent";
 import { LanguageToggle } from "./LanguageToggle";
 
 // شريط علوي ثابت يحوي شارة التوثيق ورقم السجل ومبدّل اللغة
 export const TopBar = () => {
   const { t } = useLanguage();
+  const { data: aboutData } = useAboutContent();
+  const regSec = aboutData?.find((s) => s.section_key === "registration");
+  const regRows = (regSec?.data?.rows as { label?: string; value?: string }[] | undefined) ?? [];
+  const regRow = regRows.find((r) => (r.label ?? "").includes("تسجيل") || (r.label ?? "").includes("سجل"));
+  const regNumber = regRow?.value || t.brand.regNumber;
   return (
     <div className="bg-primary text-primary-foreground text-xs sm:text-sm">
       <div className="container flex items-center justify-between gap-3 py-1.5">
@@ -15,7 +21,7 @@ export const TopBar = () => {
             <span className="sm:hidden">✓</span>
           </span>
           <span className="opacity-90 truncate">
-            {t.brand.registration}: <span className="font-semibold">{t.brand.regNumber}</span>
+            {t.brand.registration}: <span className="font-semibold">{regNumber}</span>
           </span>
         </div>
         <LanguageToggle compact />
