@@ -2,12 +2,17 @@ import { ArrowLeft, BadgeCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { usePageContent } from "@/hooks/usePublicContent";
+import { usePageContent, useAboutContent } from "@/hooks/usePublicContent";
 import aboutImg from "@/assets/about-preview.jpg";
 
 export const AboutPreview = () => {
   const { t, dir } = useLanguage();
   const { data } = usePageContent("home");
+  const { data: aboutData } = useAboutContent();
+  const regSec = aboutData?.find((s) => s.section_key === "registration");
+  const regRows = (regSec?.data?.rows as { label?: string; value?: string }[] | undefined) ?? [];
+  const regRow = regRows.find((r) => (r.label ?? "").includes("تسجيل") || (r.label ?? "").includes("سجل"));
+  const regNumber = regRow?.value || t.brand.regNumber;
   const sec = data?.find((s) => s.section_key === "about_preview");
   const title = sec?.title || t.brand.name;
   const body = sec?.content || t.about.body;
@@ -32,7 +37,7 @@ export const AboutPreview = () => {
             <span className="font-bold text-sm">{t.brand.verified}</span>
           </div>
           <p className="text-xs text-muted-foreground">
-            {t.brand.registration}: {t.brand.regNumber}
+            {t.brand.registration}: {regNumber}
           </p>
         </div>
       </div>
