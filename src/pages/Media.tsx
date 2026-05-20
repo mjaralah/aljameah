@@ -35,6 +35,7 @@ const Media = () => {
     if (dbNews && dbNews.length > 0) {
       return dbNews.map((n) => ({
         id: n.id,
+        slug: n.slug || n.id,
         title: n.title,
         excerpt: n.excerpt ?? "",
         image: n.cover_image_url || news1,
@@ -44,6 +45,7 @@ const Media = () => {
     }
     return fallbackNews.map((n) => ({
       id: n.id,
+      slug: n.id,
       title: tx(n.title),
       excerpt: tx(n.excerpt),
       image: n.image,
