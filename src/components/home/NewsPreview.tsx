@@ -4,12 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { news as fallbackNews } from "@/data";
-import { useNews } from "@/hooks/usePublicContent";
+import { useNews, usePageContent } from "@/hooks/usePublicContent";
 import news1 from "@/assets/news-1.jpg";
 
 export const NewsPreview = () => {
   const { t, tx, lang, dir } = useLanguage();
   const { data: dbNews } = useNews();
+  const { data: pageData } = usePageContent("home");
+  const sec = pageData?.find((s) => s.section_key === "news");
+  const heading = sec?.title || t.news.subtitle;
+  const eyebrow = (sec?.data?.eyebrow as string | undefined) || t.news.title;
 
   // عند توفر بيانات في قاعدة البيانات نستخدمها، وإلا نعتمد على البيانات الثابتة
   const items = dbNews && dbNews.length > 0
@@ -36,8 +40,8 @@ export const NewsPreview = () => {
     <section className="container py-16 md:py-24" aria-label="news">
       <div className="flex items-end justify-between flex-wrap gap-4 mb-10">
         <div>
-          <span className="text-accent font-bold text-sm uppercase tracking-wider">{t.news.title}</span>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-primary mt-2">{t.news.subtitle}</h2>
+          <span className="text-accent font-bold text-sm uppercase tracking-wider">{eyebrow}</span>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-primary mt-2">{heading}</h2>
         </div>
         <Button asChild variant="ghost" className="text-primary font-semibold">
           <Link to="/media">

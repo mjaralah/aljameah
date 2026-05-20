@@ -5,14 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useSiteSettings } from "@/hooks/usePublicContent";
 
-// أداة تقييم الصفحة — تُرسل التقييم إلى قاعدة البيانات
+// أداة تقييم الصفحة — يمكن إخفاؤها لكل صفحة من لوحة التحكم (الإعدادات العامة)
 export const PageFeedback = ({ pageKey }: { pageKey: string }) => {
   const { t } = useLanguage();
   const location = useLocation();
+  const { data: settings } = useSiteSettings();
   const [vote, setVote] = useState<"yes" | "no" | null>(null);
   const [comment, setComment] = useState("");
   const [done, setDone] = useState(false);
+
+  // افتراضياً تظهر، تُخفى فقط إذا ضُبطت صراحةً على false
+  const visibility = (settings as any)?.feedback_visibility as Record<string, boolean> | undefined;
+  if (visibility && visibility[pageKey] === false) return null;
 
   const submit = (val: "yes" | "no") => {
     setVote(val);
