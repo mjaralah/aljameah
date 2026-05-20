@@ -21,6 +21,7 @@ import EServicesIndex from "./pages/eservices/EServicesIndex.tsx";
 import VolunteerService from "./pages/eservices/VolunteerService.tsx";
 import MembershipService from "./pages/eservices/MembershipService.tsx";
 import Contact from "./pages/Contact.tsx";
+import { PublicRouteGuard } from "@/components/layout/PublicRouteGuard";
 
 // Admin
 import AdminLogin from "./pages/admin/AdminLogin.tsx";
@@ -73,19 +74,19 @@ const Stub = ({ titleKey, pageKey }: { titleKey: keyof ReturnType<typeof useLang
 const PublicRoutes = () => (
   <Layout>
     <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/programs" element={<Programs />} />
-      <Route path="/governance" element={<Governance />} />
-      <Route path="/media" element={<Media />} />
-      <Route path="/media/:slug" element={<NewsDetail />} />
-      <Route path="/e-services" element={<EServicesIndex />} />
-      <Route path="/e-services/volunteer" element={<VolunteerService />} />
-      <Route path="/e-services/membership" element={<MembershipService />} />
-      <Route path="/e-services/form/:slug" element={<CustomFormPage />} />
-      <Route path="/surveys" element={<SurveysPage />} />
-      <Route path="/surveys/:surveyId/results" element={<SurveyResults />} />
-      <Route path="/contact" element={<Contact />} />
+      <Route path="/" element={<PublicRouteGuard pageKey="home"><Index /></PublicRouteGuard>} />
+      <Route path="/about" element={<PublicRouteGuard pageKey="about"><About /></PublicRouteGuard>} />
+      <Route path="/programs" element={<PublicRouteGuard pageKey="programs"><Programs /></PublicRouteGuard>} />
+      <Route path="/governance" element={<PublicRouteGuard pageKey="governance"><Governance /></PublicRouteGuard>} />
+      <Route path="/media" element={<PublicRouteGuard pageKey="media"><Media /></PublicRouteGuard>} />
+      <Route path="/media/:slug" element={<PublicRouteGuard pageKey="media"><NewsDetail /></PublicRouteGuard>} />
+      <Route path="/e-services" element={<PublicRouteGuard pageKey="eservices"><EServicesIndex /></PublicRouteGuard>} />
+      <Route path="/e-services/volunteer" element={<PublicRouteGuard pageKey="eservices"><VolunteerService /></PublicRouteGuard>} />
+      <Route path="/e-services/membership" element={<PublicRouteGuard pageKey="eservices"><MembershipService /></PublicRouteGuard>} />
+      <Route path="/e-services/form/:slug" element={<PublicRouteGuard pageKey="eservices"><CustomFormPage /></PublicRouteGuard>} />
+      <Route path="/surveys" element={<PublicRouteGuard pageKey="surveys"><SurveysPage /></PublicRouteGuard>} />
+      <Route path="/surveys/:surveyId/results" element={<PublicRouteGuard pageKey="surveys"><SurveyResults /></PublicRouteGuard>} />
+      <Route path="/contact" element={<PublicRouteGuard pageKey="contact"><Contact /></PublicRouteGuard>} />
       <Route path="/donate" element={<Stub titleKey="donate" pageKey="donate" />} />
       <Route path="/search" element={<Stub titleKey="search" pageKey="search" />} />
       <Route path="/privacy-policy" element={<Stub titleKey="privacy" pageKey="privacy" />} />
