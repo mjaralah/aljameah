@@ -1,0 +1,1 @@
+DELETE FROM public.page_content WHERE section_key = 'test_block_qa';
