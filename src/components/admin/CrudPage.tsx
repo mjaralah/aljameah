@@ -87,7 +87,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>(
-    categoryFilter?.options[0]?.value ?? "",
+    categoryFilter?.includeAll ? "__all__" : (categoryFilter?.options[0]?.value ?? ""),
   );
   const [publishedFilter, setPublishedFilter] = useState<"all" | "published" | "draft">("all");
 
