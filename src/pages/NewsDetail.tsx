@@ -81,7 +81,7 @@ const NewsDetail = () => {
         eyebrow={article.category || t.nav.media}
         title={article.title}
         breadcrumb={[
-          { label: t.nav.media, href: "/media" },
+          { label: t.nav.media, to: "/media" },
           { label: article.title },
         ]}
       />
