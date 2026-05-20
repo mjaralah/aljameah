@@ -69,10 +69,21 @@ export default function AdminSettingsPage() {
         .limit(1)
         .maybeSingle();
       if (error) toast.error(error.message);
-      setS(data ?? {});
+      setS((data ?? {}) as Partial<Settings>);
       setLoading(false);
     })();
   }, []);
+
+  function toggleVis(field: "feedback_visibility" | "pages_visibility", key: string, value: boolean) {
+    setS((p) => ({
+      ...(p ?? {}),
+      [field]: { ...((p?.[field] as VisibilityMap) ?? {}), [key]: value },
+    }));
+  }
+  function isOn(field: "feedback_visibility" | "pages_visibility", key: string) {
+    const map = (s?.[field] as VisibilityMap | null | undefined) ?? {};
+    return map[key] !== false; // افتراضياً نشط
+  }
 
   async function save() {
     if (!s) return;
