@@ -304,14 +304,24 @@ export default function AdminPageContentPage() {
     if (s.section_key === "about_preview" || s.section_key === "satisfaction" || s.section_key === "volunteer_cta") {
       const d = s.data || {};
       return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div>
-            <Label>نص الزر</Label>
-            <Input value={d.cta_label ?? ""} onChange={(e) => updateData(s.id, "cta_label", e.target.value)} />
-          </div>
-          <div>
-            <Label>رابط الزر</Label>
-            <Input dir="ltr" value={d.cta_url ?? ""} onChange={(e) => updateData(s.id, "cta_url", e.target.value)} />
+        <div className="space-y-3">
+          {s.section_key === "about_preview" && (
+            <MediaUpload
+              label="صورة القسم"
+              value={d.image_url ?? ""}
+              folder="home/about"
+              onChange={(url) => updateData(s.id, "image_url", url ?? "")}
+            />
+          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <Label>نص الزر</Label>
+              <Input value={d.cta_label ?? ""} onChange={(e) => updateData(s.id, "cta_label", e.target.value)} />
+            </div>
+            <div>
+              <Label>رابط الزر</Label>
+              <Input dir="ltr" value={d.cta_url ?? ""} onChange={(e) => updateData(s.id, "cta_url", e.target.value)} />
+            </div>
           </div>
         </div>
       );
