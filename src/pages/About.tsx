@@ -103,6 +103,8 @@ const About = () => {
   const dbValues = getData<{ values: { icon: string; title: string; desc: string }[] }>("mission", { values: [] }).values;
   const valuesIconMap: Record<string, React.ComponentType<{ className?: string }>> = { Heart, ShieldCheck, Handshake, Lightbulb };
   const dbAssemblyCards = getData<{ cards: { title: string; body: string }[] }>("assembly", { cards: [] }).cards;
+  const assemblyViewMode = getData<{ view_mode?: string }>("assembly", {}).view_mode === "members" ? "members" : "cards";
+  const assemblyMembersData = getData<{ assembly?: any }>("assembly", {}).assembly;
   const dbFoundingStats = getData<{ stats: { value: string; label: string }[] }>("founding", { stats: [] }).stats;
   const ceoData = getData<{ name: string; title: string; photo_url: string | null }>("ceo", { name: "أ. فيصل عبدالعزيز", title: "المدير التنفيذي", photo_url: null });
   const structureData = getData<{ display_mode?: string; image_url?: string; nodes: { title: string; subtitle: string }[]; departments: { title: string; desc: string }[] }>("structure", {
