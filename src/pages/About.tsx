@@ -325,15 +325,21 @@ const About = () => {
             {/* الجمعية العمومية */}
             <SectionBlock id="assembly" icon={Users} title={getTitle("assembly", "الجمعية العمومية")}>
               <p>{get("assembly", "الجمعية العمومية هي السلطة العليا في الجمعية، وتتألف من جميع الأعضاء المؤسسين والعاملين الذين أوفوا بالتزاماتهم وفق النظام الأساسي.")}</p>
-              <div className="grid md:grid-cols-3 gap-4 mt-6">
-                {(dbAssemblyCards.length > 0 ? dbAssemblyCards : [
-                  { title: "الاختصاصات", body: "إقرار الخطط والسياسات، اعتماد التقارير المالية والإدارية، انتخاب مجلس الإدارة." },
-                  { title: "الاجتماعات", body: "اجتماع عادي سنوي، واجتماعات غير عادية عند الحاجة وفق نظام الجمعيات." },
-                  { title: "الأعضاء", body: "عضويةٌ مفتوحة وفق الشروط النظامية، مع حقوق متساوية في التصويت." },
-                ]).map((c) => (
-                  <InfoCard key={c.title} title={c.title} body={c.body} />
-                ))}
-              </div>
+              {assemblyViewMode === "members" ? (
+                <div className="mt-6">
+                  <AssemblyMembersView data={{ ...defaultAssemblyData(), ...(assemblyMembersData || {}) }} />
+                </div>
+              ) : (
+                <div className="grid md:grid-cols-3 gap-4 mt-6">
+                  {(dbAssemblyCards.length > 0 ? dbAssemblyCards : [
+                    { title: "الاختصاصات", body: "إقرار الخطط والسياسات، اعتماد التقارير المالية والإدارية، انتخاب مجلس الإدارة." },
+                    { title: "الاجتماعات", body: "اجتماع عادي سنوي، واجتماعات غير عادية عند الحاجة وفق نظام الجمعيات." },
+                    { title: "الأعضاء", body: "عضويةٌ مفتوحة وفق الشروط النظامية، مع حقوق متساوية في التصويت." },
+                  ]).map((c) => (
+                    <InfoCard key={c.title} title={c.title} body={c.body} />
+                  ))}
+                </div>
+              )}
             </SectionBlock>
 
             {/* أعضاء مجلس الإدارة */}
