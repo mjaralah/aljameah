@@ -16,6 +16,8 @@ export type AssemblyMember = {
   phone?: string;
   email?: string;
   status?: string; // active | inactive
+  /** هل وافق العضو على إظهار بيانات التواصل للزوار؟ */
+  contact_public?: boolean;
 };
 
 export type AssemblyData = {
@@ -49,6 +51,7 @@ export const TEMPLATE_HEADERS = [
   "phone",
   "email",
   "status",
+  "contact_public",
 ];
 
 export function downloadTemplate() {
