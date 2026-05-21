@@ -555,6 +555,13 @@ function SectionEditor({ row, onChange }: { row: Row; onChange: (d: CustomData) 
         />
       )}
 
+      {d.type === "assembly_members" && (
+        <AssemblyMembersEditor
+          data={d as unknown as AssemblyData}
+          onChange={(nd) => onChange(nd as unknown as CustomData)}
+        />
+      )}
+
       {d.type === "cta" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-3 rounded-md bg-muted/40">
           <FieldL label="نص الزر (AR)">
