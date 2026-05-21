@@ -360,7 +360,7 @@ function ContactCell({ value, href }: { value: string; href: string }) {
     }
   };
   return (
-    <span className="group inline-flex items-center gap-1.5">
+    <span className="group inline-flex items-center justify-center gap-1.5">
       <a href={href} className="text-primary hover:underline">{value}</a>
       <button
         type="button"
