@@ -32,6 +32,8 @@ import { useBoardMembers, useBoardSettings, useAboutContent, type DBAboutSection
 import { useLanguage } from "@/contexts/LanguageContext";
 import ceoPortrait from "@/assets/ceo-portrait.jpg";
 import { CustomAboutSection } from "@/components/about/CustomAboutSection";
+import { AssemblyMembersView } from "@/components/about/sections/AssemblyMembersView";
+import { defaultAssemblyData } from "@/components/admin/about/AssemblyMembersEditor";
 
 type Section = {
   id: string;
