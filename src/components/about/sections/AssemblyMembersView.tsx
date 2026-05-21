@@ -205,17 +205,17 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
       </div>
 
       {/* جدول للديسكتوب/التابلت */}
-      <Card className="hidden sm:block overflow-hidden">
+      <Card className="hidden sm:block overflow-hidden rounded-xl border shadow-sm">
         <div className="max-h-[640px] overflow-auto">
-          <Table>
-            <TableHeader className="sticky top-0 bg-card z-10 shadow-sm">
-              <TableRow>
-                <TableHead className="w-12">#</TableHead>
-                <TableHead>{isAr ? "الاسم" : "Name"}</TableHead>
-                <TableHead>{isAr ? "نوع العضوية" : "Membership"}</TableHead>
-                <TableHead className="hidden md:table-cell">{isAr ? "تاريخ الالتحاق" : "Join date"}</TableHead>
-                {anyPhone && <TableHead className="hidden lg:table-cell">{isAr ? "الهاتف" : "Phone"}</TableHead>}
-                {anyEmail && <TableHead className="hidden lg:table-cell">{isAr ? "البريد" : "Email"}</TableHead>}
+          <Table className="[&_tbody_tr:nth-child(even)]:bg-muted/30">
+            <TableHeader className="sticky top-0 z-10 bg-muted/60 backdrop-blur-sm shadow-sm">
+              <TableRow className="border-b-2 border-border hover:bg-muted/60">
+                <TableHead className="w-14 text-center text-xs font-semibold uppercase tracking-wide text-foreground">#</TableHead>
+                <TableHead className="text-start text-xs font-semibold uppercase tracking-wide text-foreground">{isAr ? "الاسم" : "Name"}</TableHead>
+                <TableHead className="text-center text-xs font-semibold uppercase tracking-wide text-foreground">{isAr ? "نوع العضوية" : "Membership"}</TableHead>
+                <TableHead className="hidden md:table-cell text-center text-xs font-semibold uppercase tracking-wide text-foreground">{isAr ? "تاريخ الالتحاق" : "Join date"}</TableHead>
+                {anyPhone && <TableHead className="hidden lg:table-cell text-center text-xs font-semibold uppercase tracking-wide text-foreground">{isAr ? "الهاتف" : "Phone"}</TableHead>}
+                {anyEmail && <TableHead className="hidden lg:table-cell text-center text-xs font-semibold uppercase tracking-wide text-foreground">{isAr ? "البريد" : "Email"}</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -227,24 +227,28 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
                 </TableRow>
               ) : (
                 pageRows.map((m, i) => (
-                  <TableRow key={m.id}>
-                    <TableCell className="text-muted-foreground tabular-nums">
-                      {(safePage - 1) * pageSize + i + 1}
+                  <TableRow key={m.id} className="border-b border-border/60">
+                    <TableCell className="py-2.5 text-center">
+                      <span className="inline-flex h-6 min-w-6 px-1.5 items-center justify-center rounded-full bg-muted text-foreground/70 text-xs tabular-nums">
+                        {(safePage - 1) * pageSize + i + 1}
+                      </span>
                     </TableCell>
-                    <TableCell className="font-medium">
+                    <TableCell className="py-2.5 font-medium text-start">
                       {isAr ? m.name_ar || m.name_en : m.name_en || m.name_ar}
                     </TableCell>
-                    <TableCell>
-                      <MembershipBadge
-                        typeKey={m.membership_type}
-                        label={typeLabel(m.membership_type)}
-                      />
+                    <TableCell className="py-2.5 text-center">
+                      <div className="flex justify-center">
+                        <MembershipBadge
+                          typeKey={m.membership_type}
+                          label={typeLabel(m.membership_type)}
+                        />
+                      </div>
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground hidden md:table-cell">
+                    <TableCell className="py-2.5 text-center text-sm text-muted-foreground hidden md:table-cell tabular-nums">
                       {m.join_date || "—"}
                     </TableCell>
                     {anyPhone && (
-                      <TableCell className="text-sm hidden lg:table-cell" dir="ltr">
+                      <TableCell className="py-2.5 text-center text-sm hidden lg:table-cell" dir="ltr">
                         {showPhoneFor(m) && m.phone ? (
                           <ContactCell value={m.phone} href={`tel:${m.phone}`} />
                         ) : (
@@ -253,7 +257,7 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
                       </TableCell>
                     )}
                     {anyEmail && (
-                      <TableCell className="text-sm hidden lg:table-cell" dir="ltr">
+                      <TableCell className="py-2.5 text-center text-sm hidden lg:table-cell" dir="ltr">
                         {showEmailFor(m) && m.email ? (
                           <ContactCell value={m.email} href={`mailto:${m.email}`} />
                         ) : (
@@ -356,7 +360,7 @@ function ContactCell({ value, href }: { value: string; href: string }) {
     }
   };
   return (
-    <span className="group inline-flex items-center gap-1.5">
+    <span className="group inline-flex items-center justify-center gap-1.5">
       <a href={href} className="text-primary hover:underline">{value}</a>
       <button
         type="button"

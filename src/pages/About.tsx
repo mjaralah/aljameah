@@ -105,7 +105,9 @@ const About = () => {
   const dbValues = getData<{ values: { icon: string; title: string; desc: string }[] }>("mission", { values: [] }).values;
   const valuesIconMap: Record<string, React.ComponentType<{ className?: string }>> = { Heart, ShieldCheck, Handshake, Lightbulb };
   const dbAssemblyCards = getData<{ cards: { title: string; body: string }[] }>("assembly", { cards: [] }).cards;
-  const assemblyViewMode = getData<{ view_mode?: string }>("assembly", {}).view_mode === "members" ? "members" : "cards";
+  const _rawAssemblyView = getData<{ view_mode?: string }>("assembly", {}).view_mode;
+  const assemblyViewMode: "cards" | "members" | "both" =
+    _rawAssemblyView === "members" ? "members" : _rawAssemblyView === "both" ? "both" : "cards";
   const assemblyMembersData = getData<{ assembly?: any }>("assembly", {}).assembly;
   const dbFoundingStats = getData<{ stats: { value: string; label: string }[] }>("founding", { stats: [] }).stats;
   const ceoData = getData<{ name: string; title: string; photo_url: string | null }>("ceo", { name: "أ. فيصل عبدالعزيز", title: "المدير التنفيذي", photo_url: null });
@@ -325,11 +327,7 @@ const About = () => {
             {/* الجمعية العمومية */}
             <SectionBlock id="assembly" icon={Users} title={getTitle("assembly", "الجمعية العمومية")}>
               <p>{get("assembly", "الجمعية العمومية هي السلطة العليا في الجمعية، وتتألف من جميع الأعضاء المؤسسين والعاملين الذين أوفوا بالتزاماتهم وفق النظام الأساسي.")}</p>
-              {assemblyViewMode === "members" ? (
-                <div className="mt-6">
-                  <AssemblyMembersView data={{ ...defaultAssemblyData(), ...(assemblyMembersData || {}) }} />
-                </div>
-              ) : (
+              {assemblyViewMode !== "members" && (
                 <div className="grid md:grid-cols-3 gap-4 mt-6">
                   {(dbAssemblyCards.length > 0 ? dbAssemblyCards : [
                     { title: "الاختصاصات", body: "إقرار الخطط والسياسات، اعتماد التقارير المالية والإدارية، انتخاب مجلس الإدارة." },
@@ -338,6 +336,20 @@ const About = () => {
                   ]).map((c) => (
                     <InfoCard key={c.title} title={c.title} body={c.body} />
                   ))}
+                </div>
+              )}
+              {assemblyViewMode !== "cards" && (
+                <div className="mt-8">
+                  {assemblyViewMode === "both" && (
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="h-px flex-1 bg-border" />
+                      <h3 className="text-sm font-semibold text-muted-foreground tracking-wide">
+                        أعضاء الجمعية العمومية
+                      </h3>
+                      <div className="h-px flex-1 bg-border" />
+                    </div>
+                  )}
+                  <AssemblyMembersView data={{ ...defaultAssemblyData(), ...(assemblyMembersData || {}) }} />
                 </div>
               )}
             </SectionBlock>
