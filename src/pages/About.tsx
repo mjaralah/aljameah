@@ -105,7 +105,9 @@ const About = () => {
   const dbValues = getData<{ values: { icon: string; title: string; desc: string }[] }>("mission", { values: [] }).values;
   const valuesIconMap: Record<string, React.ComponentType<{ className?: string }>> = { Heart, ShieldCheck, Handshake, Lightbulb };
   const dbAssemblyCards = getData<{ cards: { title: string; body: string }[] }>("assembly", { cards: [] }).cards;
-  const assemblyViewMode = getData<{ view_mode?: string }>("assembly", {}).view_mode === "members" ? "members" : "cards";
+  const _rawAssemblyView = getData<{ view_mode?: string }>("assembly", {}).view_mode;
+  const assemblyViewMode: "cards" | "members" | "both" =
+    _rawAssemblyView === "members" ? "members" : _rawAssemblyView === "both" ? "both" : "cards";
   const assemblyMembersData = getData<{ assembly?: any }>("assembly", {}).assembly;
   const dbFoundingStats = getData<{ stats: { value: string; label: string }[] }>("founding", { stats: [] }).stats;
   const ceoData = getData<{ name: string; title: string; photo_url: string | null }>("ceo", { name: "أ. فيصل عبدالعزيز", title: "المدير التنفيذي", photo_url: null });
