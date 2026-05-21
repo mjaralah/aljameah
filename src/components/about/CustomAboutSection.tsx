@@ -16,7 +16,7 @@ import type { AssemblyData } from "@/lib/assemblyExport";
 
 type ItemAny = Record<string, any>;
 type CustomData = {
-  type: "timeline" | "impact" | "testimonials" | "accreditations" | "faq" | "gallery" | "cta";
+  type: "timeline" | "impact" | "testimonials" | "accreditations" | "faq" | "gallery" | "cta" | "assembly_members";
   title_ar?: string;
   title_en?: string;
   subtitle_ar?: string;
