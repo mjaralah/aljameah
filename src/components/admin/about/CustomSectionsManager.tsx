@@ -93,6 +93,9 @@ type Row = {
 const CUSTOM_PREFIX = "custom:";
 
 function emptyData(type: CustomSectionType): CustomData {
+  if (type === "assembly_members") {
+    return defaultAssemblyData() as unknown as CustomData;
+  }
   return {
     type,
     title_ar: "",
