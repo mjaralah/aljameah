@@ -1,0 +1,533 @@
+// محرّر قسم أعضاء الجمعية العمومية — إعدادات/أنواع/أعضاء/استيراد/تصدير
+import { useMemo, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Plus, Trash2, Upload, Download, FileSpreadsheet, Pencil } from "lucide-react";
+import { toast } from "sonner";
+import {
+  AssemblyData,
+  AssemblyMember,
+  DEFAULT_TYPES,
+  MembershipType,
+  downloadTemplate,
+  exportToCSV,
+  exportToExcel,
+  exportToPDF,
+  parseImportFile,
+} from "@/lib/assemblyExport";
+
+export function defaultAssemblyData(): AssemblyData {
+  return {
+    type: "assembly_members",
+    title_ar: "أعضاء الجمعية العمومية",
+    title_en: "General Assembly Members",
+    subtitle_ar: "",
+    subtitle_en: "",
+    settings: {
+      show_phone_public: false,
+      show_email_public: false,
+      show_export_public: true,
+      page_size: 15,
+    },
+    membership_types: DEFAULT_TYPES,
+    members: [],
+  };
+}
+
+export default function AssemblyMembersEditor({
+  data,
+  onChange,
+}: {
+  data: AssemblyData;
+  onChange: (d: AssemblyData) => void;
+}) {
+  const settings = data.settings ?? {
+    show_phone_public: false,
+    show_email_public: false,
+    show_export_public: true,
+    page_size: 15,
+  };
+  const types = data.membership_types ?? DEFAULT_TYPES;
+  const members = data.members ?? [];
+  const update = (patch: Partial<AssemblyData>) => onChange({ ...data, ...patch });
+  const updateSettings = (p: Partial<NonNullable<AssemblyData["settings"]>>) =>
+    update({ settings: { ...settings, ...p } });
+
+  return (
+    <Tabs defaultValue="members" className="w-full">
+      <TabsList className="grid w-full grid-cols-3">
+        <TabsTrigger value="members">الأعضاء ({members.length})</TabsTrigger>
+        <TabsTrigger value="types">أنواع العضوية</TabsTrigger>
+        <TabsTrigger value="settings">الإعدادات</TabsTrigger>
+      </TabsList>
+
+      {/* الأعضاء */}
+      <TabsContent value="members">
+        <MembersTab
+          members={members}
+          types={types}
+          onChange={(m) => update({ members: m })}
+        />
+      </TabsContent>
+
+      {/* أنواع العضوية */}
+      <TabsContent value="types">
+        <TypesTab types={types} onChange={(t) => update({ membership_types: t })} />
+      </TabsContent>
+
+      {/* الإعدادات */}
+      <TabsContent value="settings">
+        <div className="space-y-3 p-3 rounded-md bg-muted/40">
+          <SwitchRow
+            label="إظهار رقم الهاتف للزوار"
+            hint="افتراضياً مخفي لحماية الخصوصية"
+            checked={!!settings.show_phone_public}
+            onChange={(v) => updateSettings({ show_phone_public: v })}
+          />
+          <SwitchRow
+            label="إظهار البريد الإلكتروني للزوار"
+            checked={!!settings.show_email_public}
+            onChange={(v) => updateSettings({ show_email_public: v })}
+          />
+          <SwitchRow
+            label="إتاحة تصدير القائمة للزوار (Excel/CSV/PDF)"
+            checked={!!settings.show_export_public}
+            onChange={(v) => updateSettings({ show_export_public: v })}
+          />
+          <div>
+            <Label className="text-xs mb-1 block">عدد العناصر في الصفحة</Label>
+            <Input
+              type="number"
+              min={5}
+              max={50}
+              value={settings.page_size ?? 15}
+              onChange={(e) =>
+                updateSettings({ page_size: Math.max(5, Number(e.target.value) || 15) })
+              }
+              className="max-w-[160px]"
+            />
+          </div>
+        </div>
+      </TabsContent>
+    </Tabs>
+  );
+}
+
+function SwitchRow({
+  label,
+  hint,
+  checked,
+  onChange,
+}: {
+  label: string;
+  hint?: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-3 py-1">
+      <div>
+        <div className="text-sm font-medium">{label}</div>
+        {hint && <div className="text-xs text-muted-foreground">{hint}</div>}
+      </div>
+      <Switch checked={checked} onCheckedChange={onChange} />
+    </div>
+  );
+}
+
+/* ===================== الأعضاء ===================== */
+function MembersTab({
+  members,
+  types,
+  onChange,
+}: {
+  members: AssemblyMember[];
+  types: MembershipType[];
+  onChange: (m: AssemblyMember[]) => void;
+}) {
+  const [query, setQuery] = useState("");
+  const [filterType, setFilterType] = useState<string>("all");
+  const [editing, setEditing] = useState<AssemblyMember | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return members.filter((m) => {
+      if (filterType !== "all" && m.membership_type !== filterType) return false;
+      if (!q) return true;
+      return (
+        (m.name_ar ?? "").toLowerCase().includes(q) ||
+        (m.name_en ?? "").toLowerCase().includes(q) ||
+        (m.phone ?? "").includes(q) ||
+        (m.email ?? "").toLowerCase().includes(q)
+      );
+    });
+  }, [members, query, filterType]);
+
+  const typeLabel = (k?: string) => types.find((t) => t.key === k)?.label_ar ?? k ?? "—";
+
+  async function handleImport(file: File) {
+    const { rows, errors } = await parseImportFile(file);
+    if (errors.length) toast.warning(`تجاوز ${errors.length} صفوف بسبب أخطاء`);
+    if (!rows.length) {
+      toast.error("لا توجد صفوف صالحة في الملف");
+      return;
+    }
+    onChange([...members, ...rows]);
+    toast.success(`تمت إضافة ${rows.length} عضو`);
+  }
+
+  function saveMember(m: AssemblyMember) {
+    if (members.some((x) => x.id === m.id)) {
+      onChange(members.map((x) => (x.id === m.id ? m : x)));
+    } else {
+      onChange([...members, m]);
+    }
+    setEditing(null);
+  }
+
+  function removeMember(id: string) {
+    if (!confirm("حذف هذا العضو؟")) return;
+    onChange(members.filter((m) => m.id !== id));
+  }
+
+  return (
+    <div className="space-y-3">
+      {/* شريط أدوات */}
+      <div className="flex flex-wrap gap-2 items-center">
+        <Input
+          placeholder="بحث بالاسم/الهاتف/البريد…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="max-w-xs"
+        />
+        <Select value={filterType} onValueChange={setFilterType}>
+          <SelectTrigger className="w-40">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">كل الأنواع</SelectItem>
+            {types.map((t) => (
+              <SelectItem key={t.key} value={t.key}>
+                {t.label_ar}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <div className="flex-1" />
+
+        <Button
+          size="sm"
+          onClick={() =>
+            setEditing({
+              id: crypto.randomUUID(),
+              name_ar: "",
+              name_en: "",
+              membership_type: types[0]?.key ?? "working",
+              join_date: new Date().toISOString().slice(0, 10),
+              phone: "",
+              email: "",
+              status: "active",
+            })
+          }
+        >
+          <Plus className="w-4 h-4 ml-1" /> إضافة عضو
+        </Button>
+        <Button size="sm" variant="outline" onClick={() => downloadTemplate()}>
+          <FileSpreadsheet className="w-4 h-4 ml-1" /> قالب Excel
+        </Button>
+        <Button size="sm" variant="outline" onClick={() => fileRef.current?.click()}>
+          <Upload className="w-4 h-4 ml-1" /> استيراد
+        </Button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept=".xlsx,.xls,.csv"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) handleImport(f);
+            e.target.value = "";
+          }}
+        />
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => exportToExcel(filtered, types, true)}
+        >
+          <Download className="w-4 h-4 ml-1" /> Excel
+        </Button>
+        <Button size="sm" variant="outline" onClick={() => exportToCSV(filtered, types, true)}>
+          <Download className="w-4 h-4 ml-1" /> CSV
+        </Button>
+      </div>
+
+      {/* الجدول */}
+      <div className="border rounded-md overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-12">#</TableHead>
+              <TableHead>الاسم</TableHead>
+              <TableHead>النوع</TableHead>
+              <TableHead>الالتحاق</TableHead>
+              <TableHead>الهاتف</TableHead>
+              <TableHead>البريد</TableHead>
+              <TableHead className="w-24"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filtered.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center text-muted-foreground py-6">
+                  لا يوجد أعضاء
+                </TableCell>
+              </TableRow>
+            ) : (
+              filtered.map((m, i) => (
+                <TableRow key={m.id}>
+                  <TableCell>{i + 1}</TableCell>
+                  <TableCell className="font-medium">
+                    {m.name_ar || m.name_en}
+                  </TableCell>
+                  <TableCell>{typeLabel(m.membership_type)}</TableCell>
+                  <TableCell className="text-xs">{m.join_date || "—"}</TableCell>
+                  <TableCell className="text-xs" dir="ltr">{m.phone || "—"}</TableCell>
+                  <TableCell className="text-xs" dir="ltr">{m.email || "—"}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-1">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7"
+                        onClick={() => setEditing(m)}
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 text-destructive"
+                        onClick={() => removeMember(m.id)}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* تحرير عضو */}
+      {editing && (
+        <MemberForm
+          member={editing}
+          types={types}
+          onCancel={() => setEditing(null)}
+          onSave={saveMember}
+        />
+      )}
+    </div>
+  );
+}
+
+function MemberForm({
+  member,
+  types,
+  onSave,
+  onCancel,
+}: {
+  member: AssemblyMember;
+  types: MembershipType[];
+  onSave: (m: AssemblyMember) => void;
+  onCancel: () => void;
+}) {
+  const [m, setM] = useState<AssemblyMember>(member);
+  const set = (p: Partial<AssemblyMember>) => setM({ ...m, ...p });
+  return (
+    <div className="border rounded-md p-3 bg-muted/30 space-y-3">
+      <div className="text-sm font-medium">
+        {member.name_ar || member.name_en ? "تعديل عضو" : "عضو جديد"}
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <Field label="الاسم (AR)">
+          <Input value={m.name_ar ?? ""} onChange={(e) => set({ name_ar: e.target.value })} />
+        </Field>
+        <Field label="Name (EN)">
+          <Input
+            value={m.name_en ?? ""}
+            onChange={(e) => set({ name_en: e.target.value })}
+            dir="ltr"
+          />
+        </Field>
+        <Field label="نوع العضوية">
+          <Select
+            value={m.membership_type ?? "working"}
+            onValueChange={(v) => set({ membership_type: v })}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {types.map((t) => (
+                <SelectItem key={t.key} value={t.key}>
+                  {t.label_ar}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
+        <Field label="تاريخ الالتحاق">
+          <Input
+            type="date"
+            value={m.join_date ?? ""}
+            onChange={(e) => set({ join_date: e.target.value })}
+          />
+        </Field>
+        <Field label="الهاتف (اختياري)">
+          <Input
+            value={m.phone ?? ""}
+            onChange={(e) => set({ phone: e.target.value })}
+            dir="ltr"
+          />
+        </Field>
+        <Field label="البريد (اختياري)">
+          <Input
+            type="email"
+            value={m.email ?? ""}
+            onChange={(e) => set({ email: e.target.value })}
+            dir="ltr"
+          />
+        </Field>
+        <Field label="الحالة">
+          <Select value={m.status ?? "active"} onValueChange={(v) => set({ status: v })}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="active">نشِط</SelectItem>
+              <SelectItem value="inactive">غير نشِط</SelectItem>
+            </SelectContent>
+          </Select>
+        </Field>
+      </div>
+      <div className="flex gap-2 justify-end">
+        <Button size="sm" variant="outline" onClick={onCancel}>
+          إلغاء
+        </Button>
+        <Button
+          size="sm"
+          onClick={() => {
+            if (!m.name_ar && !m.name_en) {
+              toast.error("الاسم مطلوب");
+              return;
+            }
+            onSave(m);
+          }}
+        >
+          حفظ العضو
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="text-xs font-medium mb-1 block">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+/* ===================== أنواع العضوية ===================== */
+function TypesTab({
+  types,
+  onChange,
+}: {
+  types: MembershipType[];
+  onChange: (t: MembershipType[]) => void;
+}) {
+  const update = (i: number, p: Partial<MembershipType>) => {
+    const next = [...types];
+    next[i] = { ...next[i], ...p };
+    onChange(next);
+  };
+  const add = () =>
+    onChange([
+      ...types,
+      { key: `type_${Date.now()}`, label_ar: "نوع جديد", label_en: "New type" },
+    ]);
+  const remove = (i: number) => {
+    if (!confirm("حذف هذا النوع؟")) return;
+    onChange(types.filter((_, j) => j !== i));
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex justify-end">
+        <Button size="sm" onClick={add}>
+          <Plus className="w-4 h-4 ml-1" /> إضافة نوع
+        </Button>
+      </div>
+      {types.length === 0 && (
+        <p className="text-xs text-muted-foreground text-center py-3">لا توجد أنواع</p>
+      )}
+      {types.map((t, i) => (
+        <div
+          key={i}
+          className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-2 items-end border rounded-md p-2 bg-muted/30"
+        >
+          <Field label="المفتاح (key)">
+            <Input
+              value={t.key}
+              onChange={(e) => update(i, { key: e.target.value.replace(/\s+/g, "_") })}
+              dir="ltr"
+            />
+          </Field>
+          <Field label="الاسم (AR)">
+            <Input value={t.label_ar} onChange={(e) => update(i, { label_ar: e.target.value })} />
+          </Field>
+          <Field label="Label (EN)">
+            <Input
+              value={t.label_en}
+              onChange={(e) => update(i, { label_en: e.target.value })}
+              dir="ltr"
+            />
+          </Field>
+          <Button
+            size="icon"
+            variant="ghost"
+            className="text-destructive"
+            onClick={() => remove(i)}
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        </div>
+      ))}
+    </div>
+  );
+}
