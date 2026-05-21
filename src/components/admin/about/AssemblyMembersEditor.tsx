@@ -98,13 +98,14 @@ export default function AssemblyMembersEditor({
       <TabsContent value="settings">
         <div className="space-y-3 p-3 rounded-md bg-muted/40">
           <SwitchRow
-            label="إظهار رقم الهاتف للزوار"
-            hint="افتراضياً مخفي لحماية الخصوصية"
+            label="إظهار رقم الهاتف للزوار (قاطع عام)"
+            hint="إذا أُطفئ — يختفي الهاتف للجميع. إذا فُعّل — يظهر فقط للأعضاء الذين فعّلوا خيار «إظهار التواصل»."
             checked={!!settings.show_phone_public}
             onChange={(v) => updateSettings({ show_phone_public: v })}
           />
           <SwitchRow
-            label="إظهار البريد الإلكتروني للزوار"
+            label="إظهار البريد الإلكتروني للزوار (قاطع عام)"
+            hint="نفس المنطق — يحترم تفضيل كل عضو."
             checked={!!settings.show_email_public}
             onChange={(v) => updateSettings({ show_email_public: v })}
           />
