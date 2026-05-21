@@ -63,6 +63,9 @@ export function CustomAboutSection({ id, data }: { id: string; data: CustomData 
           subtitle={subtitle}
         />
       )}
+      {data.type === "assembly_members" && (
+        <AssemblyMembersView data={data as unknown as AssemblyData} />
+      )}
     </article>
   );
 }
