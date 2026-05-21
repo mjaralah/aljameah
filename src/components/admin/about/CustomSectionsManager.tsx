@@ -39,6 +39,10 @@ import {
   SortableItem,
   persistSortOrder,
 } from "@/components/admin/SortableList";
+import AssemblyMembersEditor, {
+  defaultAssemblyData,
+} from "@/components/admin/about/AssemblyMembersEditor";
+import type { AssemblyData } from "@/lib/assemblyExport";
 
 export type CustomSectionType =
   | "timeline"
@@ -47,7 +51,8 @@ export type CustomSectionType =
   | "accreditations"
   | "faq"
   | "gallery"
-  | "cta";
+  | "cta"
+  | "assembly_members";
 
 const TYPE_META: Record<CustomSectionType, { label: string; desc: string }> = {
   timeline: { label: "الخط الزمني", desc: "محطّات ورحلة الجمعية بالسنوات" },
@@ -57,6 +62,10 @@ const TYPE_META: Record<CustomSectionType, { label: string; desc: string }> = {
   faq: { label: "الأسئلة الشائعة", desc: "سؤال وجواب قابل للطي" },
   gallery: { label: "معرض الصور", desc: "شبكة صور مع تعليقات" },
   cta: { label: "دعوة لإجراء (CTA)", desc: "عنوان + نص + زر" },
+  assembly_members: {
+    label: "أعضاء الجمعية العمومية",
+    desc: "قائمة الأعضاء مع بحث وفلترة وتصدير واستيراد جماعي (Excel)",
+  },
 };
 
 type CustomData = {
@@ -84,6 +93,9 @@ type Row = {
 const CUSTOM_PREFIX = "custom:";
 
 function emptyData(type: CustomSectionType): CustomData {
+  if (type === "assembly_members") {
+    return defaultAssemblyData() as unknown as CustomData;
+  }
   return {
     type,
     title_ar: "",
@@ -540,6 +552,13 @@ function SectionEditor({ row, onChange }: { row: Row; onChange: (d: CustomData) 
               </div>
             </div>
           )}
+        />
+      )}
+
+      {d.type === "assembly_members" && (
+        <AssemblyMembersEditor
+          data={d as unknown as AssemblyData}
+          onChange={(nd) => onChange(nd as unknown as CustomData)}
         />
       )}
 
