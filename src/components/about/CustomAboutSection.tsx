@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/accordion";
 import { icons as LucideIcons, Sparkles, ArrowLeft, Quote } from "lucide-react";
 import { Link } from "react-router-dom";
+import { AssemblyMembersView } from "@/components/about/sections/AssemblyMembersView";
+import type { AssemblyData } from "@/lib/assemblyExport";
 
 type ItemAny = Record<string, any>;
 type CustomData = {
