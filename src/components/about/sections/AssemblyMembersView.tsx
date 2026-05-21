@@ -1,9 +1,8 @@
-// عرض قسم أعضاء الجمعية العمومية للزوار — جدول + بحث + فلترة + تصفّح + تصدير
+// عرض قسم أعضاء الجمعية العمومية للزوار — جدول احترافي + شارات لونية + تواصل اختياري لكل عضو
 import { useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -19,14 +18,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Download, FileText, Search, Users, ChevronRight, ChevronLeft } from "lucide-react";
+import {
+  Download, FileText, Search, Users, ChevronRight, ChevronLeft, Copy, Check, UserX,
+} from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { MembershipBadge } from "./MembershipBadge";
 import {
   AssemblyData,
   exportToCSV,
   exportToExcel,
   exportToPDF,
 } from "@/lib/assemblyExport";
+import { toast } from "sonner";
 
 export function AssemblyMembersView({ data }: { data: AssemblyData }) {
   const { lang } = useLanguage();
@@ -45,6 +48,16 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
     const t = types.find((x) => x.key === k);
     return t ? (isAr ? t.label_ar : t.label_en) : k ?? "—";
   };
+
+  // قاطع عام + موافقة العضو
+  const globalPhone = !!settings.show_phone_public;
+  const globalEmail = !!settings.show_email_public;
+  const showPhoneFor = (m: { contact_public?: boolean }) => globalPhone && !!m.contact_public;
+  const showEmailFor = (m: { contact_public?: boolean }) => globalEmail && !!m.contact_public;
+  // أعمدة التواصل تظهر فقط إذا كان القاطع العام مفعّلاً ووُجد عضو واحد على الأقل يسمح
+  const anyPhone = globalPhone && members.some((m) => m.contact_public && m.phone);
+  const anyEmail = globalEmail && members.some((m) => m.contact_public && m.email);
+  const showExport = !!settings.show_export_public;
 
   // إحصائيات
   const stats = useMemo(() => {
@@ -86,28 +99,40 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
   const safePage = Math.min(page, totalPages);
   const pageRows = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
 
-  const showPhone = !!settings.show_phone_public;
-  const showEmail = !!settings.show_email_public;
-  const showExport = !!settings.show_export_public;
   const title = isAr ? data.title_ar || data.title_en : data.title_en || data.title_ar;
+
+  // حالة فارغة
+  if (members.length === 0) {
+    return (
+      <Card className="p-10 text-center">
+        <UserX className="mx-auto h-10 w-10 text-muted-foreground mb-3" />
+        <p className="text-muted-foreground">
+          {isAr ? "لا توجد بيانات أعضاء بعد" : "No members yet"}
+        </p>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-4">
-      {/* شريط الإحصائيات */}
-      <div className="flex flex-wrap items-center gap-2 p-4 bg-gradient-primary text-primary-foreground rounded-xl shadow-soft">
-        <div className="flex items-center gap-2 me-3">
-          <Users className="h-5 w-5" />
-          <span className="font-bold">
-            {isAr ? "إجمالي الأعضاء" : "Total"}: {members.length}
-          </span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {stats.map(([k, n]) => (
-            <Badge key={k} variant="secondary" className="bg-white/15 text-primary-foreground border-white/20">
-              {typeLabel(k)}: {n}
-            </Badge>
-          ))}
-        </div>
+      {/* بطاقات إحصائية مرئية */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+        <Card className="p-3 flex items-center gap-3 bg-gradient-primary text-primary-foreground border-0">
+          <Users className="h-5 w-5 shrink-0" />
+          <div>
+            <div className="text-xs opacity-90">{isAr ? "إجمالي الأعضاء" : "Total"}</div>
+            <div className="text-xl font-extrabold leading-tight">{members.length}</div>
+          </div>
+        </Card>
+        {stats.map(([k, n]) => (
+          <Card key={k} className="p-3">
+            <div className="text-xs text-muted-foreground mb-1">{typeLabel(k)}</div>
+            <div className="flex items-center justify-between">
+              <MembershipBadge typeKey={k} label={typeLabel(k)} />
+              <span className="text-lg font-bold tabular-nums">{n}</span>
+            </div>
+          </Card>
+        ))}
       </div>
 
       {/* أدوات */}
@@ -115,6 +140,7 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute start-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
+            aria-label={isAr ? "بحث بالاسم" : "Search by name"}
             placeholder={isAr ? "بحث بالاسم…" : "Search by name…"}
             className="ps-8"
             value={query}
@@ -131,7 +157,7 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
             setPage(1);
           }}
         >
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="w-40" aria-label={isAr ? "فلترة بالنوع" : "Filter by type"}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -144,7 +170,7 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
           </SelectContent>
         </Select>
         <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
-          <SelectTrigger className="w-40">
+          <SelectTrigger className="w-40" aria-label={isAr ? "ترتيب" : "Sort"}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -161,18 +187,10 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
         {showExport && (
           <>
             <div className="flex-1" />
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => exportToExcel(filtered, types, isAr)}
-            >
+            <Button size="sm" variant="outline" onClick={() => exportToExcel(filtered, types, isAr)}>
               <Download className="w-4 h-4 me-1" /> Excel
             </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => exportToCSV(filtered, types, isAr)}
-            >
+            <Button size="sm" variant="outline" onClick={() => exportToCSV(filtered, types, isAr)}>
               <Download className="w-4 h-4 me-1" /> CSV
             </Button>
             <Button
@@ -186,75 +204,73 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
         )}
       </div>
 
-      {/* جدول للأجهزة الكبيرة */}
-      <Card className="hidden md:block overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-12">#</TableHead>
-              <TableHead>{isAr ? "الاسم" : "Name"}</TableHead>
-              <TableHead>{isAr ? "نوع العضوية" : "Membership"}</TableHead>
-              <TableHead>{isAr ? "تاريخ الالتحاق" : "Join date"}</TableHead>
-              {showPhone && <TableHead>{isAr ? "الهاتف" : "Phone"}</TableHead>}
-              {showEmail && <TableHead>{isAr ? "البريد" : "Email"}</TableHead>}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {pageRows.length === 0 ? (
+      {/* جدول للديسكتوب/التابلت */}
+      <Card className="hidden sm:block overflow-hidden">
+        <div className="max-h-[640px] overflow-auto">
+          <Table>
+            <TableHeader className="sticky top-0 bg-card z-10 shadow-sm">
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                  {isAr ? "لا نتائج مطابقة" : "No matching results"}
-                </TableCell>
+                <TableHead className="w-12">#</TableHead>
+                <TableHead>{isAr ? "الاسم" : "Name"}</TableHead>
+                <TableHead>{isAr ? "نوع العضوية" : "Membership"}</TableHead>
+                <TableHead className="hidden md:table-cell">{isAr ? "تاريخ الالتحاق" : "Join date"}</TableHead>
+                {anyPhone && <TableHead className="hidden lg:table-cell">{isAr ? "الهاتف" : "Phone"}</TableHead>}
+                {anyEmail && <TableHead className="hidden lg:table-cell">{isAr ? "البريد" : "Email"}</TableHead>}
               </TableRow>
-            ) : (
-              pageRows.map((m, i) => (
-                <TableRow key={m.id}>
-                  <TableCell className="text-muted-foreground">
-                    {(safePage - 1) * pageSize + i + 1}
+            </TableHeader>
+            <TableBody>
+              {pageRows.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    {isAr ? "لا نتائج مطابقة" : "No matching results"}
                   </TableCell>
-                  <TableCell className="font-medium">
-                    {isAr ? m.name_ar || m.name_en : m.name_en || m.name_ar}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">{typeLabel(m.membership_type)}</Badge>
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {m.join_date || "—"}
-                  </TableCell>
-                  {showPhone && (
-                    <TableCell className="text-sm" dir="ltr">
-                      {m.phone ? (
-                        <a href={`tel:${m.phone}`} className="text-primary hover:underline">
-                          {m.phone}
-                        </a>
-                      ) : (
-                        "—"
-                      )}
-                    </TableCell>
-                  )}
-                  {showEmail && (
-                    <TableCell className="text-sm" dir="ltr">
-                      {m.email ? (
-                        <a
-                          href={`mailto:${m.email}`}
-                          className="text-primary hover:underline"
-                        >
-                          {m.email}
-                        </a>
-                      ) : (
-                        "—"
-                      )}
-                    </TableCell>
-                  )}
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                pageRows.map((m, i) => (
+                  <TableRow key={m.id}>
+                    <TableCell className="text-muted-foreground tabular-nums">
+                      {(safePage - 1) * pageSize + i + 1}
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {isAr ? m.name_ar || m.name_en : m.name_en || m.name_ar}
+                    </TableCell>
+                    <TableCell>
+                      <MembershipBadge
+                        typeKey={m.membership_type}
+                        label={typeLabel(m.membership_type)}
+                      />
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground hidden md:table-cell">
+                      {m.join_date || "—"}
+                    </TableCell>
+                    {anyPhone && (
+                      <TableCell className="text-sm hidden lg:table-cell" dir="ltr">
+                        {showPhoneFor(m) && m.phone ? (
+                          <ContactCell value={m.phone} href={`tel:${m.phone}`} />
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
+                    )}
+                    {anyEmail && (
+                      <TableCell className="text-sm hidden lg:table-cell" dir="ltr">
+                        {showEmailFor(m) && m.email ? (
+                          <ContactCell value={m.email} href={`mailto:${m.email}`} />
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </Card>
 
       {/* بطاقات للجوال */}
-      <div className="md:hidden space-y-2">
+      <div className="sm:hidden space-y-2">
         {pageRows.length === 0 ? (
           <Card className="p-6 text-center text-muted-foreground">
             {isAr ? "لا نتائج" : "No results"}
@@ -262,12 +278,15 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
         ) : (
           pageRows.map((m, i) => (
             <Card key={m.id} className="p-4">
-              <div className="flex justify-between items-start mb-2">
+              <div className="flex justify-between items-start mb-2 gap-2">
                 <div className="font-bold text-primary">
                   {(safePage - 1) * pageSize + i + 1}.{" "}
                   {isAr ? m.name_ar || m.name_en : m.name_en || m.name_ar}
                 </div>
-                <Badge variant="secondary">{typeLabel(m.membership_type)}</Badge>
+                <MembershipBadge
+                  typeKey={m.membership_type}
+                  label={typeLabel(m.membership_type)}
+                />
               </div>
               <div className="text-xs text-muted-foreground space-y-1">
                 {m.join_date && (
@@ -275,18 +294,14 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
                     {isAr ? "الالتحاق" : "Joined"}: {m.join_date}
                   </div>
                 )}
-                {showPhone && m.phone && (
+                {showPhoneFor(m) && m.phone && (
                   <div dir="ltr">
-                    <a href={`tel:${m.phone}`} className="text-primary">
-                      {m.phone}
-                    </a>
+                    <a href={`tel:${m.phone}`} className="text-primary">{m.phone}</a>
                   </div>
                 )}
-                {showEmail && m.email && (
+                {showEmailFor(m) && m.email && (
                   <div dir="ltr">
-                    <a href={`mailto:${m.email}`} className="text-primary">
-                      {m.email}
-                    </a>
+                    <a href={`mailto:${m.email}`} className="text-primary">{m.email}</a>
                   </div>
                 )}
               </div>
@@ -323,5 +338,34 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
         </div>
       )}
     </div>
+  );
+}
+
+// خلية تواصل بزر نسخ
+function ContactCell({ value, href }: { value: string; href: string }) {
+  const [copied, setCopied] = useState(false);
+  const copy = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      toast.success("تم النسخ");
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      toast.error("تعذّر النسخ");
+    }
+  };
+  return (
+    <span className="group inline-flex items-center gap-1.5">
+      <a href={href} className="text-primary hover:underline">{value}</a>
+      <button
+        type="button"
+        onClick={copy}
+        aria-label="نسخ"
+        className="opacity-0 group-hover:opacity-100 transition p-1 rounded hover:bg-muted"
+      >
+        {copied ? <Check className="w-3 h-3 text-primary" /> : <Copy className="w-3 h-3 text-muted-foreground" />}
+      </button>
+    </span>
   );
 }

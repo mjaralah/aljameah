@@ -16,6 +16,8 @@ export type AssemblyMember = {
   phone?: string;
   email?: string;
   status?: string; // active | inactive
+  /** هل وافق العضو على إظهار بيانات التواصل للزوار؟ */
+  contact_public?: boolean;
 };
 
 export type AssemblyData = {
@@ -49,6 +51,7 @@ export const TEMPLATE_HEADERS = [
   "phone",
   "email",
   "status",
+  "contact_public",
 ];
 
 export function downloadTemplate() {
@@ -61,6 +64,7 @@ export function downloadTemplate() {
       phone: "+9665XXXXXXXX",
       email: "example@email.com",
       status: "active",
+      contact_public: false,
     },
   ];
   const ws = XLSX.utils.json_to_sheet(rows, { header: TEMPLATE_HEADERS });
@@ -76,6 +80,7 @@ export function downloadTemplate() {
     ["phone", "رقم التواصل", "اختياري"],
     ["email", "البريد الإلكتروني", "اختياري"],
     ["status", "الحالة", "active / inactive"],
+    ["contact_public", "إظهار التواصل للزوار", "TRUE / FALSE — افتراضياً FALSE"],
   ]);
   XLSX.utils.book_append_sheet(wb, guide, "Guide");
   XLSX.writeFile(wb, "assembly_members_template.xlsx");
@@ -106,6 +111,7 @@ export async function parseImportFile(file: File): Promise<{
       const d = XLSX.SSF.parse_date_code(Number(join));
       if (d) join = `${d.y}-${String(d.m).padStart(2, "0")}-${String(d.d).padStart(2, "0")}`;
     }
+    const cp = String(r.contact_public ?? "").trim().toLowerCase();
     rows.push({
       id: crypto.randomUUID(),
       name_ar: nameAr,
@@ -115,6 +121,7 @@ export async function parseImportFile(file: File): Promise<{
       phone: String(r.phone ?? "").trim(),
       email: String(r.email ?? "").trim(),
       status: String(r.status ?? "active").trim() || "active",
+      contact_public: cp === "true" || cp === "1" || cp === "yes" || cp === "نعم",
     });
   });
   return { rows, errors };

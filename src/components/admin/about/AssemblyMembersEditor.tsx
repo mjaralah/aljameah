@@ -20,7 +20,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Trash2, Upload, Download, FileSpreadsheet, Pencil } from "lucide-react";
+import { Plus, Trash2, Upload, Download, FileSpreadsheet, Pencil, Eye, EyeOff } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import {
   AssemblyData,
@@ -97,13 +98,14 @@ export default function AssemblyMembersEditor({
       <TabsContent value="settings">
         <div className="space-y-3 p-3 rounded-md bg-muted/40">
           <SwitchRow
-            label="إظهار رقم الهاتف للزوار"
-            hint="افتراضياً مخفي لحماية الخصوصية"
+            label="إظهار رقم الهاتف للزوار (قاطع عام)"
+            hint="إذا أُطفئ — يختفي الهاتف للجميع. إذا فُعّل — يظهر فقط للأعضاء الذين فعّلوا خيار «إظهار التواصل»."
             checked={!!settings.show_phone_public}
             onChange={(v) => updateSettings({ show_phone_public: v })}
           />
           <SwitchRow
-            label="إظهار البريد الإلكتروني للزوار"
+            label="إظهار البريد الإلكتروني للزوار (قاطع عام)"
+            hint="نفس المنطق — يحترم تفضيل كل عضو."
             checked={!!settings.show_email_public}
             onChange={(v) => updateSettings({ show_email_public: v })}
           />
@@ -292,13 +294,14 @@ function MembersTab({
               <TableHead>الالتحاق</TableHead>
               <TableHead>الهاتف</TableHead>
               <TableHead>البريد</TableHead>
+              <TableHead className="w-28 text-center" title="إظهار بيانات التواصل للزوار">إظهار التواصل</TableHead>
               <TableHead className="w-24"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-muted-foreground py-6">
+                <TableCell colSpan={8} className="text-center text-muted-foreground py-6">
                   لا يوجد أعضاء
                 </TableCell>
               </TableRow>
@@ -313,6 +316,26 @@ function MembersTab({
                   <TableCell className="text-xs">{m.join_date || "—"}</TableCell>
                   <TableCell className="text-xs" dir="ltr">{m.phone || "—"}</TableCell>
                   <TableCell className="text-xs" dir="ltr">{m.email || "—"}</TableCell>
+                  <TableCell className="text-center">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        onChange(
+                          members.map((x) =>
+                            x.id === m.id ? { ...x, contact_public: !x.contact_public } : x,
+                          ),
+                        )
+                      }
+                      className="inline-flex items-center justify-center h-7 w-7 rounded-md hover:bg-muted transition"
+                      title={m.contact_public ? "ظاهر للزوار — اضغط للإخفاء" : "مخفي — اضغط للإظهار"}
+                    >
+                      {m.contact_public ? (
+                        <Eye className="w-4 h-4 text-primary" />
+                      ) : (
+                        <EyeOff className="w-4 h-4 text-muted-foreground" />
+                      )}
+                    </button>
+                  </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
                       <Button
@@ -339,6 +362,7 @@ function MembersTab({
           </TableBody>
         </Table>
       </div>
+
 
       {/* تحرير عضو */}
       {editing && (
@@ -433,6 +457,18 @@ function MemberForm({
           </Select>
         </Field>
       </div>
+      <label className="flex items-center gap-2 text-sm cursor-pointer select-none">
+        <Checkbox
+          checked={!!m.contact_public}
+          onCheckedChange={(v) => set({ contact_public: !!v })}
+        />
+        <span>
+          العضو موافق على إظهار رقم التواصل والبريد للزوار
+          <span className="text-xs text-muted-foreground block">
+            عند الإلغاء — تبقى البيانات محفوظة لكن مخفية في الموقع العام
+          </span>
+        </span>
+      </label>
       <div className="flex gap-2 justify-end">
         <Button size="sm" variant="outline" onClick={onCancel}>
           إلغاء
