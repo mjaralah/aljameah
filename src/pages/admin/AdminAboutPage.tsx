@@ -13,6 +13,8 @@ import { IconPicker } from "@/components/admin/IconPicker";
 import { MediaUpload } from "@/components/admin/MediaUpload";
 import { SortableList, SortableItem, persistSortOrder } from "@/components/admin/SortableList";
 import CustomSectionsManager from "@/components/admin/about/CustomSectionsManager";
+import AssemblyMembersEditor, { defaultAssemblyData } from "@/components/admin/about/AssemblyMembersEditor";
+import type { AssemblyData } from "@/lib/assemblyExport";
 
 type AnyData = Record<string, unknown> | null;
 
