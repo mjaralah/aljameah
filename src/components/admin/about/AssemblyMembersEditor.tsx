@@ -456,6 +456,18 @@ function MemberForm({
           </Select>
         </Field>
       </div>
+      <label className="flex items-center gap-2 text-sm cursor-pointer select-none">
+        <Checkbox
+          checked={!!m.contact_public}
+          onCheckedChange={(v) => set({ contact_public: !!v })}
+        />
+        <span>
+          العضو موافق على إظهار رقم التواصل والبريد للزوار
+          <span className="text-xs text-muted-foreground block">
+            عند الإلغاء — تبقى البيانات محفوظة لكن مخفية في الموقع العام
+          </span>
+        </span>
+      </label>
       <div className="flex gap-2 justify-end">
         <Button size="sm" variant="outline" onClick={onCancel}>
           إلغاء
