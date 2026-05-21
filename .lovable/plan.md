@@ -1,72 +1,96 @@
-# تطوير صفحة "من نحن" — أقسام ديناميكية قابلة للإضافة
+# قسم "أعضاء الجمعية العمومية" في صفحة من نحن
 
-## الهدف
-السماح بإضافة أقسام جديدة من اللوحة لصفحة "من نحن" بالإضافة للأقسام الثابتة الحالية، مع دعم العربي/الإنجليزي.
+## نظرة عامة
+إضافة نوع قسم جديد `assembly_members` ضمن الأقسام المخصّصة لصفحة "من نحن"، يعرض حتى 40+ عضو في جدول مع بحث وفلترة وفرز وتصفّح.
 
-## الأنواع السبعة المعتمدة (أولوية)
-1. **Timeline** — الخط الزمني (سنة + عنوان + وصف لكل حدث)
-2. **Impact Numbers** — أرقام الأثر (رقم + تسمية + أيقونة)
-3. **Testimonials** — شهادات المستفيدين (اسم + صورة + صفة + نص)
-4. **Accreditations & Awards** — الاعتمادات والجوائز (شعار + اسم + سنة)
-5. **FAQ** — أسئلة شائعة (سؤال + جواب)
-6. **Gallery** — معرض صور (شبكة صور مع تعليق اختياري)
-7. **CTA** — دعوة لإجراء (عنوان + نص + زر + رابط)
+## القرارات (بناءً على إجابات المستخدم)
+1. **أنواع العضوية**: تُدار ديناميكياً من اللوحة. القائمة الافتراضية: عامل، فخري، داعم، منتسب.
+2. **رقم التواصل/البريد**: مخفي افتراضياً، مع تحكّم الأدمن في إظهار/إخفاء كل من الهاتف والبريد للعموم.
+3. **التصدير (PDF / Excel)**: متاح للزوار والإدارة، مع تحكّم الأدمن بإظهار/إخفاء الميزة للزوار.
+4. **الاستيراد المجمّع**: رفع ملف Excel/CSV من قالب جاهز (Bulk Import).
 
-كل قسم له **عنوان رئيسي + وصف فرعي + محتوى** بنسختين عربي/إنجليزي.
+## قاعدة البيانات
+لا حاجة لجداول جديدة. الاستفادة من `about_content` (jsonb في `data`).
 
-## ما سيتغيّر للمستخدم
+شكل الـ data للقسم:
+```json
+{
+  "type": "assembly_members",
+  "title_ar": "أعضاء الجمعية العمومية",
+  "title_en": "General Assembly Members",
+  "subtitle_ar": "...",
+  "subtitle_en": "...",
+  "settings": {
+    "show_phone_public": false,
+    "show_email_public": false,
+    "show_export_public": true,
+    "page_size": 15
+  },
+  "membership_types": [
+    { "key": "working",   "label_ar": "عامل",  "label_en": "Working" },
+    { "key": "honorary",  "label_ar": "فخري",  "label_en": "Honorary" },
+    { "key": "supporter", "label_ar": "داعم",  "label_en": "Supporter" },
+    { "key": "affiliate", "label_ar": "منتسب", "label_en": "Affiliate" }
+  ],
+  "members": [
+    {
+      "id": "uuid",
+      "name_ar": "...",
+      "name_en": "...",
+      "membership_type": "working",
+      "join_date": "2022-05-01",
+      "phone": "+9665...",
+      "email": "...",
+      "status": "active"
+    }
+  ]
+}
+```
 
-### في لوحة التحكم > "من نحن"
-- تبقى الأقسام التسعة الحالية كما هي (نشأة، رؤية، رسالة…).
-- يُضاف زر **"إضافة قسم جديد"** يفتح نافذة فيها:
-  - اختيار نوع القسم من قائمة (الأنواع السبعة أعلاه).
-  - إدخال العنوان الرئيسي (AR/EN) + الوصف الفرعي (AR/EN).
-  - محرّر مخصّص لكل نوع (مثلاً Timeline يعرض قائمة أحداث قابلة للإضافة/الترتيب).
-- قائمة بالأقسام المخصّصة المُضافة مع: تعديل / حذف / نشر / سحب لإعادة الترتيب.
-- اختيار موضع القسم: قبل / بعد قسم محدد من الأقسام الثابتة (عبر `sort_order`).
+## واجهة الإدارة (CustomSectionsManager)
+- إضافة نوع `assembly_members` في قائمة الأنواع.
+- محرّر مخصّص يحوي:
+  - **تبويب "الإعدادات"**: العنوان/الوصف (AR/EN)، مفاتيح تحكّم (إظهار الهاتف/البريد للعموم، إظهار التصدير للزوار)، عدد العناصر في الصفحة.
+  - **تبويب "أنواع العضوية"**: CRUD لقائمة الأنواع.
+  - **تبويب "الأعضاء"**:
+    - جدول داخلي مع بحث وفلترة وفرز وحذف/تعديل.
+    - زر "إضافة عضو" (Dialog).
+    - زر "استيراد Excel" + رابط "تنزيل القالب" (يولّد ملف .xlsx جاهز بالأعمدة).
+    - زر "تصدير CSV/Excel".
 
-### في صفحة "من نحن" العامة
-- الأقسام الثابتة تظهر كما هي.
-- الأقسام المخصّصة تُعرض بترتيبها مع تصميم احترافي لكل نوع.
-- اللغة الحالية تحدد عرض النصوص (AR/EN).
+## واجهة العامة (CustomAboutSection)
+- يضاف `AssemblyMembersView` للأنواع المعروضة.
+- شريط ملخّص: عدد الأعضاء الكلي + توزيع حسب النوع.
+- صف أدوات: بحث (debounced)، فلترة بالنوع، فرز (الاسم/التاريخ)، أزرار تصدير (إن كانت مفعّلة).
+- جدول responsive يتحول إلى بطاقات مكدّسة على الجوال.
+- الهاتف/البريد يظهران فقط إذا فعّل الأدمن خياره (للعموم).
+- Pagination حسب page_size.
 
-## التفاصيل التقنية
+## التصدير
+- **CSV**: توليد client-side من البيانات الحالية بعد الفلترة.
+- **Excel (.xlsx)**: عبر مكتبة `xlsx` (SheetJS) — تضاف.
+- **PDF**: عبر `jspdf` + `jspdf-autotable` — تضاف (مع دعم RTL أساسي).
 
-### قاعدة البيانات
-نستفيد من جدول `about_content` الموجود (فيه `section_key`, `title`, `content`, `data jsonb`, `sort_order`, `published`).
+## الاستيراد
+- قراءة ملف Excel/CSV عبر `xlsx`.
+- التحقق من الأعمدة: `name_ar, name_en, membership_type, join_date, phone, email, status`.
+- معاينة الصفوف + عرض الأخطاء قبل الإضافة.
+- دمج مع القائمة الحالية (لا استبدال).
 
-- نستخدم `section_key` بصيغة: `custom:{type}:{uuid}` لتمييز الأقسام المخصّصة عن الثابتة.
-- نضع المحتوى في `data jsonb` بهذا الشكل:
-  ```
-  {
-    "type": "timeline" | "impact" | "testimonials" | "accreditations" | "faq" | "gallery" | "cta",
-    "title_ar": "...", "title_en": "...",
-    "subtitle_ar": "...", "subtitle_en": "...",
-    "items": [ ... ]  // الحقول تختلف حسب النوع
-  }
-  ```
-- لا حاجة لـ migration جديد — البنية الحالية كافية.
+## الملفات
 
-### Frontend
+### جديدة
+- `src/components/admin/about/AssemblyMembersEditor.tsx` — المحرّر الكامل (إعدادات/أنواع/أعضاء/استيراد/تصدير).
+- `src/components/about/sections/AssemblyMembersView.tsx` — العرض العام.
+- `src/lib/assemblyExport.ts` — دوال تصدير CSV/Excel/PDF + قالب الاستيراد.
 
-**`src/pages/admin/AdminAboutPage.tsx`**
-- إضافة قسم "أقسام مخصّصة" مع زر "إضافة قسم".
-- نافذة (Dialog) لاختيار النوع → ثم محرّر متخصّص لكل نوع.
-- قائمة بالأقسام المُضافة مع SortableList لإعادة الترتيب.
+### معدّلة
+- `src/components/admin/about/CustomSectionsManager.tsx` — إضافة النوع الجديد لقائمة الأنواع وربط المحرّر.
+- `src/components/about/CustomAboutSection.tsx` — إضافة فرع `assembly_members` وعرض `AssemblyMembersView`.
+- `package.json` — إضافة `xlsx`, `jspdf`, `jspdf-autotable`.
 
-**`src/components/admin/about/` (مجلد جديد)**
-- `CustomSectionDialog.tsx` — حاوية النافذة + اختيار النوع.
-- `editors/TimelineEditor.tsx`, `ImpactEditor.tsx`, `TestimonialsEditor.tsx`, `AccreditationsEditor.tsx`, `FaqEditor.tsx`, `GalleryEditor.tsx`, `CtaEditor.tsx`.
-  - كل محرّر يأخذ `value` و`onChange` ويتعامل مع `items[]` (إضافة/حذف/ترتيب/رفع صور عبر `MediaUpload`).
-
-**`src/pages/About.tsx`**
-- قراءة الأقسام المخصّصة من `about_content` (`section_key LIKE 'custom:%'`).
-- دمجها مع الأقسام الثابتة بالترتيب حسب `sort_order`.
-- لكل نوع رندرر مخصّص في `src/components/about/sections/`:
-  - `TimelineSection.tsx`, `ImpactSection.tsx`, `TestimonialsSection.tsx`, `AccreditationsSection.tsx`, `FaqSection.tsx`, `GallerySection.tsx`, `CtaSection.tsx`.
-- اختيار النصوص حسب `language` (AR/EN) مع fallback للعربي.
-
-### بدون تغييرات
-- لا تغيير على الأقسام الثابتة التسعة الحالية ولا على هيكلها.
-- لا تغيير على `governance_categories` أو أي جدول آخر.
-- لا تغيير على المصادقة/الأدوار.
+## ملاحظات أمنية/UX
+- جميع البيانات تُخزّن في jsonb داخل صف واحد في `about_content` → مناسب لـ ≤ ~200 عضو دون مشاكل أداء.
+- الهاتف/البريد مخفيان افتراضياً لحماية الخصوصية.
+- الفرز/البحث/الفلترة كلها client-side (مناسب للحجم).
+- لا تغيير على RLS أو المصادقة.
