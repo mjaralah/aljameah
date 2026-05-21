@@ -39,6 +39,10 @@ import {
   SortableItem,
   persistSortOrder,
 } from "@/components/admin/SortableList";
+import AssemblyMembersEditor, {
+  defaultAssemblyData,
+} from "@/components/admin/about/AssemblyMembersEditor";
+import type { AssemblyData } from "@/lib/assemblyExport";
 
 export type CustomSectionType =
   | "timeline"
@@ -47,7 +51,8 @@ export type CustomSectionType =
   | "accreditations"
   | "faq"
   | "gallery"
-  | "cta";
+  | "cta"
+  | "assembly_members";
 
 const TYPE_META: Record<CustomSectionType, { label: string; desc: string }> = {
   timeline: { label: "الخط الزمني", desc: "محطّات ورحلة الجمعية بالسنوات" },
@@ -57,6 +62,10 @@ const TYPE_META: Record<CustomSectionType, { label: string; desc: string }> = {
   faq: { label: "الأسئلة الشائعة", desc: "سؤال وجواب قابل للطي" },
   gallery: { label: "معرض الصور", desc: "شبكة صور مع تعليقات" },
   cta: { label: "دعوة لإجراء (CTA)", desc: "عنوان + نص + زر" },
+  assembly_members: {
+    label: "أعضاء الجمعية العمومية",
+    desc: "قائمة الأعضاء مع بحث وفلترة وتصدير واستيراد جماعي (Excel)",
+  },
 };
 
 type CustomData = {
