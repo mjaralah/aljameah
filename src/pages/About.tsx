@@ -32,6 +32,8 @@ import { useBoardMembers, useBoardSettings, useAboutContent, type DBAboutSection
 import { useLanguage } from "@/contexts/LanguageContext";
 import ceoPortrait from "@/assets/ceo-portrait.jpg";
 import { CustomAboutSection } from "@/components/about/CustomAboutSection";
+import { AssemblyMembersView } from "@/components/about/sections/AssemblyMembersView";
+import { defaultAssemblyData } from "@/components/admin/about/AssemblyMembersEditor";
 
 type Section = {
   id: string;
@@ -103,6 +105,8 @@ const About = () => {
   const dbValues = getData<{ values: { icon: string; title: string; desc: string }[] }>("mission", { values: [] }).values;
   const valuesIconMap: Record<string, React.ComponentType<{ className?: string }>> = { Heart, ShieldCheck, Handshake, Lightbulb };
   const dbAssemblyCards = getData<{ cards: { title: string; body: string }[] }>("assembly", { cards: [] }).cards;
+  const assemblyViewMode = getData<{ view_mode?: string }>("assembly", {}).view_mode === "members" ? "members" : "cards";
+  const assemblyMembersData = getData<{ assembly?: any }>("assembly", {}).assembly;
   const dbFoundingStats = getData<{ stats: { value: string; label: string }[] }>("founding", { stats: [] }).stats;
   const ceoData = getData<{ name: string; title: string; photo_url: string | null }>("ceo", { name: "أ. فيصل عبدالعزيز", title: "المدير التنفيذي", photo_url: null });
   const structureData = getData<{ display_mode?: string; image_url?: string; nodes: { title: string; subtitle: string }[]; departments: { title: string; desc: string }[] }>("structure", {
@@ -321,15 +325,21 @@ const About = () => {
             {/* الجمعية العمومية */}
             <SectionBlock id="assembly" icon={Users} title={getTitle("assembly", "الجمعية العمومية")}>
               <p>{get("assembly", "الجمعية العمومية هي السلطة العليا في الجمعية، وتتألف من جميع الأعضاء المؤسسين والعاملين الذين أوفوا بالتزاماتهم وفق النظام الأساسي.")}</p>
-              <div className="grid md:grid-cols-3 gap-4 mt-6">
-                {(dbAssemblyCards.length > 0 ? dbAssemblyCards : [
-                  { title: "الاختصاصات", body: "إقرار الخطط والسياسات، اعتماد التقارير المالية والإدارية، انتخاب مجلس الإدارة." },
-                  { title: "الاجتماعات", body: "اجتماع عادي سنوي، واجتماعات غير عادية عند الحاجة وفق نظام الجمعيات." },
-                  { title: "الأعضاء", body: "عضويةٌ مفتوحة وفق الشروط النظامية، مع حقوق متساوية في التصويت." },
-                ]).map((c) => (
-                  <InfoCard key={c.title} title={c.title} body={c.body} />
-                ))}
-              </div>
+              {assemblyViewMode === "members" ? (
+                <div className="mt-6">
+                  <AssemblyMembersView data={{ ...defaultAssemblyData(), ...(assemblyMembersData || {}) }} />
+                </div>
+              ) : (
+                <div className="grid md:grid-cols-3 gap-4 mt-6">
+                  {(dbAssemblyCards.length > 0 ? dbAssemblyCards : [
+                    { title: "الاختصاصات", body: "إقرار الخطط والسياسات، اعتماد التقارير المالية والإدارية، انتخاب مجلس الإدارة." },
+                    { title: "الاجتماعات", body: "اجتماع عادي سنوي، واجتماعات غير عادية عند الحاجة وفق نظام الجمعيات." },
+                    { title: "الأعضاء", body: "عضويةٌ مفتوحة وفق الشروط النظامية، مع حقوق متساوية في التصويت." },
+                  ]).map((c) => (
+                    <InfoCard key={c.title} title={c.title} body={c.body} />
+                  ))}
+                </div>
+              )}
             </SectionBlock>
 
             {/* أعضاء مجلس الإدارة */}
