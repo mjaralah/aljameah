@@ -276,29 +276,60 @@ export default function AdminAboutPage() {
         );
       }
       case "assembly": {
+        const view = (data.view_mode as string) === "members" ? "members" : "cards";
         const cards = (Array.isArray(data.cards) ? data.cards : []) as { title?: string; body?: string }[];
+        const membersData: AssemblyData = (data.assembly && typeof data.assembly === "object")
+          ? (data.assembly as AssemblyData)
+          : defaultAssemblyData();
         return (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium">البطاقات</label>
-              <Button type="button" size="sm" variant="outline"
-                onClick={() => updateData(s.id, "cards", [...cards, { title: "", body: "" }])}>
-                <Plus className="w-3.5 h-3.5 ml-1" /> إضافة بطاقة
-              </Button>
+          <div className="space-y-4">
+            <div className="flex items-center gap-1 p-1 rounded-lg bg-muted w-fit">
+              {([
+                { v: "cards", label: "بطاقات تعريفية" },
+                { v: "members", label: "قائمة الأعضاء" },
+              ] as const).map((opt) => (
+                <button
+                  key={opt.v}
+                  type="button"
+                  onClick={() => updateData(s.id, "view_mode", opt.v)}
+                  className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
+                    view === opt.v ? "bg-background shadow-sm font-medium text-foreground" : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
             </div>
-            {cards.map((it, i) => (
-              <RowFrame key={i} index={i}
-                onRemove={() => updateData(s.id, "cards", cards.filter((_, j) => j !== i))}>
-                <Field label="العنوان">
-                  <Input value={it.title ?? ""}
-                    onChange={(e) => updateData(s.id, "cards", cards.map((x, j) => j === i ? { ...x, title: e.target.value } : x))} />
-                </Field>
-                <Field label="النص">
-                  <Textarea rows={3} value={it.body ?? ""}
-                    onChange={(e) => updateData(s.id, "cards", cards.map((x, j) => j === i ? { ...x, body: e.target.value } : x))} />
-                </Field>
-              </RowFrame>
-            ))}
+
+            {view === "members" ? (
+              <AssemblyMembersEditor
+                data={membersData}
+                onChange={(d) => updateData(s.id, "assembly", d as unknown as AnyData)}
+              />
+            ) : (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium">البطاقات</label>
+                  <Button type="button" size="sm" variant="outline"
+                    onClick={() => updateData(s.id, "cards", [...cards, { title: "", body: "" }])}>
+                    <Plus className="w-3.5 h-3.5 ml-1" /> إضافة بطاقة
+                  </Button>
+                </div>
+                {cards.map((it, i) => (
+                  <RowFrame key={i} index={i}
+                    onRemove={() => updateData(s.id, "cards", cards.filter((_, j) => j !== i))}>
+                    <Field label="العنوان">
+                      <Input value={it.title ?? ""}
+                        onChange={(e) => updateData(s.id, "cards", cards.map((x, j) => j === i ? { ...x, title: e.target.value } : x))} />
+                    </Field>
+                    <Field label="النص">
+                      <Textarea rows={3} value={it.body ?? ""}
+                        onChange={(e) => updateData(s.id, "cards", cards.map((x, j) => j === i ? { ...x, body: e.target.value } : x))} />
+                    </Field>
+                  </RowFrame>
+                ))}
+              </div>
+            )}
           </div>
         );
       }
