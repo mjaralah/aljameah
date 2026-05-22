@@ -355,10 +355,13 @@ const About = () => {
             </SectionBlock>
 
             {/* أعضاء مجلس الإدارة */}
-            <SectionBlock id="board" icon={UserSquare2} title="أعضاء مجلس الإدارة">
+            <SectionBlock id="board" icon={UserSquare2} title={getTitle("board", "أعضاء مجلس الإدارة")}>
               <p>
-                {dbBoardSettings?.intro_text ||
-                  "نخبةٌ من الكفاءات المتطوّعة لخدمة رسالة الجمعية، يُمثّلون تنوعاً في الخبرات والتخصصات."}
+                {get(
+                  "board",
+                  dbBoardSettings?.intro_text ||
+                    "نخبةٌ من الكفاءات المتطوّعة لخدمة رسالة الجمعية، يُمثّلون تنوعاً في الخبرات والتخصصات.",
+                )}
               </p>
 
               <div className="grid lg:grid-cols-4 gap-5 mt-6">

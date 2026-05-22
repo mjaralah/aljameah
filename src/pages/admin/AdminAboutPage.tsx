@@ -36,6 +36,7 @@ const KEY_LABELS: Record<string, string> = {
   operational: "الأهداف التشغيلية",
   ceo: "المدير التنفيذي",
   assembly: "الجمعية العمومية",
+  board: "أعضاء مجلس الإدارة",
   structure: "الهيكل التنظيمي",
   registration: "شهادة التسجيل",
 };
