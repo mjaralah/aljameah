@@ -235,7 +235,7 @@ const About = () => {
           {/* المحتوى */}
           <div className="flex flex-col gap-10 md:gap-14 min-w-0">
             {/* النشأة والتأسيس */}
-            <SectionBlock id="founding" icon={Sparkles} title={getTitle("founding", "النشأة والتأسيس")}>
+            <SectionBlock id="founding" icon={Sparkles} title={getTitle("founding", "النشأة والتأسيس")} order={orderOf("founding", 10)}>
               {(get("founding", "").split("\n\n").filter(Boolean).length
                 ? get("founding", "").split("\n\n").filter(Boolean)
                 : [
@@ -257,7 +257,7 @@ const About = () => {
             </SectionBlock>
 
             {/* الرؤية */}
-            <SectionBlock id="vision" icon={Eye} title={getTitle("vision", "الرؤية")} accent="gold">
+            <SectionBlock id="vision" icon={Eye} title={getTitle("vision", "الرؤية")} accent="gold" order={orderOf("vision", 20)}>
               <div className="bg-gradient-to-br from-accent-soft to-card border-r-4 border-accent rounded-2xl p-6 md:p-8">
                 <p className="text-lg md:text-xl font-semibold leading-loose text-primary">
                   "{get("vision", "أن نكون جمعيةً رائدةً في العمل الخيري المؤسسي، نُلهم العطاء ونصنع أثراً مستداماً في حياة الإنسان والمجتمع.")}"
@@ -266,7 +266,7 @@ const About = () => {
             </SectionBlock>
 
             {/* الرسالة */}
-            <SectionBlock id="mission" icon={Target} title={getTitle("mission", "الرسالة")}>
+            <SectionBlock id="mission" icon={Target} title={getTitle("mission", "الرسالة")} order={orderOf("mission", 30)}>
               <div className="bg-gradient-to-br from-secondary to-card border-r-4 border-primary rounded-2xl p-6 md:p-8">
                 <p className="text-base md:text-lg leading-loose">
                   {get("mission", "تقديم برامج وخدمات نوعية للفئات المحتاجة في مجالات التعليم والصحة والإغاثة والتنمية، عبر فريقٍ مؤهَّل وشراكاتٍ فاعلة، وبأعلى معايير الجودة والحوكمة.")}
@@ -297,7 +297,7 @@ const About = () => {
             </SectionBlock>
 
             {/* الأهداف الاستراتيجية */}
-            <SectionBlock id="strategic" icon={Crosshair} title={getTitle("strategic", "الأهداف الاستراتيجية")}>
+            <SectionBlock id="strategic" icon={Crosshair} title={getTitle("strategic", "الأهداف الاستراتيجية")} order={orderOf("strategic", 40)}>
               <p>{get("strategic", "أهدافٌ بعيدة المدى تُشكّل بوصلة عمل الجمعية للسنوات القادمة:")}</p>
               <div className="grid sm:grid-cols-2 gap-4 mt-4">
                 {dbStrategicGoals.map((g, i) => (
@@ -316,7 +316,7 @@ const About = () => {
             </SectionBlock>
 
             {/* الأهداف التشغيلية */}
-            <SectionBlock id="operational" icon={ListChecks} title={getTitle("operational", "الأهداف التشغيلية")}>
+            <SectionBlock id="operational" icon={ListChecks} title={getTitle("operational", "الأهداف التشغيلية")} order={orderOf("operational", 50)}>
               <p>{get("operational", "مؤشرات أداء سنوية قابلة للقياس، نَعمل عليها بشكلٍ مباشر:")}</p>
               <ul className="grid sm:grid-cols-2 gap-3 mt-4">
                 {dbOperationalGoals.map((g, i) => (
@@ -334,7 +334,7 @@ const About = () => {
             </SectionBlock>
 
             {/* الجمعية العمومية */}
-            <SectionBlock id="assembly" icon={Users} title={getTitle("assembly", "الجمعية العمومية")}>
+            <SectionBlock id="assembly" icon={Users} title={getTitle("assembly", "الجمعية العمومية")} order={orderOf("assembly", 80)}>
               <p>{get("assembly", "الجمعية العمومية هي السلطة العليا في الجمعية، وتتألف من جميع الأعضاء المؤسسين والعاملين الذين أوفوا بالتزاماتهم وفق النظام الأساسي.")}</p>
               {assemblyViewMode !== "members" && (
                 <div className="grid md:grid-cols-3 gap-4 mt-6">
@@ -364,7 +364,7 @@ const About = () => {
             </SectionBlock>
 
             {/* أعضاء مجلس الإدارة */}
-            <SectionBlock id="board" icon={UserSquare2} title={getTitle("board", "أعضاء مجلس الإدارة")}>
+            <SectionBlock id="board" icon={UserSquare2} title={getTitle("board", "أعضاء مجلس الإدارة")} order={orderOf("board", 85)}>
               <p>
                 {get(
                   "board",
@@ -471,7 +471,7 @@ const About = () => {
             </SectionBlock>
 
             {/* المدير التنفيذي */}
-            <SectionBlock id="ceo" icon={UserCog} title={getTitle("ceo", "المدير التنفيذي")}>
+            <SectionBlock id="ceo" icon={UserCog} title={getTitle("ceo", "المدير التنفيذي")} order={orderOf("ceo", 60)}>
               <div className="bg-gradient-to-br from-secondary to-card border border-border rounded-2xl p-6 md:p-8">
                 <div className="flex flex-col md:flex-row gap-6 items-start">
                   <div className="h-24 w-24 md:h-28 md:w-28 shrink-0 rounded-2xl overflow-hidden ring-2 ring-accent/40 shadow-card">
@@ -498,7 +498,7 @@ const About = () => {
             </SectionBlock>
 
             {/* الهيكل التنظيمي */}
-            <SectionBlock id="structure" icon={Network} title={getTitle("structure", "الهيكل التنظيمي")}>
+            <SectionBlock id="structure" icon={Network} title={getTitle("structure", "الهيكل التنظيمي")} order={orderOf("structure", 70)}>
               {structureData.display_mode === "image" && structureData.image_url ? (
                 <div className="mt-2 rounded-2xl border border-border bg-card p-3 sm:p-4">
                   <img
@@ -540,7 +540,7 @@ const About = () => {
             </SectionBlock>
 
             {/* شهادة التسجيل */}
-            <SectionBlock id="registration" icon={BadgeCheck} title={getTitle("registration", "شهادة التسجيل")}>
+            <SectionBlock id="registration" icon={BadgeCheck} title={getTitle("registration", "شهادة التسجيل")} order={orderOf("registration", 90)}>
               <div className="relative overflow-hidden bg-gradient-to-br from-card to-accent-soft border-2 border-accent/40 rounded-2xl p-6 md:p-8">
                 <div className="absolute top-4 left-4 opacity-10">
                   <Award className="h-32 w-32 text-accent" />
