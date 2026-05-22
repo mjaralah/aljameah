@@ -173,6 +173,15 @@ const About = () => {
     return () => observer.disconnect();
   }, []);
 
+  // ترتيب الأقسام من قاعدة البيانات (sort_order)
+  const orderMap: Record<string, number> = {};
+  (dbAbout ?? []).forEach((s) => { orderMap[s.section_key] = s.sort_order; });
+  const orderOf = (key: string, fallback: number) => orderMap[key] ?? fallback;
+  const orderedNav = [...sections]
+    .map((s, i) => ({ ...s, _order: orderOf(s.id, (i + 1) * 10) }))
+    .sort((a, b) => a._order - b._order);
+
+
   const handleNav = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
@@ -197,7 +206,7 @@ const About = () => {
               </div>
               <nav className="p-2">
                 <ul className="space-y-1">
-                  {sections.map((s) => {
+                  {orderedNav.map((s) => {
                     const Icon = s.icon;
                     const isActive = active === s.id;
                     return (
@@ -224,7 +233,7 @@ const About = () => {
           </aside>
 
           {/* المحتوى */}
-          <div className="space-y-10 md:space-y-14 min-w-0">
+          <div className="flex flex-col gap-10 md:gap-14 min-w-0">
             {/* النشأة والتأسيس */}
             <SectionBlock id="founding" icon={Sparkles} title={getTitle("founding", "النشأة والتأسيس")}>
               {(get("founding", "").split("\n\n").filter(Boolean).length
