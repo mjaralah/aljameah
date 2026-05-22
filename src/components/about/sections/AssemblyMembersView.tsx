@@ -125,12 +125,9 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
           </div>
         </Card>
         {stats.map(([k, n]) => (
-          <Card key={k} className="p-3">
-            <div className="text-xs text-muted-foreground mb-1">{typeLabel(k)}</div>
-            <div className="flex items-center justify-between">
-              <MembershipBadge typeKey={k} label={typeLabel(k)} />
-              <span className="text-lg font-bold tabular-nums">{n}</span>
-            </div>
+          <Card key={k} className="p-3 flex items-center justify-between gap-2">
+            <MembershipBadge typeKey={k} label={typeLabel(k)} />
+            <span className="text-lg font-bold tabular-nums">{n}</span>
           </Card>
         ))}
       </div>
