@@ -591,7 +591,9 @@ const About = () => {
               .filter((s) => s.section_key.startsWith("custom:"))
               .sort((a, b) => a.sort_order - b.sort_order)
               .map((s) => (
-                <CustomAboutSection key={s.id} id={s.section_key} data={s.data as any} />
+                <div key={s.id} style={{ order: s.sort_order }}>
+                  <CustomAboutSection id={s.section_key} data={s.data as any} />
+                </div>
               ))}
 
           </div>
