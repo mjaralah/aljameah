@@ -611,14 +611,16 @@ const SectionBlock = ({
   title,
   children,
   accent = "primary",
+  order,
 }: {
   id: string;
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   children: React.ReactNode;
   accent?: "primary" | "gold";
+  order?: number;
 }) => (
-  <article id={id} className="scroll-mt-24">
+  <article id={id} className="scroll-mt-24" style={order !== undefined ? { order } : undefined}>
     <header className="flex items-center gap-3 mb-5">
       <div
         className={`h-11 w-11 rounded-xl grid place-items-center shadow-soft ${
