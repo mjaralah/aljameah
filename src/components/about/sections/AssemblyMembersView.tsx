@@ -19,14 +19,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  Download, FileText, Search, Users, ChevronRight, ChevronLeft, Copy, Check, UserX,
+  FileText, Search, Users, ChevronRight, ChevronLeft, Copy, Check, UserX,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { MembershipBadge } from "./MembershipBadge";
 import {
   AssemblyData,
-  exportToCSV,
-  exportToExcel,
   exportToPDF,
 } from "@/lib/assemblyExport";
 import { toast } from "sonner";
@@ -41,7 +39,6 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
 
   const [query, setQuery] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
-  const [sortBy, setSortBy] = useState<"name" | "date_asc" | "date_desc">("name");
   const [page, setPage] = useState(1);
 
   const typeLabel = (k?: string) => {
@@ -79,21 +76,13 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
         (m.name_en ?? "").toLowerCase().includes(q)
       );
     });
-    if (sortBy === "name") {
-      arr = [...arr].sort((a, b) =>
-        (isAr ? a.name_ar || a.name_en || "" : a.name_en || a.name_ar || "").localeCompare(
-          isAr ? b.name_ar || b.name_en || "" : b.name_en || b.name_ar || "",
-        ),
-      );
-    } else {
-      arr = [...arr].sort((a, b) => {
-        const da = a.join_date || "";
-        const db = b.join_date || "";
-        return sortBy === "date_asc" ? da.localeCompare(db) : db.localeCompare(da);
-      });
-    }
+    arr = [...arr].sort((a, b) =>
+      (isAr ? a.name_ar || a.name_en || "" : a.name_en || a.name_ar || "").localeCompare(
+        isAr ? b.name_ar || b.name_en || "" : b.name_en || b.name_ar || "",
+      ),
+    );
     return arr;
-  }, [members, query, filterType, sortBy, isAr]);
+  }, [members, query, filterType, isAr]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const safePage = Math.min(page, totalPages);
@@ -166,30 +155,10 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
             ))}
           </SelectContent>
         </Select>
-        <Select value={sortBy} onValueChange={(v) => setSortBy(v as any)}>
-          <SelectTrigger className="w-40" aria-label={isAr ? "ترتيب" : "Sort"}>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="name">{isAr ? "ترتيب: الاسم" : "Sort: Name"}</SelectItem>
-            <SelectItem value="date_desc">
-              {isAr ? "الأحدث التحاقاً" : "Newest joined"}
-            </SelectItem>
-            <SelectItem value="date_asc">
-              {isAr ? "الأقدم التحاقاً" : "Oldest joined"}
-            </SelectItem>
-          </SelectContent>
-        </Select>
 
         {showExport && (
           <>
             <div className="flex-1" />
-            <Button size="sm" variant="outline" onClick={() => exportToExcel(filtered, types, isAr)}>
-              <Download className="w-4 h-4 me-1" /> Excel
-            </Button>
-            <Button size="sm" variant="outline" onClick={() => exportToCSV(filtered, types, isAr)}>
-              <Download className="w-4 h-4 me-1" /> CSV
-            </Button>
             <Button
               size="sm"
               variant="outline"
