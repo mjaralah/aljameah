@@ -128,7 +128,7 @@ export default function AdminNewsPage() {
             <Button
               type="button"
               variant="secondary"
-              onClick={() => window.open(`/news/${slug}?preview=1`, "_blank")}
+              onClick={() => window.open(`/media/${slug}?preview=1`, "_blank")}
             >
               <Eye className="w-4 h-4 ml-1" />
               معاينة
