@@ -71,6 +71,7 @@ const PUBLIC_PAGES: { key: string; label: string }[] = [
   { key: "surveys", label: "الاستبيانات" },
   { key: "eservices", label: "الخدمات الإلكترونية" },
   { key: "contact", label: "تواصل معنا" },
+  { key: "sitemap", label: "خريطة الموقع" },
 ];
 
 function SaveStatusIndicator({ status, onRetry }: { status: SaveStatus; onRetry: () => void }) {

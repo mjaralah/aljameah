@@ -409,6 +409,23 @@ export function useLegalPage(slug: string) {
   });
 }
 
+export function useLegalPages() {
+  return useQuery({
+    queryKey: ["public", "legal_pages", "all"],
+    staleTime: STALE,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("legal_pages")
+        .select("id, slug, title")
+        .eq("published", true)
+        .order("sort_order", { ascending: true })
+        .order("slug", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as { id: string; slug: string; title: string }[];
+    },
+  });
+}
+
 // أقسام البلوكات المخصّصة لصفحة محدّدة (للصفحات النظامية مثل home)
 export function useCustomBlocks(pageKey: string) {
   return useQuery({

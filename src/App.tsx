@@ -10,6 +10,7 @@ import { Layout } from "@/components/layout/Layout";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import StubPage from "./pages/StubPage.tsx";
+import SitemapPage from "./pages/SitemapPage.tsx";
 import Programs from "./pages/Programs.tsx";
 import Governance from "./pages/Governance.tsx";
 import Media from "./pages/Media.tsx";
@@ -97,7 +98,7 @@ const PublicRoutes = () => (
       <Route path="/terms-of-use" element={<Stub titleKey="terms" pageKey="terms" />} />
       <Route path="/cookie-policy" element={<Stub titleKey="cookies" pageKey="cookies" />} />
       <Route path="/accessibility-statement" element={<Stub titleKey="accessibility" pageKey="accessibility" />} />
-      <Route path="/sitemap" element={<Stub titleKey="sitemap" pageKey="sitemap" />} />
+      <Route path="/sitemap" element={<PublicRouteGuard pageKey="sitemap"><SitemapPage /></PublicRouteGuard>} />
       <Route path="/p/:slug" element={<CustomPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
