@@ -280,6 +280,20 @@ export default function AdminFormsPage() {
         onChipChange={(v) => setView(v as any)}
       />
 
+      {!loading && visibleForms.length > 0 && (
+        <BulkActionsBar
+          count={visibleSelectedCount}
+          total={visibleForms.length}
+          allSelected={allVisibleSelected}
+          onToggleAll={toggleSelectAll}
+          onClear={clearSelection}
+          onPublish={() => bulkSetPublished(true)}
+          onUnpublish={() => bulkSetPublished(false)}
+          onDelete={() => setBulkDeleteOpen(true)}
+          busy={bulkBusy}
+        />
+      )}
+
       {loading ? (
         <div className="flex justify-center p-12"><Loader2 className="h-6 w-6 animate-spin" /></div>
       ) : (
@@ -296,6 +310,7 @@ export default function AdminFormsPage() {
           {view === "active" && visibleForms.length > 1 && (
             <p className="text-xs text-muted-foreground">اسحب أيقونة <GripVertical className="inline w-3 h-3" /> لإعادة ترتيب النماذج.</p>
           )}
+
           <SortableList
             ids={visibleForms.map((f) => f.id)}
             onReorder={(newIds) => reorder(newIds)}
