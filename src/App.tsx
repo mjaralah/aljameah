@@ -98,7 +98,7 @@ const PublicRoutes = () => (
       <Route path="/terms-of-use" element={<Stub titleKey="terms" pageKey="terms" />} />
       <Route path="/cookie-policy" element={<Stub titleKey="cookies" pageKey="cookies" />} />
       <Route path="/accessibility-statement" element={<Stub titleKey="accessibility" pageKey="accessibility" />} />
-      <Route path="/sitemap" element={<Stub titleKey="sitemap" pageKey="sitemap" />} />
+      <Route path="/sitemap" element={<PublicRouteGuard pageKey="sitemap"><SitemapPage /></PublicRouteGuard>} />
       <Route path="/p/:slug" element={<CustomPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
