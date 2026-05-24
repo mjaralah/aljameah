@@ -61,7 +61,10 @@ export type CrudPageProps<T extends { id: string; published?: boolean }> = {
     /** Extra slot rendered next to the category tabs (e.g. "Manage categories" button). */
     extraAction?: ReactNode;
   };
+  /** Extra actions shown in the dialog footer between Cancel and Save */
+  extraDialogActions?: ReactNode | ((values: Partial<T>) => ReactNode);
 };
+
 
 
 function isImageKey(k: string) {
@@ -82,6 +85,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
   orderBy = { column: "sort_order", ascending: true },
   reorderable = false,
   categoryFilter,
+  extraDialogActions,
 }: CrudPageProps<T>) {
   const [rows, setRows] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
@@ -485,6 +489,11 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
         onSave={handleSave}
         saving={saving}
         size="lg"
+        extraActions={
+          typeof extraDialogActions === "function"
+            ? (extraDialogActions as any)(editing ?? {})
+            : extraDialogActions
+        }
       >
         {editing && renderForm(editing, setValue)}
       </AdminDialog>

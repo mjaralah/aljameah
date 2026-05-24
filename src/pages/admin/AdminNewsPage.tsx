@@ -4,6 +4,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MediaUpload } from "@/components/admin/MediaUpload";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
+import { Button } from "@/components/ui/button";
+import { Eye } from "lucide-react";
+
 
 type News = {
   id: string;
@@ -117,6 +120,23 @@ export default function AdminNewsPage() {
           </div>
         </>
       )}
+      extraDialogActions={
+        (values: Partial<News>) => {
+          const slug = values.slug?.trim();
+          if (!slug) return null;
+          return (
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => window.open(`/news/${slug}?preview=1`, "_blank")}
+            >
+              <Eye className="w-4 h-4 ml-1" />
+              معاينة
+            </Button>
+          );
+        }
+      }
     />
   );
 }
+
