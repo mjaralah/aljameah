@@ -22,12 +22,11 @@ export const Footer = () => {
     { to: "/e-services/volunteer", label: t.nav.eservicesVolunteer },
     { to: "/e-services/membership", label: t.nav.eservicesMembership },
   ];
+  const visibility = (settings as any)?.pages_visibility as Record<string, boolean> | undefined;
+  const sitemapHidden = visibility && visibility.sitemap === false;
   const legal = [
-    { to: "/privacy-policy", label: t.footer.privacy },
-    { to: "/terms-of-use", label: t.footer.terms },
-    { to: "/cookie-policy", label: t.footer.cookies },
-    { to: "/accessibility-statement", label: t.footer.accessibility },
-    { to: "/sitemap", label: t.footer.sitemap },
+    ...((legalPages ?? []).map((p) => ({ to: `/${p.slug}`, label: p.title }))),
+    ...(sitemapHidden ? [] : [{ to: "/sitemap", label: t.footer.sitemap }]),
   ];
 
   return (
