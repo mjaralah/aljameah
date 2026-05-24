@@ -12,14 +12,17 @@ import type { DBNews } from "@/hooks/usePublicContent";
 
 const NewsDetail = () => {
   const { slug = "" } = useParams();
+  const [searchParams] = useSearchParams();
+  const isPreview = searchParams.get("preview") === "1";
   const { t, lang, dir } = useLanguage();
 
   const { data, isLoading } = useQuery({
-    queryKey: ["public", "news", "detail", slug],
+    queryKey: ["public", "news", "detail", slug, isPreview ? "preview" : "live"],
     queryFn: async () => {
       const decoded = (() => { try { return decodeURIComponent(slug); } catch { return slug; } })();
       const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(decoded);
-      let q = supabase.from("news").select("*").eq("published", true);
+      let q = supabase.from("news").select("*");
+      if (!isPreview) q = q.eq("published", true);
       q = isUuid ? q.eq("id", decoded) : q.eq("slug", decoded);
       const { data, error } = await q.maybeSingle();
       if (error) throw error;
