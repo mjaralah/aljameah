@@ -51,7 +51,7 @@ export const Footer = () => {
                 { Icon: Instagram, href: settings?.social_instagram },
                 { Icon: Linkedin, href: settings?.social_linkedin },
                 { Icon: Youtube, href: settings?.social_youtube },
-              ] as { Icon: typeof X; href: string | null | undefined }[])
+              ] as { Icon: typeof XLogo; href: string | null | undefined }[])
                 .filter((s) => !!s.href)
                 .map(({ Icon, href }, i) => (
                   <a
