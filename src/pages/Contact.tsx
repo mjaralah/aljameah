@@ -96,13 +96,15 @@ const channels = [
   },
 ];
 
-const socials = [
-  { icon: Twitter, label: "تويتر", href: "#", color: "hover:bg-[#1DA1F2]/10 hover:text-[#1DA1F2]" },
-  { icon: Instagram, label: "انستغرام", href: "#", color: "hover:bg-[#E4405F]/10 hover:text-[#E4405F]" },
-  { icon: Facebook, label: "فيسبوك", href: "#", color: "hover:bg-[#1877F2]/10 hover:text-[#1877F2]" },
-  { icon: Youtube, label: "يوتيوب", href: "#", color: "hover:bg-[#FF0000]/10 hover:text-[#FF0000]" },
-  { icon: MessageCircle, label: "واتساب", href: "#", color: "hover:bg-[#25D366]/10 hover:text-[#25D366]" },
-];
+// قائمة افتراضية للأيقونات — الروابط الفعلية تأتي من إعدادات الموقع
+const SOCIAL_DEFS = [
+  { key: "social_twitter",   icon: Twitter,        label: "تويتر",   color: "hover:bg-[#1DA1F2]/10 hover:text-[#1DA1F2]" },
+  { key: "social_instagram", icon: Instagram,      label: "انستغرام", color: "hover:bg-[#E4405F]/10 hover:text-[#E4405F]" },
+  { key: "social_facebook",  icon: Facebook,       label: "فيسبوك",  color: "hover:bg-[#1877F2]/10 hover:text-[#1877F2]" },
+  { key: "social_linkedin",  icon: Linkedin,       label: "لينكدإن", color: "hover:bg-[#0A66C2]/10 hover:text-[#0A66C2]" },
+  { key: "social_youtube",   icon: Youtube,        label: "يوتيوب",  color: "hover:bg-[#FF0000]/10 hover:text-[#FF0000]" },
+  { key: "whatsapp_number",  icon: MessageCircle,  label: "واتساب",  color: "hover:bg-[#25D366]/10 hover:text-[#25D366]" },
+] as const;
 
 export default function Contact() {
   const { toast } = useToast();
