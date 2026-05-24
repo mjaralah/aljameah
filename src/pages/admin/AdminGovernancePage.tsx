@@ -217,8 +217,7 @@ export default function AdminGovernancePage() {
       categoryFilter={{
         field: "category",
         options,
-        includeAll: true,
-        allLabel: "الكل",
+        includeAll: false,
         extraAction: <CategoryManager onChanged={() => setVersion((v) => v + 1)} />,
       }}
       columns={[
