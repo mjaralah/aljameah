@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { SortableList, SortableItem } from "@/components/admin/SortableList";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Save, GripVertical, Plus, Pencil, Trash2, LayoutPanelBottom, Info } from "lucide-react";
+import { Loader2, Save, GripVertical, Plus, Pencil, Trash2, PanelBottom, Info } from "lucide-react";
 import {
   useAdminFooterSections,
   useAdminFooterLinks,
@@ -88,7 +88,7 @@ export default function AdminFooterPage() {
       <AdminPageHeader
         title="تذييل الموقع"
         description="تحرير قسم تعريف الجمعية، إدارة روابط الأعمدة، وإعادة ترتيب الأعمدة في التذييل."
-        icon={LayoutPanelBottom}
+        icon={PanelBottom}
       />
 
       <div className="space-y-5 max-w-4xl">
