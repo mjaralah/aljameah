@@ -156,15 +156,13 @@ export default function AdminSurveysPage() {
           )}
           <SortableList
             ids={surveys.map((s) => s.id)}
-            onReorder={async (newIds) => {
-              setSurveys(newIds.map((id) => surveys.find((s) => s.id === id)!));
-              try { await persistSortOrder(supabase, "surveys", newIds); toast.success("تم تحديث الترتيب"); }
-              catch { toast.error("تعذر حفظ الترتيب"); load(); }
-            }}
+            onReorder={reorderSurveys}
           >
-            {surveys.map((s) => {
+            {surveys.map((s, sIdx) => {
               const open = openId === s.id;
               const qs = questions[s.id] ?? [];
+              const surveyIds = surveys.map((x) => x.id);
+              const applySurveyMove = (next: string[] | null) => { if (next) reorderSurveys(next); };
               return (
                 <SortableItem key={s.id} id={s.id}>
                   {({ handleProps, setNodeRef, style }) => (
@@ -188,6 +186,19 @@ export default function AdminSurveysPage() {
                       onTogglePublished={load}
                       onEdit={() => setEditing(s)}
                       onDelete={() => deleteSurvey(s.id)}
+                      reorderControls={surveys.length > 1 ? (
+                        <ReorderControls
+                          position={sIdx + 1}
+                          total={surveys.length}
+                          others={surveys.filter((x) => x.id !== s.id).map((x) => ({ id: x.id, label: x.title }))}
+                          onMoveUp={() => applySurveyMove(moveToPosition(surveyIds, s.id, sIdx))}
+                          onMoveDown={() => applySurveyMove(moveToPosition(surveyIds, s.id, sIdx + 2))}
+                          onSetPosition={(pos) => applySurveyMove(moveToPosition(surveyIds, s.id, pos))}
+                          onMoveToStart={() => applySurveyMove(moveToPosition(surveyIds, s.id, 1))}
+                          onMoveToEnd={() => applySurveyMove(moveToPosition(surveyIds, s.id, surveys.length))}
+                          onMoveRelative={(t, w) => applySurveyMove(moveRelativeTo(surveyIds, s.id, t, w))}
+                        />
+                      ) : undefined}
                       extraActions={
                         <BtnIcon
                           type="button"
