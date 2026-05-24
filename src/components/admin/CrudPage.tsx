@@ -21,6 +21,7 @@ import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AdminEmptyState } from "@/components/admin/AdminEmptyState";
 import { AdminListToolbar } from "@/components/admin/AdminListToolbar";
 import { AdminDialog } from "@/components/admin/AdminDialog";
+import { ReorderControls } from "@/components/admin/ReorderControls";
 
 export type Column<T> = {
   key: keyof T | string;
