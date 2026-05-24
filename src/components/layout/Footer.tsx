@@ -7,8 +7,8 @@ import { useFooterSections, useFooterLinks } from "@/hooks/useFooter";
 
 // تذييل الموقع — أعمدته وروابطه ديناميكية من قاعدة البيانات
 export const Footer = () => {
-  const { t, language } = useLanguage();
-  const isEn = language === "en";
+  const { t, lang } = useLanguage();
+  const isEn = lang === "en";
   const { data: settings } = useSiteSettings();
   const { data: legalPages } = useLegalPages();
   const { data: sections = [] } = useFooterSections();
