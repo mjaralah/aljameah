@@ -237,6 +237,10 @@ export default function AdminSettingsPage() {
                   <Input dir="ltr" value={s.social_instagram ?? ""} onChange={(e) => set("social_instagram", e.target.value)} />
                 </div>
                 <div>
+                  <Label>فيسبوك</Label>
+                  <Input dir="ltr" value={s.social_facebook ?? ""} onChange={(e) => set("social_facebook", e.target.value)} />
+                </div>
+                <div>
                   <Label>لينكدإن</Label>
                   <Input dir="ltr" value={s.social_linkedin ?? ""} onChange={(e) => set("social_linkedin", e.target.value)} />
                 </div>
