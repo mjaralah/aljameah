@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AdminDialog } from "@/components/admin/AdminDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Pencil, Plus, Trash2, FolderCog } from "lucide-react";
+import { Loader2, Pencil, Plus, Trash2, FolderCog, Eye, EyeOff, ArrowUp, ArrowDown, ArrowUpToLine, ArrowDownToLine } from "lucide-react";
 
 type GovDoc = {
   id: string;
