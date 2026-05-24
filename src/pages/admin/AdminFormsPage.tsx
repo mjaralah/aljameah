@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { Plus, Trash2, GripVertical, ExternalLink, Copy, Loader2, Archive, ArchiveRestore, Lock, Eye, EyeOff, ClipboardList, FileInput } from "lucide-react";
 import { SortableList, SortableItem, persistSortOrder } from "@/components/admin/SortableList";
 import { AdminListRow } from "@/components/admin/AdminListRow";
+import { ReorderControls } from "@/components/admin/ReorderControls";
+import { moveToPosition, moveRelativeTo } from "@/lib/reorderHelpers";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
@@ -233,9 +235,11 @@ export default function AdminFormsPage() {
             ids={visibleForms.map((f) => f.id)}
             onReorder={(newIds) => reorder(newIds)}
           >
-            {visibleForms.map((f) => {
+            {visibleForms.map((f, idx) => {
               const sys = f.is_system ? SYSTEM_LABELS[f.is_system] : null;
               const publicUrl = sys?.url ?? `/e-services/form/${f.slug}`;
+              const canReorder = view === "active" && visibleForms.length > 1;
+              const applyMove = (next: string[] | null) => { if (next) reorder(next); };
               return (
                 <SortableItem key={f.id} id={f.id} disabled={view === "archived"}>
                   {({ handleProps, setNodeRef, style }) => (
@@ -246,6 +250,19 @@ export default function AdminFormsPage() {
                       table="custom_forms"
                       dragHandleProps={handleProps}
                       showDragHandle={view === "active"}
+                      reorderControls={canReorder ? (
+                        <ReorderControls
+                          position={idx + 1}
+                          total={visibleForms.length}
+                          others={visibleForms.filter((x) => x.id !== f.id).map((x) => ({ id: x.id, label: x.title }))}
+                          onMoveUp={() => applyMove(moveToPosition(visibleForms.map((x) => x.id), f.id, idx))}
+                          onMoveDown={() => applyMove(moveToPosition(visibleForms.map((x) => x.id), f.id, idx + 2))}
+                          onSetPosition={(pos) => applyMove(moveToPosition(visibleForms.map((x) => x.id), f.id, pos))}
+                          onMoveToStart={() => applyMove(moveToPosition(visibleForms.map((x) => x.id), f.id, 1))}
+                          onMoveToEnd={() => applyMove(moveToPosition(visibleForms.map((x) => x.id), f.id, visibleForms.length))}
+                          onMoveRelative={(targetId, where) => applyMove(moveRelativeTo(visibleForms.map((x) => x.id), f.id, targetId, where))}
+                        />
+                      ) : undefined}
                       title={
                         <span className="flex items-center gap-2 flex-wrap">
                           {f.title}

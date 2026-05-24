@@ -39,6 +39,8 @@ import {
   SortableItem,
   persistSortOrder,
 } from "@/components/admin/SortableList";
+import { ReorderControls } from "@/components/admin/ReorderControls";
+import { moveToPosition, moveRelativeTo } from "@/lib/reorderHelpers";
 import AssemblyMembersEditor, {
   defaultAssemblyData,
 } from "@/components/admin/about/AssemblyMembersEditor";
@@ -239,7 +241,10 @@ export default function CustomSectionsManager() {
           </p>
         ) : (
           <SortableList ids={rows.map((r) => r.id)} onReorder={handleReorder}>
-            {rows.map((r) => (
+            {rows.map((r, idx) => {
+              const ids = rows.map((x) => x.id);
+              const apply = (n: string[] | null) => { if (n) handleReorder(n); };
+              return (
               <SortableItem key={r.id} id={r.id}>
                 {({ handleProps, setNodeRef, style }) => (
                   <div
@@ -265,6 +270,19 @@ export default function CustomSectionsManager() {
                         {TYPE_META[r.data.type]?.label ?? r.data.type}
                       </div>
                     </div>
+                    {rows.length > 1 && (
+                      <ReorderControls
+                        position={idx + 1}
+                        total={rows.length}
+                        others={rows.filter((x) => x.id !== r.id).map((x) => ({ id: x.id, label: x.data.title_ar || x.title || TYPE_META[x.data.type]?.label || x.id }))}
+                        onMoveUp={() => apply(moveToPosition(ids, r.id, idx))}
+                        onMoveDown={() => apply(moveToPosition(ids, r.id, idx + 2))}
+                        onSetPosition={(pos) => apply(moveToPosition(ids, r.id, pos))}
+                        onMoveToStart={() => apply(moveToPosition(ids, r.id, 1))}
+                        onMoveToEnd={() => apply(moveToPosition(ids, r.id, rows.length))}
+                        onMoveRelative={(t, w) => apply(moveRelativeTo(ids, r.id, t, w))}
+                      />
+                    )}
                     <Button size="sm" variant="ghost" onClick={() => setEditing(r)}>
                       <Pencil className="w-4 h-4" />
                     </Button>
@@ -277,7 +295,8 @@ export default function CustomSectionsManager() {
                   </div>
                 )}
               </SortableItem>
-            ))}
+              );
+            })}
           </SortableList>
         )}
       </CardContent>

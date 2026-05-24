@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import { IconPicker } from "@/components/admin/IconPicker";
 import { MediaUpload } from "@/components/admin/MediaUpload";
 import { SortableList, SortableItem, persistSortOrder } from "@/components/admin/SortableList";
+import { ReorderControls } from "@/components/admin/ReorderControls";
+import { moveToPosition, moveRelativeTo } from "@/lib/reorderHelpers";
 import CustomSectionsManager from "@/components/admin/about/CustomSectionsManager";
 import AssemblyMembersEditor, { defaultAssemblyData } from "@/components/admin/about/AssemblyMembersEditor";
 import type { AssemblyData } from "@/lib/assemblyExport";
@@ -528,13 +530,16 @@ export default function AdminAboutPage() {
 
           <p className="text-xs text-muted-foreground">اسحب البطاقات من المقبض لإعادة ترتيب الأقسام في صفحة "من نحن".</p>
           <SortableList ids={sections.map((s) => s.id)} onReorder={handleReorder}>
-            {sections.map((s) => (
+            {sections.map((s, idx) => {
+              const sectionIds = sections.map((x) => x.id);
+              const apply = (n: string[] | null) => { if (n) handleReorder(n); };
+              return (
               <SortableItem key={s.id} id={s.id}>
                 {({ handleProps, setNodeRef, style }) => (
                   <div ref={setNodeRef} style={style}>
                     <Card className={!s.published ? "opacity-70 border-dashed" : undefined}>
                       <CardHeader>
-                        <CardTitle className="text-base flex items-center justify-between gap-2">
+                        <CardTitle className="text-base flex items-center justify-between gap-2 flex-wrap">
                           <span className="flex items-center gap-2">
                             <button
                               type="button"
@@ -552,6 +557,19 @@ export default function AdminAboutPage() {
                             </span>
                           </span>
                           <div className="flex items-center gap-1">
+                            {sections.length > 1 && (
+                              <ReorderControls
+                                position={idx + 1}
+                                total={sections.length}
+                                others={sections.filter((x) => x.id !== s.id).map((x) => ({ id: x.id, label: KEY_LABELS[x.section_key] ?? x.section_key }))}
+                                onMoveUp={() => apply(moveToPosition(sectionIds, s.id, idx))}
+                                onMoveDown={() => apply(moveToPosition(sectionIds, s.id, idx + 2))}
+                                onSetPosition={(pos) => apply(moveToPosition(sectionIds, s.id, pos))}
+                                onMoveToStart={() => apply(moveToPosition(sectionIds, s.id, 1))}
+                                onMoveToEnd={() => apply(moveToPosition(sectionIds, s.id, sections.length))}
+                                onMoveRelative={(t, w) => apply(moveRelativeTo(sectionIds, s.id, t, w))}
+                              />
+                            )}
                             <Button type="button" size="sm" variant="ghost" onClick={() => togglePublished(s)} title={s.published ? "إخفاء" : "إظهار"}>
                               {s.published ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </Button>
@@ -585,7 +603,8 @@ export default function AdminAboutPage() {
                   </div>
                 )}
               </SortableItem>
-            ))}
+              );
+            })}
           </SortableList>
         </div>
       )}

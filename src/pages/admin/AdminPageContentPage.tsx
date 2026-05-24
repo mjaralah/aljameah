@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import { SortableList, SortableItem, persistSortOrder } from "@/components/admin/SortableList";
 import { AdminListRow } from "@/components/admin/AdminListRow";
+import { ReorderControls } from "@/components/admin/ReorderControls";
+import { moveToPosition, moveRelativeTo } from "@/lib/reorderHelpers";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AdminEmptyState } from "@/components/admin/AdminEmptyState";
 import { supabase } from "@/integrations/supabase/client";
@@ -509,19 +511,20 @@ export default function AdminPageContentPage() {
                         </Button>
                       </div>
 
-                      {pageSections.length > 0 && (
-                        <SortableList
-                          ids={pageSections.map((s) => s.id)}
-                          onReorder={async (newIds) => {
-                            const idIndex = new Map(newIds.map((id, i) => [id, i]));
-                            setSections((arr) => arr.map((s) =>
-                              idIndex.has(s.id) ? { ...s, sort_order: (idIndex.get(s.id)! + 1) * 10 } : s,
-                            ));
-                            try { await persistSortOrder(supabase, "page_content", newIds); toast.success("تم تحديث الترتيب"); }
-                            catch { toast.error("تعذر حفظ الترتيب"); load(); }
-                          }}
-                        >
-                          {pageSections.map((s) => {
+                      {pageSections.length > 0 && (() => {
+                        const pageIds = pageSections.map((s) => s.id);
+                        const doReorder = async (newIds: string[]) => {
+                          const idIndex = new Map(newIds.map((id, i) => [id, i]));
+                          setSections((arr) => arr.map((s) =>
+                            idIndex.has(s.id) ? { ...s, sort_order: (idIndex.get(s.id)! + 1) * 10 } : s,
+                          ));
+                          try { await persistSortOrder(supabase, "page_content", newIds); toast.success("تم تحديث الترتيب"); }
+                          catch { toast.error("تعذر حفظ الترتيب"); load(); }
+                        };
+                        const apply = (n: string[] | null) => { if (n) doReorder(n); };
+                        return (
+                        <SortableList ids={pageIds} onReorder={doReorder}>
+                          {pageSections.map((s, idx) => {
                             const isBlock = !!s.data?.block_type;
                             return (
                               <SortableItem key={s.id} id={s.id}>
@@ -532,6 +535,19 @@ export default function AdminPageContentPage() {
                                     id={s.id}
                                     table="page_content"
                                     dragHandleProps={handleProps}
+                                    reorderControls={pageSections.length > 1 ? (
+                                      <ReorderControls
+                                        position={idx + 1}
+                                        total={pageSections.length}
+                                        others={pageSections.filter((x) => x.id !== s.id).map((x) => ({ id: x.id, label: sectionLabel(x) }))}
+                                        onMoveUp={() => apply(moveToPosition(pageIds, s.id, idx))}
+                                        onMoveDown={() => apply(moveToPosition(pageIds, s.id, idx + 2))}
+                                        onSetPosition={(pos) => apply(moveToPosition(pageIds, s.id, pos))}
+                                        onMoveToStart={() => apply(moveToPosition(pageIds, s.id, 1))}
+                                        onMoveToEnd={() => apply(moveToPosition(pageIds, s.id, pageSections.length))}
+                                        onMoveRelative={(t, w) => apply(moveRelativeTo(pageIds, s.id, t, w))}
+                                      />
+                                    ) : undefined}
                                     title={
                                       <span className="inline-flex items-center gap-2">
                                         {isBlock && <Blocks className="w-3.5 h-3.5 text-primary" />}
@@ -591,7 +607,8 @@ export default function AdminPageContentPage() {
                             );
                           })}
                         </SortableList>
-                      )}
+                        );
+                      })()}
 
                       {pageSections.length === 0 && !(QUICK_LINKS[page.key]?.length) && (
                         <AdminEmptyState icon={FolderOpen} title="لا توجد أقسام بعد — اضغط ‘إضافة قسم جديد’ لبدء البناء" />

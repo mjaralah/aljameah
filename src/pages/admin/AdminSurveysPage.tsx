@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Plus, Pencil, Trash2, ChevronDown, ChevronUp, GripVertical, ClipboardList } from "lucide-react";
 import { SortableList, SortableItem, persistSortOrder } from "@/components/admin/SortableList";
 import { AdminListRow } from "@/components/admin/AdminListRow";
+import { ReorderControls } from "@/components/admin/ReorderControls";
+import { moveToPosition, moveRelativeTo } from "@/lib/reorderHelpers";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AdminEmptyState } from "@/components/admin/AdminEmptyState";
 import { Button as BtnIcon } from "@/components/ui/button";
@@ -124,7 +126,22 @@ export default function AdminSurveysPage() {
     if (error) toast.error(error.message); else { toast.success("تم"); load(); }
   }
 
+  async function reorderSurveys(newIds: string[]) {
+    setSurveys(newIds.map((id) => surveys.find((s) => s.id === id)!).filter(Boolean) as Survey[]);
+    try { await persistSortOrder(supabase, "surveys", newIds); toast.success("تم تحديث الترتيب"); }
+    catch { toast.error("تعذر حفظ الترتيب"); load(); }
+  }
+
+  async function reorderQuestions(surveyId: string, newIds: string[]) {
+    const qs = questions[surveyId] ?? [];
+    const reordered = newIds.map((id) => qs.find((q) => q.id === id)!).filter(Boolean) as Question[];
+    setQuestions((prev) => ({ ...prev, [surveyId]: reordered }));
+    try { await persistSortOrder(supabase, "survey_questions", newIds); toast.success("تم تحديث الترتيب"); }
+    catch { toast.error("تعذر حفظ الترتيب"); load(); }
+  }
+
   return (
+
     <AdminLayout title="الاستبيانات">
       <AdminPageHeader
         title="الاستبيانات"
@@ -154,15 +171,13 @@ export default function AdminSurveysPage() {
           )}
           <SortableList
             ids={surveys.map((s) => s.id)}
-            onReorder={async (newIds) => {
-              setSurveys(newIds.map((id) => surveys.find((s) => s.id === id)!));
-              try { await persistSortOrder(supabase, "surveys", newIds); toast.success("تم تحديث الترتيب"); }
-              catch { toast.error("تعذر حفظ الترتيب"); load(); }
-            }}
+            onReorder={reorderSurveys}
           >
-            {surveys.map((s) => {
+            {surveys.map((s, sIdx) => {
               const open = openId === s.id;
               const qs = questions[s.id] ?? [];
+              const surveyIds = surveys.map((x) => x.id);
+              const applySurveyMove = (next: string[] | null) => { if (next) reorderSurveys(next); };
               return (
                 <SortableItem key={s.id} id={s.id}>
                   {({ handleProps, setNodeRef, style }) => (
@@ -186,6 +201,19 @@ export default function AdminSurveysPage() {
                       onTogglePublished={load}
                       onEdit={() => setEditing(s)}
                       onDelete={() => deleteSurvey(s.id)}
+                      reorderControls={surveys.length > 1 ? (
+                        <ReorderControls
+                          position={sIdx + 1}
+                          total={surveys.length}
+                          others={surveys.filter((x) => x.id !== s.id).map((x) => ({ id: x.id, label: x.title }))}
+                          onMoveUp={() => applySurveyMove(moveToPosition(surveyIds, s.id, sIdx))}
+                          onMoveDown={() => applySurveyMove(moveToPosition(surveyIds, s.id, sIdx + 2))}
+                          onSetPosition={(pos) => applySurveyMove(moveToPosition(surveyIds, s.id, pos))}
+                          onMoveToStart={() => applySurveyMove(moveToPosition(surveyIds, s.id, 1))}
+                          onMoveToEnd={() => applySurveyMove(moveToPosition(surveyIds, s.id, surveys.length))}
+                          onMoveRelative={(t, w) => applySurveyMove(moveRelativeTo(surveyIds, s.id, t, w))}
+                        />
+                      ) : undefined}
                       extraActions={
                         <BtnIcon
                           type="button"
@@ -212,15 +240,13 @@ export default function AdminSurveysPage() {
                           ) : (
                             <SortableList
                               ids={qs.map((q) => q.id)}
-                              onReorder={async (newIds) => {
-                                const reordered = newIds.map((id) => qs.find((q) => q.id === id)!);
-                                setQuestions((prev) => ({ ...prev, [s.id]: reordered }));
-                                try { await persistSortOrder(supabase, "survey_questions", newIds); toast.success("تم تحديث الترتيب"); }
-                                catch { toast.error("تعذر حفظ الترتيب"); load(); }
-                              }}
+                              onReorder={(newIds) => reorderQuestions(s.id, newIds)}
                             >
                               <ul className="space-y-2">
-                                {qs.map((q, idx) => (
+                                {qs.map((q, idx) => {
+                                  const qIds = qs.map((x) => x.id);
+                                  const apply = (n: string[] | null) => { if (n) reorderQuestions(s.id, n); };
+                                  return (
                                   <SortableItem key={q.id} id={q.id}>
                                     {({ handleProps, setNodeRef, style }) => (
                                       <li ref={setNodeRef as any} style={style} className="flex items-start gap-2 p-2 rounded-md bg-muted/40 text-sm">
@@ -234,6 +260,19 @@ export default function AdminSurveysPage() {
                                           <p className="font-medium">{q.question}</p>
                                           <p className="text-xs text-muted-foreground">{QTYPES.find((t) => t.value === q.type)?.label ?? q.type}{q.required ? " · مطلوب" : ""}</p>
                                         </div>
+                                        {qs.length > 1 && (
+                                          <ReorderControls
+                                            position={idx + 1}
+                                            total={qs.length}
+                                            others={qs.filter((x) => x.id !== q.id).map((x) => ({ id: x.id, label: x.question }))}
+                                            onMoveUp={() => apply(moveToPosition(qIds, q.id, idx))}
+                                            onMoveDown={() => apply(moveToPosition(qIds, q.id, idx + 2))}
+                                            onSetPosition={(pos) => apply(moveToPosition(qIds, q.id, pos))}
+                                            onMoveToStart={() => apply(moveToPosition(qIds, q.id, 1))}
+                                            onMoveToEnd={() => apply(moveToPosition(qIds, q.id, qs.length))}
+                                            onMoveRelative={(t, w) => apply(moveRelativeTo(qIds, q.id, t, w))}
+                                          />
+                                        )}
                                         <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditQ(q)}>
                                           <Pencil className="w-3 h-3" />
                                         </Button>
@@ -243,7 +282,8 @@ export default function AdminSurveysPage() {
                                       </li>
                                     )}
                                   </SortableItem>
-                                ))}
+                                  );
+                                })}
                               </ul>
                             </SortableList>
                           )}
