@@ -22,6 +22,7 @@ import {
   ClipboardList,
   Scale,
   LayoutTemplate,
+  PanelBottom,
 } from "lucide-react";
 import {
   Sidebar,
