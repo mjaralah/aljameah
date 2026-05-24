@@ -1,10 +1,15 @@
 // محرر أقسام صفحة مخصّصة — يستخدم نفس بانِي البلوكات
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AdminListRow } from "@/components/admin/AdminListRow";
 import { AdminEmptyState } from "@/components/admin/AdminEmptyState";
+import { BulkActionsBar } from "@/components/admin/BulkActionsBar";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
 import { Loader2, Plus, Save, Blocks, ExternalLink, ArrowRight, FolderOpen, GripVertical } from "lucide-react";
@@ -13,6 +18,7 @@ import { ReorderControls } from "@/components/admin/ReorderControls";
 import { BlockEditor } from "@/components/admin/blocks/BlockEditor";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
 
 type Section = {
   id: string;
@@ -32,6 +38,9 @@ export default function AdminPageBuilderPage() {
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -49,6 +58,45 @@ export default function AdminPageBuilderPage() {
   function update(id: string, patch: Partial<Section>) {
     setSections((arr) => arr.map((s) => (s.id === id ? { ...s, ...patch } : s)));
   }
+
+  const sectionIds = useMemo(() => sections.map((s) => s.id), [sections]);
+  const visibleSelectedCount = sectionIds.filter((id) => selectedIds.has(id)).length;
+  const allVisibleSelected = sectionIds.length > 0 && visibleSelectedCount === sectionIds.length;
+  function toggleSelect(id: string, next: boolean) {
+    setSelectedIds((prev) => {
+      const s = new Set(prev);
+      if (next) s.add(id); else s.delete(id);
+      return s;
+    });
+  }
+  function toggleSelectAll(next: boolean) { setSelectedIds(next ? new Set(sectionIds) : new Set()); }
+  function clearSelection() { setSelectedIds(new Set()); }
+
+  async function bulkSetPublished(next: boolean) {
+    const ids = Array.from(selectedIds).filter((id) => sectionIds.includes(id));
+    if (ids.length === 0) return;
+    setBulkBusy(true);
+    const { error } = await supabase.from("page_content").update({ published: next }).in("id", ids);
+    setBulkBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success(next ? `تم نشر ${ids.length} قسماً` : `تم إخفاء ${ids.length} قسماً`);
+    clearSelection();
+    load();
+  }
+
+  async function bulkDelete() {
+    const ids = Array.from(selectedIds).filter((id) => sectionIds.includes(id));
+    if (ids.length === 0) return;
+    setBulkBusy(true);
+    const { error } = await supabase.from("page_content").delete().in("id", ids);
+    setBulkBusy(false);
+    setBulkDeleteOpen(false);
+    if (error) return toast.error(error.message);
+    toast.success(`تم حذف ${ids.length} قسماً`);
+    clearSelection();
+    load();
+  }
+
 
   async function save(s: Section) {
     setSavingId(s.id);
@@ -107,11 +155,23 @@ export default function AdminPageBuilderPage() {
         />
       ) : (
         <>
+          <BulkActionsBar
+            count={visibleSelectedCount}
+            total={sections.length}
+            allSelected={allVisibleSelected}
+            onToggleAll={toggleSelectAll}
+            onClear={clearSelection}
+            onPublish={() => bulkSetPublished(true)}
+            onUnpublish={() => bulkSetPublished(false)}
+            onDelete={() => setBulkDeleteOpen(true)}
+            busy={bulkBusy}
+          />
           {sections.length > 1 && (
             <p className="text-xs text-muted-foreground mb-2">
               استخدم الأسهم <span className="inline-block">▲▼</span> أو حقل الرقم لتغيير الترتيب، أو اسحب <GripVertical className="inline w-3 h-3" />.
             </p>
           )}
+
           {(() => {
             async function applyOrder(newIds: string[]) {
               const orderMap = new Map(newIds.map((id, i) => [id, (i + 1) * 10]));
@@ -162,7 +222,11 @@ export default function AdminPageBuilderPage() {
                         id={s.id}
                         table="page_content"
                         dragHandleProps={handleProps}
+                        selectable
+                        selected={selectedIds.has(s.id)}
+                        onSelectChange={(next) => toggleSelect(s.id, next)}
                         reorderControls={sections.length > 1 ? (
+
                           <ReorderControls
                             position={idx + 1}
                             total={sections.length}
@@ -209,6 +273,23 @@ export default function AdminPageBuilderPage() {
           })()}
         </>
       )}
+
+      <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>حذف الأقسام المحددة؟</AlertDialogTitle>
+            <AlertDialogDescription>
+              سيتم حذف {visibleSelectedCount} قسماً نهائياً. لا يمكن التراجع.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={bulkBusy}>إلغاء</AlertDialogCancel>
+            <AlertDialogAction onClick={bulkDelete} disabled={bulkBusy} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {bulkBusy ? "جارٍ الحذف..." : "حذف"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 }

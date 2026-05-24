@@ -10,6 +10,11 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AdminEmptyState } from "@/components/admin/AdminEmptyState";
 import { AdminListToolbar } from "@/components/admin/AdminListToolbar";
+import { BulkActionsBar } from "@/components/admin/BulkActionsBar";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -21,6 +26,7 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { IconPicker } from "@/components/admin/IconPicker";
+
 
 type FieldType = "text" | "textarea" | "email" | "phone" | "number" | "date" | "select" | "checkbox";
 interface Field {
@@ -103,6 +109,9 @@ export default function AdminFormsPage() {
   const [editing, setEditing] = useState<CustomForm | (Omit<CustomForm, "id"> & { id?: string }) | null>(null);
   const [saving, setSaving] = useState(false);
   const [view, setView] = useState<"active" | "archived">("active");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -117,6 +126,62 @@ export default function AdminFormsPage() {
     () => forms.filter((f) => (view === "archived" ? f.archived : !f.archived)),
     [forms, view],
   );
+
+  // مسح التحديد عند تغيير التبويب لمنع تنفيذ إجراءات على عناصر مخفية.
+  useEffect(() => { setSelectedIds(new Set()); }, [view]);
+
+  const visibleIds = useMemo(() => visibleForms.map((f) => f.id), [visibleForms]);
+  const visibleSelectedCount = visibleIds.filter((id) => selectedIds.has(id)).length;
+  const allVisibleSelected = visibleIds.length > 0 && visibleSelectedCount === visibleIds.length;
+
+  function toggleSelect(id: string, next: boolean) {
+    setSelectedIds((prev) => {
+      const s = new Set(prev);
+      if (next) s.add(id); else s.delete(id);
+      return s;
+    });
+  }
+  function toggleSelectAll(next: boolean) {
+    setSelectedIds(next ? new Set(visibleIds) : new Set());
+  }
+  function clearSelection() { setSelectedIds(new Set()); }
+
+  async function bulkSetPublished(next: boolean) {
+    const ids = Array.from(selectedIds).filter((id) => visibleIds.includes(id));
+    if (ids.length === 0) return;
+    setBulkBusy(true);
+    const { error } = await supabase.from("custom_forms").update({ published: next }).in("id", ids);
+    setBulkBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success(next ? `تم نشر ${ids.length} نموذجاً` : `تم إخفاء ${ids.length} نموذجاً`);
+    clearSelection();
+    load();
+  }
+
+  async function bulkDelete() {
+    const ids = Array.from(selectedIds).filter((id) => visibleIds.includes(id));
+    if (ids.length === 0) return;
+    // لا تحذف النماذج النظامية مجمّعةً
+    const systemIds = forms.filter((f) => ids.includes(f.id) && f.is_system).map((f) => f.id);
+    const deletable = ids.filter((id) => !systemIds.includes(id));
+    if (deletable.length === 0) {
+      setBulkDeleteOpen(false);
+      return toast.error("جميع العناصر المحددة نظامية ولا يمكن حذفها.");
+    }
+    setBulkBusy(true);
+    const { error } = await supabase.from("custom_forms").delete().in("id", deletable);
+    setBulkBusy(false);
+    setBulkDeleteOpen(false);
+    if (error) return toast.error(error.message);
+    toast.success(
+      systemIds.length > 0
+        ? `تم حذف ${deletable.length} (تم تجاهل ${systemIds.length} نظامي)`
+        : `تم حذف ${deletable.length} نموذجاً`,
+    );
+    clearSelection();
+    load();
+  }
+
 
   async function remove(id: string, isSystem?: string | null) {
     if (isSystem) {
@@ -215,6 +280,20 @@ export default function AdminFormsPage() {
         onChipChange={(v) => setView(v as any)}
       />
 
+      {!loading && visibleForms.length > 0 && (
+        <BulkActionsBar
+          count={visibleSelectedCount}
+          total={visibleForms.length}
+          allSelected={allVisibleSelected}
+          onToggleAll={toggleSelectAll}
+          onClear={clearSelection}
+          onPublish={() => bulkSetPublished(true)}
+          onUnpublish={() => bulkSetPublished(false)}
+          onDelete={() => setBulkDeleteOpen(true)}
+          busy={bulkBusy}
+        />
+      )}
+
       {loading ? (
         <div className="flex justify-center p-12"><Loader2 className="h-6 w-6 animate-spin" /></div>
       ) : (
@@ -231,6 +310,7 @@ export default function AdminFormsPage() {
           {view === "active" && visibleForms.length > 1 && (
             <p className="text-xs text-muted-foreground">اسحب أيقونة <GripVertical className="inline w-3 h-3" /> لإعادة ترتيب النماذج.</p>
           )}
+
           <SortableList
             ids={visibleForms.map((f) => f.id)}
             onReorder={(newIds) => reorder(newIds)}
@@ -250,7 +330,11 @@ export default function AdminFormsPage() {
                       table="custom_forms"
                       dragHandleProps={handleProps}
                       showDragHandle={view === "active"}
+                      selectable
+                      selected={selectedIds.has(f.id)}
+                      onSelectChange={(next) => toggleSelect(f.id, next)}
                       reorderControls={canReorder ? (
+
                         <ReorderControls
                           position={idx + 1}
                           total={visibleForms.length}
@@ -319,7 +403,26 @@ export default function AdminFormsPage() {
           saving={saving}
         />
       )}
+
+      <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>حذف العناصر المحددة؟</AlertDialogTitle>
+            <AlertDialogDescription>
+              سيتم حذف {visibleSelectedCount} نموذجاً نهائياً، مع جميع طلباته. لا يمكن التراجع.
+              النماذج النظامية لن تُحذف.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={bulkBusy}>إلغاء</AlertDialogCancel>
+            <AlertDialogAction onClick={bulkDelete} disabled={bulkBusy} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {bulkBusy ? "جارٍ الحذف..." : "حذف"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
+
   );
 }
 
