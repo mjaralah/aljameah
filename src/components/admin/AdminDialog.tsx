@@ -23,6 +23,8 @@ export type AdminDialogProps = {
   /** إخفاء التذييل (لاستخدام أزرار مخصّصة داخل المحتوى) */
   hideFooter?: boolean;
   footer?: ReactNode;
+  /** أزرار إضافية تُعرض بين إلغاء والحفظ */
+  extraActions?: ReactNode;
 };
 
 const SIZE_CLASS: Record<NonNullable<AdminDialogProps["size"]>, string> = {
@@ -38,6 +40,7 @@ export function AdminDialog({
   onSave, onCancel, saving = false,
   saveLabel = "حفظ", cancelLabel = "إلغاء",
   size = "lg", hideFooter, footer,
+  extraActions,
 }: AdminDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -54,6 +57,7 @@ export function AdminDialog({
                 <Button variant="outline" onClick={() => (onCancel ? onCancel() : onOpenChange(false))}>
                   {cancelLabel}
                 </Button>
+                {extraActions}
                 {onSave && (
                   <Button onClick={onSave} disabled={saving}>
                     {saving && <Loader2 className="w-4 h-4 ml-1 animate-spin" />}
@@ -68,3 +72,4 @@ export function AdminDialog({
     </Dialog>
   );
 }
+

@@ -61,7 +61,10 @@ export type CrudPageProps<T extends { id: string; published?: boolean }> = {
     /** Extra slot rendered next to the category tabs (e.g. "Manage categories" button). */
     extraAction?: ReactNode;
   };
+  /** Extra actions shown in the dialog footer between Cancel and Save */
+  extraDialogActions?: ReactNode;
 };
+
 
 
 function isImageKey(k: string) {
