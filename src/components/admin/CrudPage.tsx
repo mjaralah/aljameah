@@ -62,7 +62,7 @@ export type CrudPageProps<T extends { id: string; published?: boolean }> = {
     extraAction?: ReactNode;
   };
   /** Extra actions shown in the dialog footer between Cancel and Save */
-  extraDialogActions?: ReactNode;
+  extraDialogActions?: ReactNode | ((values: Partial<T>) => ReactNode);
 };
 
 
