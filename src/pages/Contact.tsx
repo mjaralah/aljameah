@@ -28,7 +28,6 @@ import {
   AtSign,
   Smartphone,
   Headphones,
-  X,
   Instagram,
   Facebook,
   Linkedin,
@@ -39,6 +38,7 @@ import {
   Handshake,
   Megaphone,
 } from "lucide-react";
+import { XLogo } from "@/components/icons/XLogo";
 import { cn } from "@/lib/utils";
 import { IconField } from "@/components/eservices/FormFields";
 import { usePageContent, useSiteSettings } from "@/hooks/usePublicContent";
@@ -98,7 +98,7 @@ const channels = [
 
 // قائمة افتراضية للأيقونات — الروابط الفعلية تأتي من إعدادات الموقع
 const SOCIAL_DEFS = [
-  { key: "social_twitter",   icon: X,             label: "X",       color: "hover:bg-[#000000]/10 hover:text-[#000000]" },
+  { key: "social_twitter",   icon: XLogo,          label: "X",       color: "hover:bg-[#000000]/10 hover:text-[#000000]" },
   { key: "social_instagram", icon: Instagram,      label: "انستغرام", color: "hover:bg-[#E4405F]/10 hover:text-[#E4405F]" },
   { key: "social_facebook",  icon: Facebook,       label: "فيسبوك",  color: "hover:bg-[#1877F2]/10 hover:text-[#1877F2]" },
   { key: "social_linkedin",  icon: Linkedin,       label: "لينكدإن", color: "hover:bg-[#0A66C2]/10 hover:text-[#0A66C2]" },
