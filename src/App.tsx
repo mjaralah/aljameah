@@ -262,6 +262,14 @@ const App = () => (
                 }
               />
               <Route
+                path="/admin/footer"
+                element={
+                  <ProtectedAdminRoute>
+                    <AdminFooterPage />
+                  </ProtectedAdminRoute>
+                }
+              />
+              <Route
                 path="/admin/page-content"
                 element={
                   <ProtectedAdminRoute>
