@@ -515,9 +515,18 @@ export default function AdminPageContentPage() {
                         const pageIds = pageSections.map((s) => s.id);
                         const doReorder = async (newIds: string[]) => {
                           const idIndex = new Map(newIds.map((id, i) => [id, i]));
-                          setSections((arr) => arr.map((s) =>
-                            idIndex.has(s.id) ? { ...s, sort_order: (idIndex.get(s.id)! + 1) * 10 } : s,
-                          ));
+                          const subset = new Set(newIds);
+                          setSections((arr) => {
+                            const map = new Map(arr.map((x) => [x.id, x]));
+                            const reordered = newIds.map((id, i) => ({
+                              ...(map.get(id) as Section),
+                              sort_order: (i + 1) * 10,
+                            }));
+                            let cursor = 0;
+                            return arr.map((s) =>
+                              subset.has(s.id) ? reordered[cursor++] : s,
+                            );
+                          });
                           try { await persistSortOrder(supabase, "page_content", newIds); toast.success("تم تحديث الترتيب"); }
                           catch { toast.error("تعذر حفظ الترتيب"); load(); }
                         };
