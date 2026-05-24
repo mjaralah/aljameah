@@ -46,14 +46,32 @@ export const Footer = () => {
           <div className="mt-5">
             <div className="text-sm font-semibold mb-2">{t.footer.follow}</div>
             <div className="flex items-center gap-2">
-                {([
-                { Icon: XLogo, href: settings?.social_twitter },
-                { Icon: Instagram, href: settings?.social_instagram },
-                { Icon: Linkedin, href: settings?.social_linkedin },
-                { Icon: Youtube, href: settings?.social_youtube },
-              ] as { Icon: typeof XLogo; href: string | null | undefined }[])
-                .filter((s) => !!s.href)
-                .map(({ Icon, href }, i) => (
+              {(() => {
+                const waDigits = (settings?.whatsapp_number ?? "").replace(/\D/g, "");
+                const waHref = waDigits
+                  ? `https://wa.me/${waDigits}${settings?.whatsapp_message ? `?text=${encodeURIComponent(settings.whatsapp_message)}` : ""}`
+                  : null;
+                const items = [
+                  { Icon: XLogo, href: settings?.social_twitter },
+                  { Icon: Instagram, href: settings?.social_instagram },
+                  { Icon: Linkedin, href: settings?.social_linkedin },
+                  { Icon: Youtube, href: settings?.social_youtube },
+                  { Icon: MessageCircle, href: waHref },
+                ] as { Icon: React.ComponentType<{ className?: string }>; href: string | null | undefined }[];
+                const visible = items.filter((s) => !!s.href);
+                if (visible.length === 0) {
+                  return [XLogo, Facebook, Instagram, Youtube].map((Icon, i) => (
+                    <a
+                      key={i}
+                      href="#"
+                      aria-label="social"
+                      className="h-9 w-9 rounded-full bg-primary-foreground/10 hover:bg-accent hover:text-accent-foreground grid place-items-center transition-smooth"
+                    >
+                      <Icon className="h-4 w-4" />
+                    </a>
+                  ));
+                }
+                return visible.map(({ Icon, href }, i) => (
                   <a
                     key={i}
                     href={href!}
@@ -64,14 +82,8 @@ export const Footer = () => {
                   >
                     <Icon className="h-4 w-4" />
                   </a>
-                ))}
-              {/* احتياطي عند عدم وجود إعدادات */}
-                {!(settings?.social_twitter || settings?.social_instagram || settings?.social_linkedin || settings?.social_youtube) &&
-                [XLogo, Facebook, Instagram, Youtube].map((Icon, i) => (
-                  <a key={i} href="#" aria-label="social" className="h-9 w-9 rounded-full bg-primary-foreground/10 hover:bg-accent hover:text-accent-foreground grid place-items-center transition-smooth">
-                    <Icon className="h-4 w-4" />
-                  </a>
-                ))}
+                ));
+              })()}
             </div>
           </div>
         </div>
