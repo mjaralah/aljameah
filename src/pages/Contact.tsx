@@ -109,7 +109,26 @@ const SOCIAL_DEFS = [
 export default function Contact() {
   const { toast } = useToast();
   const { data: pageSections } = usePageContent("contact");
+  const { data: settings } = useSiteSettings();
   const { data: systemForm } = useSystemForm("contact");
+
+  // بناء قائمة الأيقونات من إعدادات الموقع — يظهر فقط ما تم إدخاله
+  const socials = SOCIAL_DEFS
+    .map((s) => {
+      const raw = (settings as any)?.[s.key] as string | null | undefined;
+      if (!raw) return null;
+      let href = raw.trim();
+      if (s.key === "whatsapp_number") {
+        const digits = href.replace(/\D/g, "");
+        if (!digits) return null;
+        const msg = (settings as any)?.whatsapp_message;
+        href = `https://wa.me/${digits}${msg ? `?text=${encodeURIComponent(msg)}` : ""}`;
+      } else if (!/^https?:\/\//i.test(href)) {
+        href = `https://${href}`;
+      }
+      return { icon: s.icon, label: s.label, color: s.color, href };
+    })
+    .filter(Boolean) as { icon: typeof SOCIAL_DEFS[number]["icon"]; label: string; color: string; href: string }[];
   const sectionMap = (pageSections ?? []).reduce<Record<string, any>>(
     (acc, s) => ({ ...acc, [s.section_key]: s }),
     {},
