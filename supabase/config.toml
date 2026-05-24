@@ -1,1 +1,3 @@
 project_id = "icgbruteqqcwxxlnrhlz"
+[functions.resolve-map-url]
+verify_jwt = false
