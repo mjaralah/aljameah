@@ -68,12 +68,14 @@ const Media = () => {
 
   return (
     <>
-      <PageHero
-        eyebrow={t.nav.media}
-        title={intro?.title || t.pages.media.heading}
-        lead={intro?.content || t.pages.media.lead}
-        breadcrumb={[{ label: intro?.title || t.nav.media }]}
-      />
+      {intro && (
+        <PageHero
+          eyebrow={t.nav.media}
+          title={intro.title || t.pages.media.heading}
+          lead={intro.content || t.pages.media.lead}
+          breadcrumb={[{ label: intro.title || t.nav.media }]}
+        />
+      )}
 
       <section className="container py-12 md:py-16">
         <div className="flex flex-col md:flex-row gap-4 mb-8">
