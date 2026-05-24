@@ -16,6 +16,11 @@ type Program = {
   published: boolean;
   sort_order: number;
   featured: boolean;
+  sponsor_button_enabled: boolean;
+  sponsor_button_label: string | null;
+  sponsor_button_label_en: string | null;
+  sponsor_button_url: string | null;
+  sponsor_button_icon: string | null;
 };
 
 const slugify = (s: string) =>
