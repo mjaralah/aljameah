@@ -287,13 +287,31 @@ export default function AdminPageContentPage() {
               placeholder="الرياض، المملكة العربية السعودية" />
           </div>
           <div>
-            <Label>رابط تضمين خرائط Google (iframe src)</Label>
-            <Input dir="ltr" value={d.embed_url ?? ""}
-              onChange={(e) => updateData(s.id, "embed_url", e.target.value)}
-              placeholder="https://www.google.com/maps/embed?..." />
+            <Label>خريطة Google — الصق كود التضمين أو الرابط</Label>
+            <Textarea
+              dir="ltr"
+              rows={3}
+              value={d.embed_url ?? ""}
+              onChange={(e) => {
+                const raw = e.target.value.trim();
+                let url = raw;
+                const m = raw.match(/<iframe[^>]*\ssrc=["']([^"']+)["']/i);
+                if (m) url = m[1];
+                else if (/^https?:\/\//i.test(raw) && !/\/maps\/embed/i.test(raw)) {
+                  url = `https://maps.google.com/maps?q=${encodeURIComponent(raw)}&output=embed`;
+                }
+                updateData(s.id, "embed_url", url);
+              }}
+              placeholder='الصق هنا كود <iframe ...> كاملاً، أو رابط الخريطة من زر "شارك"'
+            />
             <p className="text-xs text-muted-foreground mt-1">
-              من خرائط Google: شارك ← تضمين خريطة ← انسخ قيمة src فقط
+              ✅ يمكنك لصق كود التضمين كاملاً من Google Maps (شارك ← تضمين خريطة ← نسخ HTML)، أو لصق رابط المشاركة العادي — وسيتم استخراج رابط التضمين الصحيح تلقائياً.
             </p>
+            {d.embed_url && (
+              <div className="mt-2 rounded-md border overflow-hidden aspect-video bg-muted">
+                <iframe src={d.embed_url} className="w-full h-full border-0" loading="lazy" title="معاينة الخريطة" />
+              </div>
+            )}
           </div>
         </div>
       );
