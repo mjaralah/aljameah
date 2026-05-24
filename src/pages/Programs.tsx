@@ -60,7 +60,7 @@ const Programs = () => {
       category: p.category,
       beneficiaries: p.beneficiaries,
     }));
-  }, [useDb, dbPrograms, tx]);
+  }, [useDb, dbPrograms, tx, lang]);
 
   const filtered = useMemo(() => {
     const base = active === "all" || useDb ? items : items.filter((p) => p.category === active);
