@@ -211,6 +211,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
         toast.success("تمت الإضافة");
       }
       setEditing(null);
+      invalidatePublic();
       load();
     } catch (e) {
       toast.error((e as Error).message);
@@ -225,6 +226,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
     if (error) toast.error(error.message);
     else {
       toast.success("تم الحذف");
+      invalidatePublic();
       load();
     }
     setDeleteId(null);
