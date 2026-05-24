@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, Calendar } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { news as fallbackNews } from "@/data";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageHero } from "@/components/layout/PageHero";
@@ -13,7 +12,7 @@ import type { DBNews } from "@/hooks/usePublicContent";
 
 const NewsDetail = () => {
   const { slug = "" } = useParams();
-  const { t, tx, lang, dir } = useLanguage();
+  const { t, lang, dir } = useLanguage();
 
   const { data, isLoading } = useQuery({
     queryKey: ["public", "news", "detail", slug],
@@ -29,7 +28,6 @@ const NewsDetail = () => {
     enabled: !!slug,
   });
 
-  const fallback = fallbackNews.find((n) => n.id === slug);
   const article = data
     ? {
         title: data.title,
@@ -39,16 +37,7 @@ const NewsDetail = () => {
         date: data.published_at || data.created_at,
         category: data.category ?? "",
       }
-    : fallback
-      ? {
-          title: tx(fallback.title),
-          excerpt: tx(fallback.excerpt),
-          content: tx(fallback.body),
-          image: fallback.image,
-          date: fallback.date,
-          category: tx(fallback.category),
-        }
-      : null;
+    : null;
 
   const BackIcon = dir === "rtl" ? ArrowRight : ArrowLeft;
 
