@@ -314,7 +314,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
 
       {reorderable && filtered.length > 1 && activeCategory !== "__all__" && (
         <p className="text-xs text-muted-foreground mb-3 px-1">
-          اسحب أيقونة <GripVertical className="inline w-3 h-3" /> لإعادة ترتيب العناصر. يُحفظ الترتيب تلقائياً.
+          استخدم الأسهم <span className="inline-block">▲▼</span> أو حقل الرقم لتغيير الترتيب، أو اسحب أيقونة <GripVertical className="inline w-3 h-3" />. يُحفظ الترتيب تلقائياً.
         </p>
       )}
 
