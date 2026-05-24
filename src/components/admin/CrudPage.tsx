@@ -21,6 +21,7 @@ import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AdminEmptyState } from "@/components/admin/AdminEmptyState";
 import { AdminListToolbar } from "@/components/admin/AdminListToolbar";
 import { AdminDialog } from "@/components/admin/AdminDialog";
+import { ReorderControls } from "@/components/admin/ReorderControls";
 
 export type Column<T> = {
   key: keyof T | string;
@@ -171,11 +172,18 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
     const reorderedSubset = newIds
       .map((id) => filtered.find((r) => r.id === id))
       .filter(Boolean) as T[];
+    // Assign new sort_order values (10-step gaps) so the in-memory order
+    // matches what's persisted and React doesn't silently revert on next sort.
+    const orderMap = new Map(newIds.map((id, i) => [id, (i + 1) * 10]));
     const newRows: T[] = [];
     let cursor = 0;
     for (const r of rows) {
-      if (subsetIds.has(r.id)) newRows.push(reorderedSubset[cursor++]);
-      else newRows.push(r);
+      if (subsetIds.has(r.id)) {
+        const next = reorderedSubset[cursor++];
+        newRows.push({ ...next, sort_order: orderMap.get(next.id) } as T);
+      } else {
+        newRows.push(r);
+      }
     }
     setRows(newRows);
     try {
@@ -185,6 +193,30 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
       toast.error("تعذر حفظ الترتيب");
       load();
     }
+  }
+
+  function reorderByPosition(rowId: string, newPos1: number) {
+    const ids = filtered.map((r) => r.id);
+    const oldIdx = ids.indexOf(rowId);
+    if (oldIdx === -1) return;
+    const target = Math.max(0, Math.min(ids.length - 1, newPos1 - 1));
+    if (target === oldIdx) return;
+    const next = [...ids];
+    const [moved] = next.splice(oldIdx, 1);
+    next.splice(target, 0, moved);
+    handleReorder(next);
+  }
+
+  function moveRelative(rowId: string, targetId: string, where: "before" | "after") {
+    const ids = filtered.map((r) => r.id);
+    const oldIdx = ids.indexOf(rowId);
+    let targetIdx = ids.indexOf(targetId);
+    if (oldIdx === -1 || targetIdx === -1 || rowId === targetId) return;
+    const next = [...ids];
+    next.splice(oldIdx, 1);
+    targetIdx = next.indexOf(targetId);
+    next.splice(where === "before" ? targetIdx : targetIdx + 1, 0, rowId);
+    handleReorder(next);
   }
 
   function setValue<K extends keyof T>(key: K, value: T[K]) {
@@ -282,7 +314,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
 
       {reorderable && filtered.length > 1 && activeCategory !== "__all__" && (
         <p className="text-xs text-muted-foreground mb-3 px-1">
-          اسحب أيقونة <GripVertical className="inline w-3 h-3" /> لإعادة ترتيب العناصر. يُحفظ الترتيب تلقائياً.
+          استخدم الأسهم <span className="inline-block">▲▼</span> أو حقل الرقم لتغيير الترتيب، أو اسحب أيقونة <GripVertical className="inline w-3 h-3" />. يُحفظ الترتيب تلقائياً.
         </p>
       )}
 
@@ -301,10 +333,11 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
       ) : (
         <SortableList ids={filtered.map((r) => r.id)} onReorder={handleReorder}>
           <div className="space-y-2">
-            {filtered.map((row) => (
+            {filtered.map((row, idx) => (
               <SortableItem key={row.id} id={row.id} disabled={!reorderable || activeCategory === "__all__"}>
                 {({ handleProps, setNodeRef, style }) => {
                   const allView = activeCategory === "__all__";
+                  const canReorder = reorderable && !allView && filtered.length > 1;
                   return (
                   <AdminListRow
                     ref={setNodeRef as any}
@@ -313,6 +346,24 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
                     table={table}
                     showDragHandle={reorderable && !allView}
                     dragHandleProps={handleProps}
+                    reorderControls={canReorder ? (
+                      <ReorderControls
+                        position={idx + 1}
+                        total={filtered.length}
+                        others={filtered
+                          .filter((r) => r.id !== row.id)
+                          .map((r) => ({
+                            id: r.id,
+                            label: String(titleCol ? (r[titleCol.key as keyof T] ?? "") : r.id),
+                          }))}
+                        onMoveUp={() => reorderByPosition(row.id, idx)}
+                        onMoveDown={() => reorderByPosition(row.id, idx + 2)}
+                        onSetPosition={(pos) => reorderByPosition(row.id, pos)}
+                        onMoveToStart={() => reorderByPosition(row.id, 1)}
+                        onMoveToEnd={() => reorderByPosition(row.id, filtered.length)}
+                        onMoveRelative={(targetId, where) => moveRelative(row.id, targetId, where)}
+                      />
+                    ) : undefined}
                     thumbnail={thumbCol ? renderCol(thumbCol, row) : undefined}
                     title={titleCol ? renderCol(titleCol, row) : "—"}
                     subtitle={

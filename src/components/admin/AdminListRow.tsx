@@ -28,6 +28,8 @@ export type AdminListRowProps = {
   extraActions?: ReactNode;
   dragHandleProps?: Record<string, unknown>;
   showDragHandle?: boolean;
+  /** Optional alternative reorder controls (arrows / position input / move-to menu). */
+  reorderControls?: ReactNode;
   className?: string;
   style?: React.CSSProperties;
   children?: ReactNode;
@@ -37,7 +39,8 @@ export const AdminListRow = forwardRef<HTMLDivElement, AdminListRowProps>(functi
   {
     id, table, title, subtitle, thumbnail, badges,
     published, onTogglePublished, onEdit, onDelete, extraActions,
-    dragHandleProps, showDragHandle = true, className, style, children,
+    dragHandleProps, showDragHandle = true, reorderControls,
+    className, style, children,
   },
   ref,
 ) {
@@ -109,7 +112,9 @@ export const AdminListRow = forwardRef<HTMLDivElement, AdminListRowProps>(functi
 
         <TooltipProvider delayDuration={200}>
           <div className="flex items-center gap-1.5">
+            {reorderControls}
             {extraActions}
+
 
             {onDelete && (
               <Tooltip>
