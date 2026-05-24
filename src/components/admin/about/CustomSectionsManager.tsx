@@ -39,6 +39,8 @@ import {
   SortableItem,
   persistSortOrder,
 } from "@/components/admin/SortableList";
+import { ReorderControls } from "@/components/admin/ReorderControls";
+import { moveToPosition, moveRelativeTo } from "@/lib/reorderHelpers";
 import AssemblyMembersEditor, {
   defaultAssemblyData,
 } from "@/components/admin/about/AssemblyMembersEditor";
