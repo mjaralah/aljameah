@@ -755,6 +755,12 @@ export type Database = {
           social_twitter: string | null
           social_youtube: string | null
           updated_at: string
+          whatsapp_enabled: boolean
+          whatsapp_message: string | null
+          whatsapp_number: string | null
+          whatsapp_position: string
+          whatsapp_show_tooltip: boolean
+          whatsapp_tooltip: string | null
         }
         Insert: {
           contact_address?: string | null
@@ -774,6 +780,12 @@ export type Database = {
           social_twitter?: string | null
           social_youtube?: string | null
           updated_at?: string
+          whatsapp_enabled?: boolean
+          whatsapp_message?: string | null
+          whatsapp_number?: string | null
+          whatsapp_position?: string
+          whatsapp_show_tooltip?: boolean
+          whatsapp_tooltip?: string | null
         }
         Update: {
           contact_address?: string | null
@@ -793,6 +805,12 @@ export type Database = {
           social_twitter?: string | null
           social_youtube?: string | null
           updated_at?: string
+          whatsapp_enabled?: boolean
+          whatsapp_message?: string | null
+          whatsapp_number?: string | null
+          whatsapp_position?: string
+          whatsapp_show_tooltip?: boolean
+          whatsapp_tooltip?: string | null
         }
         Relationships: []
       }

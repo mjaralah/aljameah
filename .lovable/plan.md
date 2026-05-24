@@ -1,88 +1,57 @@
-## المشكلة
-عند تغيير ألوان الهوية من **الإعدادات العامة**، يتم تحديث متغيرين فقط في الجذر:
-- `--primary` (اللون الأساسي)
-- `--accent` (اللون الثانوي)
+# زر التواصل عبر واتساب عائم (Floating WhatsApp Button)
 
-بينما الموقع يعتمد على عشرات المتغيرات المشتقة من هذين اللونين والتي تظل مثبتة على القيم الأصلية (أخضر/ذهبي) في `index.css`، مما يجعل أجزاء كثيرة لا تتغير:
+## الفكرة الإبداعية
+زر عائم دائري في الزاوية السفلية (يسار في RTL) بلون واتساب الأخضر المميز، مع:
+- **نبضة لطيفة (pulse ring)** تجذب الانتباه دون إزعاج
+- **تلميح منبثق (tooltip)** يظهر تلقائياً بعد 5 ثوانٍ من تحميل الصفحة لأول مرة، بنص ترحيبي قابل للتخصيص ("مرحباً 👋 كيف يمكننا مساعدتك؟")
+- **زر إغلاق صغير** على التلميح حتى لا يكون مزعجاً
+- **أيقونة WhatsApp** من lucide-react (`MessageCircle`) أو SVG رسمية
+- يظهر بعد تمرير بسيط (scroll > 200px) لإبقاء الصفحة الأولى نظيفة
+- متجاوب: حجم أصغر على الجوال
+- يحترم وضع الـ Dark Mode
 
-| المتغير | يُستخدم في |
-|---|---|
-| `--gradient-primary` | البطاقات، الهيدر، الأيقونات، PageHero، SectionRenderer (CTA)، VolunteerCta |
-| `--gradient-cta` / `--gradient-hero` / `--gradient-gold` | البطل الرئيسي، VolunteerCta، AboutPreview |
-| `--primary-glow` | تدرّجات الهوفر والإشعاعات |
-| `--ring` | حلقة تركيز الحقول |
-| `--accent-soft` | خلفية أيقونات SectionHeader |
-| `--shadow-soft` / `--shadow-card` / `--shadow-gold` | ظلال البطاقات والأزرار الذهبية |
-| `--sidebar-primary` / `--sidebar-accent` / `--sidebar-ring` | الشريط الجانبي في لوحة التحكم |
-| `--primary-foreground` / `--accent-foreground` | لون النص فوق الخلفيات الملونة |
+## أين يظهر
+- في كل صفحات الموقع (يوضع في `Layout.tsx`) — وليس فقط الرئيسية، لأن المستخدم قد يحتاج التواصل من أي صفحة
+- يختفي تلقائياً في صفحات لوحة التحكم (`/admin/*`)
 
-نتيجة ذلك: الهيدر، أيقونات الصفحات، CTA "تطوع معنا"، أبطال الصفحات (PageHero)، الشريط العلوي (TopBar)، شارة التوثيق، والشريط الجانبي للوحة التحكم… تبقى بالألوان الأصلية حتى لو غيّر المدير اللونين.
+## إعدادات لوحة التحكم
+يضاف قسم جديد في `AdminSettingsPage.tsx` بعنوان **"زر واتساب العائم"** يحتوي:
 
-## الحل
-ترقية `SiteSettingsProvider` ليُولّد **كامل منظومة التوكنات** ديناميكياً من اللونين HEX المختارين، بدلاً من تحديث متغيرين فقط.
+| الحقل | النوع | الوصف |
+|---|---|---|
+| `whatsapp_enabled` | Switch | تفعيل/تعطيل الزر |
+| `whatsapp_number` | Input | رقم الواتساب بصيغة دولية (مثل 966500000000) |
+| `whatsapp_message` | Textarea | رسالة افتراضية تظهر في محادثة الواتساب |
+| `whatsapp_tooltip` | Input | نص التلميح المنبثق |
+| `whatsapp_show_tooltip` | Switch | إظهار/إخفاء التلميح التلقائي |
+| `whatsapp_position` | Select | يسار / يمين |
 
-### الخطوات
+## التغييرات التقنية
 
-**1) توسيع `src/contexts/SiteSettingsContext.tsx`**
+### 1. قاعدة البيانات (migration)
+إضافة 6 أعمدة إلى جدول `site_settings`:
+- `whatsapp_enabled boolean default false`
+- `whatsapp_number text`
+- `whatsapp_message text`
+- `whatsapp_tooltip text`
+- `whatsapp_show_tooltip boolean default true`
+- `whatsapp_position text default 'left'`
 
-إضافة مساعدات تحويل ألوان متقدمة:
-- `hexToHslParts(hex)` يُعيد `{h, s, l}` بأرقام (موجودة جزئياً، تُحدَّث لإعادة الأرقام).
-- `hslString({h,s,l})` → سلسلة `"H S% L%"`.
-- `adjust({h,s,l}, {dl, ds, dh})` لاشتقاق درجات أفتح/أغمق/أكثر تشبعاً.
-- `pickForeground({h,s,l})` يختار `0 0% 100%` أو `0 0% 10%` حسب سطوع اللون لضمان التباين.
+### 2. ملفات جديدة
+- `src/components/layout/WhatsAppFloat.tsx` — المكوّن العائم مع الأنيميشن
 
-عند ورود `primary_color` و `secondary_color` يحسب التوكنات التالية ويُطبّقها على `:root`:
+### 3. ملفات معدّلة
+- `src/components/layout/Layout.tsx` — تركيب `<WhatsAppFloat />` مع إخفائه في مسارات `/admin`
+- `src/pages/admin/AdminSettingsPage.tsx` — إضافة قسم إعدادات واتساب
+- `src/hooks/usePublicContent.ts` — التأكد أن `useSiteSettings` يجلب الحقول الجديدة (تلقائي عبر `select *`)
+- `src/index.css` — إضافة keyframes للنبضة (إن لم تكن موجودة)
 
+### 4. الرابط
 ```
---primary              = primary
---primary-foreground   = pickForeground(primary)
---primary-glow         = adjust(primary, {dl: +14, ds: -10})
---ring                 = primary
---secondary            = adjust(primary, {dl: +60, ds: -30})         /* تينت فاتح */
---secondary-foreground = adjust(primary, {dl: -6, ds: 0})
-
---accent               = accent
---accent-foreground    = pickForeground(accent)
---accent-soft          = adjust(accent, {dl: +44, ds: +14})
-
---gradient-primary = linear-gradient(135deg, hsl(P), hsl(adjust(P,{dl:+8})))
---gradient-gold    = linear-gradient(135deg, hsl(A), hsl(adjust(A,{dl:+10})))
---gradient-hero    = linear-gradient(135deg, hsl(adjust(P,{dl:-6})/0.85), hsl(adjust(P,{dl:+4})/0.6))
---gradient-cta     = linear-gradient(120deg, hsl(P) 0%, hsl(adjust(P,{dl:+8})) 60%, hsl(A) 100%)
-
---shadow-soft = 0 4px 20px -8px hsl(P / 0.15)
---shadow-card = 0 10px 30px -12px hsl(P / 0.18)
---shadow-gold = 0 8px 24px -10px hsl(A / 0.40)
-
---sidebar-primary               = primary
---sidebar-primary-foreground    = pickForeground(primary)
---sidebar-accent                = accent
---sidebar-accent-foreground     = pickForeground(accent)
---sidebar-ring                  = primary
---sidebar-border                = adjust(primary, {dl: +55, ds: -35})
+https://wa.me/{number}?text={encodeURIComponent(message)}
 ```
+يفتح في تبويب جديد (`target="_blank"`, `rel="noopener noreferrer"`).
 
-كل القيم تُكتب عبر `root.style.setProperty(...)` بحيث تتجاوز ما في `index.css` (Specificity أعلى).
-
-**2) دعم الوضع الداكن**
-
-نفس الـ Provider يكتشف وجود الكلاس `.dark` ويعيد توليد نسخ معدّلة (سطوع أعلى للأساسي، خلفيات أغمق للسايدبار) عند التبديل، باستخدام `MutationObserver` على `documentElement.classList`.
-
-**3) إزالة الفولباك الزائد**
-
-عند عدم وجود إعدادات أو ألوان محفوظة، يستخدم Provider اللونين الافتراضيين `#1B5E35` و `#C5973A` (نفس القيم الحالية في `index.css`) ليبقى المظهر مطابقاً قبل التخصيص.
-
-**4) لمسة تحقق**
-
-بعد التطبيق، سيتم اختبار:
-- تغيير اللون الأساسي إلى أزرق → التحقق من تحوّل: الهيدر، Hero، PageHero، CTA التطوع، بطاقات البرامج، أيقونات SectionHeader، شارة التوثيق في TopBar، والسايدبار في لوحة التحكم.
-- تغيير اللون الثانوي → التحقق من الأزرار الذهبية وشارات Hero.
-
-## ملاحظات تقنية
-- لا تغييرات على قاعدة البيانات.
-- لا تغييرات على `index.css` (تبقى الافتراضيات للزوار قبل تحميل الإعدادات).
-- لا تغييرات على المكوّنات؛ كلها تستهلك التوكنات تلقائياً.
-- العناصر التي تستخدم `bg-white/10`, `bg-black/70`, `text-white` فوق الأبطال المتدرجة هي زخرفية مقصودة (Glass overlays) وتبقى كما هي.
-
-## الملفات المتأثرة
-- `src/contexts/SiteSettingsContext.tsx` (الملف الوحيد المعدَّل)
+## ملاحظات
+- لون الزر سيستخدم لون واتساب الرسمي `#25D366` كاستثناء بصري معروف عالمياً (مثل لون فيسبوك/تويتر) — وهذه ممارسة مقبولة لأن الزر يمثّل خدمة طرف ثالث، ولا يكسر هوية الموقع.
+- لن يظهر الزر إذا كان `whatsapp_enabled = false` أو الرقم فارغ.
