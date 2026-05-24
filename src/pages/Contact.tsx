@@ -28,7 +28,6 @@ import {
   AtSign,
   Smartphone,
   Headphones,
-  X,
   Instagram,
   Facebook,
   Linkedin,
@@ -39,6 +38,7 @@ import {
   Handshake,
   Megaphone,
 } from "lucide-react";
+import { XLogo } from "@/components/icons/XLogo";
 import { cn } from "@/lib/utils";
 import { IconField } from "@/components/eservices/FormFields";
 import { usePageContent, useSiteSettings } from "@/hooks/usePublicContent";
