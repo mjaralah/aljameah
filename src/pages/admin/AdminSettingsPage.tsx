@@ -364,6 +364,22 @@ export default function AdminSettingsPage() {
             </div>
           </CardContent>
         </Card>
+
+        <div className="flex justify-end pt-2 pb-4">
+          <Button onClick={save} disabled={saving} size="lg">
+            {saving ? <Loader2 className="w-4 h-4 ml-1 animate-spin" /> : <Save className="w-4 h-4 ml-1" />}
+            حفظ الإعدادات
+          </Button>
+        </div>
+      </div>
+
+      <div className="sticky bottom-0 left-0 right-0 -mx-4 md:-mx-6 mt-4 px-4 md:px-6 py-3 bg-background/95 backdrop-blur border-t shadow-lg z-30">
+        <div className="max-w-3xl flex justify-end">
+          <Button onClick={save} disabled={saving} size="lg" className="min-w-[160px]">
+            {saving ? <Loader2 className="w-4 h-4 ml-1 animate-spin" /> : <Save className="w-4 h-4 ml-1" />}
+            حفظ التغييرات
+          </Button>
+        </div>
       </div>
     </AdminLayout>
   );
