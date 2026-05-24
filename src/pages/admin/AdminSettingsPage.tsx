@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { MediaUpload } from "@/components/admin/MediaUpload";
-import { Loader2, Save, Settings as SettingsIcon, Palette, Phone, Share2, Image as ImageIcon, ThumbsUp, EyeOff, MessageCircle, Heart, Gift, HandHeart } from "lucide-react";
+import { Loader2, Save, Settings as SettingsIcon, Palette, Phone, Share2, Image as ImageIcon, ThumbsUp, EyeOff, MessageCircle, Heart, Check, AlertCircle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -49,6 +49,8 @@ type Settings = {
   donate_button_icon: string | null;
 };
 
+type SaveStatus = "idle" | "dirty" | "saving" | "saved" | "error";
+
 const FEEDBACK_PAGES: { key: string; label: string }[] = [
   { key: "home", label: "الصفحة الرئيسية" },
   { key: "about", label: "من نحن" },
@@ -71,10 +73,50 @@ const PUBLIC_PAGES: { key: string; label: string }[] = [
   { key: "contact", label: "تواصل معنا" },
 ];
 
+function SaveStatusIndicator({ status, onRetry }: { status: SaveStatus; onRetry: () => void }) {
+  if (status === "idle") return null;
+  if (status === "dirty") {
+    return (
+      <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+        <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+        تغييرات غير محفوظة
+      </span>
+    );
+  }
+  if (status === "saving") {
+    return (
+      <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        جارٍ الحفظ...
+      </span>
+    );
+  }
+  if (status === "saved") {
+    return (
+      <span className="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+        <Check className="h-3.5 w-3.5" />
+        تم الحفظ
+      </span>
+    );
+  }
+  return (
+    <span className="text-xs text-destructive flex items-center gap-2">
+      <AlertCircle className="h-3.5 w-3.5" />
+      فشل الحفظ
+      <button type="button" onClick={onRetry} className="underline hover:no-underline">
+        إعادة المحاولة
+      </button>
+    </span>
+  );
+}
+
 export default function AdminSettingsPage() {
   const [s, setS] = useState<Partial<Settings> | null>(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState<SaveStatus>("idle");
+  const skipNextAutoSaveRef = useRef(true);
+  const savingRef = useRef(false);
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -97,28 +139,66 @@ export default function AdminSettingsPage() {
   }
   function isOn(field: "feedback_visibility" | "pages_visibility", key: string) {
     const map = (s?.[field] as VisibilityMap | null | undefined) ?? {};
-    return map[key] !== false; // افتراضياً نشط
+    return map[key] !== false;
   }
 
-  async function save() {
-    if (!s) return;
-    setSaving(true);
+  async function save(current?: Partial<Settings> | null) {
+    const data = current ?? s;
+    if (!data || savingRef.current) return;
+    savingRef.current = true;
+    setStatus("saving");
     try {
-      if (s.id) {
-        const { id, ...rest } = s;
+      if (data.id) {
+        const { id, ...rest } = data;
         const { error } = await supabase.from("site_settings").update(rest).eq("id", id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("site_settings").insert(s);
+        const { data: inserted, error } = await supabase.from("site_settings").insert(data).select().single();
         if (error) throw error;
+        if (inserted) {
+          skipNextAutoSaveRef.current = true;
+          setS(inserted as Partial<Settings>);
+        }
       }
-      toast.success("تم حفظ الإعدادات");
+      setStatus("saved");
+      if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+      savedTimerRef.current = setTimeout(() => {
+        setStatus((prev) => (prev === "saved" ? "idle" : prev));
+      }, 2500);
     } catch (e) {
+      setStatus("error");
       toast.error((e as Error).message);
     } finally {
-      setSaving(false);
+      savingRef.current = false;
     }
   }
+
+  // الحفظ التلقائي (debounce)
+  useEffect(() => {
+    if (loading || !s) return;
+    if (skipNextAutoSaveRef.current) {
+      skipNextAutoSaveRef.current = false;
+      return;
+    }
+    setStatus("dirty");
+    const timer = setTimeout(() => {
+      save(s);
+    }, 1500);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [s, loading]);
+
+  // تحذير قبل إغلاق الصفحة عند وجود تغييرات لم تحفظ
+  useEffect(() => {
+    function onBeforeUnload(e: BeforeUnloadEvent) {
+      if (status === "dirty" || status === "saving") {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    }
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [status]);
 
   function set<K extends keyof Settings>(k: K, v: Settings[K]) {
     setS((p) => ({ ...(p ?? {}), [k]: v }));
@@ -138,13 +218,20 @@ export default function AdminSettingsPage() {
     <AdminLayout title="الإعدادات العامة">
       <AdminPageHeader
         title="الإعدادات العامة"
-        description="هوية الموقع، الشعار، الألوان، ومعلومات التواصل"
+        description="هوية الموقع، الشعار، الألوان، ومعلومات التواصل — يتم الحفظ تلقائياً عند التعديل"
         icon={SettingsIcon}
         action={
-          <Button onClick={save} disabled={saving}>
-            {saving ? <Loader2 className="w-4 h-4 ml-1 animate-spin" /> : <Save className="w-4 h-4 ml-1" />}
-            حفظ
-          </Button>
+          <div className="flex items-center gap-3">
+            <SaveStatusIndicator status={status} onRetry={() => save()} />
+            <Button onClick={() => save()} disabled={status === "saving"} variant="outline" size="sm">
+              {status === "saving" ? (
+                <Loader2 className="w-4 h-4 ml-1 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4 ml-1" />
+              )}
+              حفظ الآن
+            </Button>
+          </div>
         }
       />
 
@@ -479,22 +566,6 @@ export default function AdminSettingsPage() {
             </div>
           </CardContent>
         </Card>
-
-        <div className="flex justify-end pt-2 pb-4">
-          <Button onClick={save} disabled={saving} size="lg">
-            {saving ? <Loader2 className="w-4 h-4 ml-1 animate-spin" /> : <Save className="w-4 h-4 ml-1" />}
-            حفظ الإعدادات
-          </Button>
-        </div>
-      </div>
-
-      <div className="sticky bottom-0 left-0 right-0 -mx-4 md:-mx-6 mt-4 px-4 md:px-6 py-3 bg-background/95 backdrop-blur border-t shadow-lg z-30">
-        <div className="max-w-3xl flex justify-end">
-          <Button onClick={save} disabled={saving} size="lg" className="min-w-[160px]">
-            {saving ? <Loader2 className="w-4 h-4 ml-1 animate-spin" /> : <Save className="w-4 h-4 ml-1" />}
-            حفظ التغييرات
-          </Button>
-        </div>
       </div>
     </AdminLayout>
   );
