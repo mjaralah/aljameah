@@ -222,7 +222,11 @@ export default function AdminPageBuilderPage() {
                         id={s.id}
                         table="page_content"
                         dragHandleProps={handleProps}
+                        selectable
+                        selected={selectedIds.has(s.id)}
+                        onSelectChange={(next) => toggleSelect(s.id, next)}
                         reorderControls={sections.length > 1 ? (
+
                           <ReorderControls
                             position={idx + 1}
                             total={sections.length}
