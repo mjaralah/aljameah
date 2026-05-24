@@ -38,6 +38,9 @@ export default function AdminPageBuilderPage() {
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -55,6 +58,45 @@ export default function AdminPageBuilderPage() {
   function update(id: string, patch: Partial<Section>) {
     setSections((arr) => arr.map((s) => (s.id === id ? { ...s, ...patch } : s)));
   }
+
+  const sectionIds = useMemo(() => sections.map((s) => s.id), [sections]);
+  const visibleSelectedCount = sectionIds.filter((id) => selectedIds.has(id)).length;
+  const allVisibleSelected = sectionIds.length > 0 && visibleSelectedCount === sectionIds.length;
+  function toggleSelect(id: string, next: boolean) {
+    setSelectedIds((prev) => {
+      const s = new Set(prev);
+      if (next) s.add(id); else s.delete(id);
+      return s;
+    });
+  }
+  function toggleSelectAll(next: boolean) { setSelectedIds(next ? new Set(sectionIds) : new Set()); }
+  function clearSelection() { setSelectedIds(new Set()); }
+
+  async function bulkSetPublished(next: boolean) {
+    const ids = Array.from(selectedIds).filter((id) => sectionIds.includes(id));
+    if (ids.length === 0) return;
+    setBulkBusy(true);
+    const { error } = await supabase.from("page_content").update({ published: next }).in("id", ids);
+    setBulkBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success(next ? `تم نشر ${ids.length} قسماً` : `تم إخفاء ${ids.length} قسماً`);
+    clearSelection();
+    load();
+  }
+
+  async function bulkDelete() {
+    const ids = Array.from(selectedIds).filter((id) => sectionIds.includes(id));
+    if (ids.length === 0) return;
+    setBulkBusy(true);
+    const { error } = await supabase.from("page_content").delete().in("id", ids);
+    setBulkBusy(false);
+    setBulkDeleteOpen(false);
+    if (error) return toast.error(error.message);
+    toast.success(`تم حذف ${ids.length} قسماً`);
+    clearSelection();
+    load();
+  }
+
 
   async function save(s: Section) {
     setSavingId(s.id);
