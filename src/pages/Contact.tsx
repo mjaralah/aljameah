@@ -41,7 +41,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { IconField } from "@/components/eservices/FormFields";
-import { usePageContent } from "@/hooks/usePublicContent";
+import { usePageContent, useSiteSettings } from "@/hooks/usePublicContent";
 import { useSystemForm } from "@/hooks/useSystemForm";
 
 const contactSchema = z.object({
