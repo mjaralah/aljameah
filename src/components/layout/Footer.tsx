@@ -24,6 +24,7 @@ export const Footer = () => {
   ];
   const visibility = (settings as any)?.pages_visibility as Record<string, boolean> | undefined;
   const sitemapHidden = visibility && visibility.sitemap === false;
+  const legalSectionHidden = visibility && visibility.footer_legal === false;
   const legal = [
     ...((legalPages ?? []).map((p) => ({ to: `/${p.slug}`, label: p.title }))),
     ...(sitemapHidden ? [] : [{ to: "/sitemap", label: t.footer.sitemap }]),
