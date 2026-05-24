@@ -84,7 +84,7 @@ export const WhatsAppFloat = () => {
         rel="noopener noreferrer"
         aria-label="تواصل عبر واتساب"
         onClick={dismissTip}
-        className="group relative grid place-items-center h-14 w-14 rounded-full bg-white border-[3px] shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300"
+        className="group relative grid place-items-center h-14 w-14 rounded-full bg-white border-[3px] shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 hover:bg-[#308450]"
         style={{ borderColor: "#308450" }}
       >
         <span
@@ -92,7 +92,10 @@ export const WhatsAppFloat = () => {
           style={{ backgroundColor: "#308450" }}
           aria-hidden="true"
         />
-        <WhatsAppIcon className="h-7 w-7 relative z-10 group-hover:text-white transition-colors duration-300" style={{ color: "#308450" }} />
+        <WhatsAppIcon 
+          className="h-7 w-7 relative z-10 group-hover:text-white transition-colors duration-300" 
+          style={{ color: "#308450" }} 
+        />
       </a>
     </div>
   );
