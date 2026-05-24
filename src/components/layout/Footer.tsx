@@ -115,18 +115,20 @@ export const Footer = () => {
           </ul>
         </div>
 
-        <div>
-          <h3 className="font-bold mb-4 text-accent">{t.footer.legal}</h3>
-          <ul className="space-y-2 text-sm">
-            {legal.map((l) => (
-              <li key={l.to}>
-                <Link to={l.to} className="opacity-90 hover:opacity-100 hover:text-accent transition-smooth">
-                  {l.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {!legalSectionHidden && (
+          <div>
+            <h3 className="font-bold mb-4 text-accent">{t.footer.legal}</h3>
+            <ul className="space-y-2 text-sm">
+              {legal.map((l) => (
+                <li key={l.to}>
+                  <Link to={l.to} className="opacity-90 hover:opacity-100 hover:text-accent transition-smooth">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <div>
           <h3 className="font-bold mb-4 text-accent">{t.footer.contact}</h3>
