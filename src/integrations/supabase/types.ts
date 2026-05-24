@@ -751,6 +751,21 @@ export type Database = {
         }
         Relationships: []
       }
+      public_content_versions: {
+        Row: {
+          id: boolean
+          updated_at: string
+        }
+        Insert: {
+          id?: boolean
+          updated_at?: string
+        }
+        Update: {
+          id?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           contact_address: string | null

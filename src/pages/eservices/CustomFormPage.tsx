@@ -25,12 +25,23 @@ export default function CustomFormPage() {
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    (async () => {
+    let active = true;
+    const load = async () => {
+      setLoading(true);
       const { data, error } = await supabase.from("custom_forms").select("*").eq("slug", slug).eq("published", true).eq("archived", false).maybeSingle();
       if (error) toast.error(error.message);
-      setForm(data);
-      setLoading(false);
-    })();
+      if (active) {
+        setForm(data);
+        setLoading(false);
+      }
+    };
+
+    load();
+    window.addEventListener("public-content-changed", load);
+    return () => {
+      active = false;
+      window.removeEventListener("public-content-changed", load);
+    };
   }, [slug]);
 
   async function submit(e: React.FormEvent) {

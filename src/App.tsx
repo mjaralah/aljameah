@@ -23,6 +23,7 @@ import MembershipService from "./pages/eservices/MembershipService.tsx";
 import Contact from "./pages/Contact.tsx";
 import { PublicRouteGuard } from "@/components/layout/PublicRouteGuard";
 import { ScrollToTop } from "@/components/layout/ScrollToTop";
+import { usePublicContentRealtime } from "@/hooks/usePublicContent";
 
 // Admin
 import AdminLogin from "./pages/admin/AdminLogin.tsx";
@@ -103,6 +104,11 @@ const PublicRoutes = () => (
   </Layout>
 );
 
+const RealtimeSync = () => {
+  usePublicContentRealtime();
+  return null;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
@@ -112,6 +118,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <RealtimeSync />
             <ScrollToTop />
             <Routes>
               {/* Admin routes — standalone, no public Layout */}

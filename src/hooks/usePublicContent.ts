@@ -1,6 +1,7 @@
 // React Query hooks لجلب المحتوى العام من قاعدة البيانات
 // يستخدم في الصفحات العامة (الرئيسية، الأخبار، البرامج، الحوكمة...)
-import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export type DBHeroSlide = {
@@ -115,6 +116,35 @@ export type DBSiteSettings = {
 };
 
 const STALE = 1000 * 60 * 2; // 2 دقيقة
+
+export function usePublicContentRealtime() {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const refreshPublicQueries = () => {
+      window.dispatchEvent(new Event("public-content-changed"));
+      void queryClient.invalidateQueries({ queryKey: ["public"] });
+      void queryClient.invalidateQueries({ queryKey: ["public-eservices-forms"] });
+      void queryClient.invalidateQueries({ queryKey: ["system-form"] });
+      void queryClient.refetchQueries({ queryKey: ["public"], type: "active" });
+      void queryClient.refetchQueries({ queryKey: ["public-eservices-forms"], type: "active" });
+      void queryClient.refetchQueries({ queryKey: ["system-form"], type: "active" });
+    };
+
+    const channel = supabase
+      .channel("public-content-realtime-sync")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "public_content_versions" },
+        refreshPublicQueries,
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+}
 
 export function useHeroSlides() {
   return useQuery({
