@@ -100,6 +100,13 @@ export type DBSiteSettings = {
   whatsapp_tooltip: string | null;
   whatsapp_show_tooltip: boolean | null;
   whatsapp_position: string | null;
+  donate_button_enabled: boolean | null;
+  donate_button_label_ar: string | null;
+  donate_button_label_en: string | null;
+  donate_button_url: string | null;
+  donate_button_bg_color: string | null;
+  donate_button_text_color: string | null;
+  donate_button_icon: string | null;
 };
 
 const STALE = 1000 * 60 * 2; // 2 دقيقة

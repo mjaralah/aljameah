@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Heart, Menu, Search } from "lucide-react";
+import { Heart, Menu, Search, Gift, HandHeart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useMenuPages } from "@/hooks/usePublicContent";
+import { useMenuPages, useSiteSettings } from "@/hooks/usePublicContent";
 import { cn } from "@/lib/utils";
 
 // رأس الصفحة بالشعار والتنقل الرئيسي
@@ -13,6 +13,27 @@ export const Header = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const { data: menuPages } = useMenuPages();
+  const { data: settings } = useSiteSettings();
+
+  // إعدادات زر التبرع (قابلة للتحكم من لوحة التحكم)
+  const donateEnabled = settings?.donate_button_enabled !== false;
+  const donateLabel =
+    (lang === "en"
+      ? settings?.donate_button_label_en || settings?.donate_button_label_ar
+      : settings?.donate_button_label_ar || settings?.donate_button_label_en) || t.nav.donate;
+  const donateUrl = settings?.donate_button_url || "/donate";
+  const isExternal = /^https?:\/\//i.test(donateUrl);
+  const donateBg = settings?.donate_button_bg_color || undefined;
+  const donateFg = settings?.donate_button_text_color || undefined;
+  const iconKey = settings?.donate_button_icon || "heart";
+  const DonateIcon =
+    iconKey === "gift" ? Gift : iconKey === "hand-heart" ? HandHeart : iconKey === "none" ? null : Heart;
+  const handleDonate = () => {
+    if (isExternal) window.open(donateUrl, "_blank", "noopener,noreferrer");
+    else navigate(donateUrl);
+  };
+  const donateStyle = donateBg || donateFg ? { backgroundColor: donateBg, color: donateFg } : undefined;
+
 
   const links = [
     { to: "/", label: t.nav.home },
@@ -70,13 +91,19 @@ export const Header = () => {
           >
             <Search className="h-5 w-5" />
           </Button>
-          <Button
-            className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold shadow-gold hidden sm:inline-flex"
-            onClick={() => navigate("/donate")}
-          >
-            <Heart className="h-4 w-4" fill="currentColor" />
-            {t.nav.donate}
-          </Button>
+          {donateEnabled && (
+            <Button
+              className={cn(
+                "font-bold shadow-gold hidden sm:inline-flex",
+                !donateBg && "bg-accent hover:bg-accent/90 text-accent-foreground",
+              )}
+              style={donateStyle}
+              onClick={handleDonate}
+            >
+              {DonateIcon && <DonateIcon className="h-4 w-4" fill="currentColor" />}
+              {donateLabel}
+            </Button>
+          )}
 
           {/* قائمة الجوال */}
           <Sheet open={open} onOpenChange={setOpen}>
@@ -104,16 +131,22 @@ export const Header = () => {
                   </NavLink>
                 ))}
 
-                <Button
-                  className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold mt-4"
-                  onClick={() => {
-                    setOpen(false);
-                    navigate("/donate");
-                  }}
-                >
-                  <Heart className="h-4 w-4" fill="currentColor" />
-                  {t.nav.donate}
-                </Button>
+                {donateEnabled && (
+                  <Button
+                    className={cn(
+                      "font-bold mt-4",
+                      !donateBg && "bg-accent hover:bg-accent/90 text-accent-foreground",
+                    )}
+                    style={donateStyle}
+                    onClick={() => {
+                      setOpen(false);
+                      handleDonate();
+                    }}
+                  >
+                    {DonateIcon && <DonateIcon className="h-4 w-4" fill="currentColor" />}
+                    {donateLabel}
+                  </Button>
+                )}
               </div>
             </SheetContent>
           </Sheet>
