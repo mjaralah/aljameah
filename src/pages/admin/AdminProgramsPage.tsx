@@ -16,6 +16,11 @@ type Program = {
   published: boolean;
   sort_order: number;
   featured: boolean;
+  sponsor_button_enabled: boolean;
+  sponsor_button_label: string | null;
+  sponsor_button_label_en: string | null;
+  sponsor_button_url: string | null;
+  sponsor_button_icon: string | null;
 };
 
 const slugify = (s: string) =>
@@ -59,6 +64,11 @@ export default function AdminProgramsPage() {
         published: true,
         sort_order: 0,
         featured: false,
+        sponsor_button_enabled: true,
+        sponsor_button_label: "",
+        sponsor_button_label_en: "",
+        sponsor_button_url: "",
+        sponsor_button_icon: "Heart",
       })}
       validate={(v) => {
         if (!v.title?.trim()) return "اسم البرنامج مطلوب";
@@ -115,6 +125,55 @@ export default function AdminProgramsPage() {
                 <input type="checkbox" checked={!!v.featured} onChange={(e) => set("featured", e.target.checked)} />
                 إبراز (مميز)
               </label>
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-border p-4 space-y-3 bg-muted/30">
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-semibold">زر الكفالة / الإجراء</Label>
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={v.sponsor_button_enabled !== false}
+                  onChange={(e) => set("sponsor_button_enabled", e.target.checked)}
+                />
+                إظهار الزر
+              </label>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              تحكم بنص الزر ورابطه. اترك الرابط فارغاً مؤقتاً، أو ضع رابط منتج المتجر الإلكتروني عند توفره.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <Label>نص الزر (عربي)</Label>
+                <Input
+                  value={v.sponsor_button_label ?? ""}
+                  placeholder="تبرع الآن"
+                  onChange={(e) => set("sponsor_button_label", e.target.value)}
+                />
+              </div>
+              <div>
+                <Label>نص الزر (إنجليزي)</Label>
+                <Input
+                  dir="ltr"
+                  value={v.sponsor_button_label_en ?? ""}
+                  placeholder="Sponsor"
+                  onChange={(e) => set("sponsor_button_label_en", e.target.value)}
+                />
+              </div>
+            </div>
+            <div>
+              <Label>رابط الزر (URL)</Label>
+              <Input
+                dir="ltr"
+                value={v.sponsor_button_url ?? ""}
+                placeholder="https://store.example.com/product/..."
+                onChange={(e) => set("sponsor_button_url", e.target.value)}
+              />
+            </div>
+            <div>
+              <Label>أيقونة الزر</Label>
+              <IconPicker value={v.sponsor_button_icon ?? "Heart"} onChange={(name) => set("sponsor_button_icon", name)} />
             </div>
           </div>
         </>

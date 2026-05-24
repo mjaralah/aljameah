@@ -22,10 +22,14 @@ type ViewItem = {
   category?: Program["category"];
   beneficiaries: number;
   featured?: boolean;
+  sponsorEnabled?: boolean;
+  sponsorLabel?: string;
+  sponsorUrl?: string;
+  sponsorIcon?: string;
 };
 
 const Programs = () => {
-  const { t, tx, dir } = useLanguage();
+  const { t, tx, dir, lang } = useLanguage();
   const [active, setActive] = useState<Program["category"] | "all">("all");
   const { data: dbPrograms } = usePrograms();
   const { data: pageSections } = usePageContent("programs");
@@ -42,6 +46,10 @@ const Programs = () => {
         icon: p.icon || "Heart",
         beneficiaries: 0,
         featured: !!p.featured,
+        sponsorEnabled: p.sponsor_button_enabled !== false,
+        sponsorLabel: (lang === "en" ? p.sponsor_button_label_en : p.sponsor_button_label) || undefined,
+        sponsorUrl: p.sponsor_button_url || undefined,
+        sponsorIcon: p.sponsor_button_icon || "Heart",
       }));
     }
     return fallbackPrograms.map((p) => ({
@@ -52,7 +60,7 @@ const Programs = () => {
       category: p.category,
       beneficiaries: p.beneficiaries,
     }));
-  }, [useDb, dbPrograms, tx]);
+  }, [useDb, dbPrograms, tx, lang]);
 
   const filtered = useMemo(() => {
     const base = active === "all" || useDb ? items : items.filter((p) => p.category === active);
@@ -130,11 +138,22 @@ const Programs = () => {
                         {p.beneficiaries.toLocaleString()}+ {t.stats.beneficiaries}
                       </span>
                     ) : <span />}
-                    <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                      <Heart className="h-3.5 w-3.5" fill="currentColor" />
-                      {t.pages.programsPage.sponsor}
-                      <ArrowLeft className={dir === "rtl" ? "h-3.5 w-3.5" : "h-3.5 w-3.5 rotate-180"} />
-                    </Button>
+                    {p.sponsorEnabled !== false && (() => {
+                      const SponsorIcon =
+                        (Icons[(p.sponsorIcon || "Heart") as keyof typeof Icons] as React.FC<{ className?: string; fill?: string }>) || Heart;
+                      const label = p.sponsorLabel || t.pages.programsPage.sponsor;
+                      const href = p.sponsorUrl || "#";
+                      const external = /^https?:\/\//i.test(href);
+                      return (
+                        <Button asChild size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                          <a href={href} target={external ? "_blank" : undefined} rel={external ? "noopener noreferrer" : undefined}>
+                            <SponsorIcon className="h-3.5 w-3.5" fill="currentColor" />
+                            {label}
+                            <ArrowLeft className={dir === "rtl" ? "h-3.5 w-3.5" : "h-3.5 w-3.5 rotate-180"} />
+                          </a>
+                        </Button>
+                      );
+                    })()}
                   </div>
                 </Card>
               );
