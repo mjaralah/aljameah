@@ -2,12 +2,13 @@ import { Link } from "react-router-dom";
 import { Facebook, Heart, Instagram, Linkedin, Mail, MapPin, MessageCircle, Phone, Youtube } from "lucide-react";
 import { XLogo } from "@/components/icons/XLogo";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useSiteSettings } from "@/hooks/usePublicContent";
+import { useLegalPages, useSiteSettings } from "@/hooks/usePublicContent";
 
 // تذييل الموقع الكامل
 export const Footer = () => {
   const { t } = useLanguage();
   const { data: settings } = useSiteSettings();
+  const { data: legalPages } = useLegalPages();
 
   const quick = [
     { to: "/about", label: t.nav.about },
@@ -21,12 +22,11 @@ export const Footer = () => {
     { to: "/e-services/volunteer", label: t.nav.eservicesVolunteer },
     { to: "/e-services/membership", label: t.nav.eservicesMembership },
   ];
+  const visibility = (settings as any)?.pages_visibility as Record<string, boolean> | undefined;
+  const sitemapHidden = visibility && visibility.sitemap === false;
   const legal = [
-    { to: "/privacy-policy", label: t.footer.privacy },
-    { to: "/terms-of-use", label: t.footer.terms },
-    { to: "/cookie-policy", label: t.footer.cookies },
-    { to: "/accessibility-statement", label: t.footer.accessibility },
-    { to: "/sitemap", label: t.footer.sitemap },
+    ...((legalPages ?? []).map((p) => ({ to: `/${p.slug}`, label: p.title }))),
+    ...(sitemapHidden ? [] : [{ to: "/sitemap", label: t.footer.sitemap }]),
   ];
 
   return (
