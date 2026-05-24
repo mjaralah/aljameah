@@ -296,16 +296,44 @@ export default function AdminPageContentPage() {
                 const raw = e.target.value.trim();
                 let url = raw;
                 const m = raw.match(/<iframe[^>]*\ssrc=["']([^"']+)["']/i);
-                if (m) url = m[1];
+                if (m) { url = m[1]; }
+                else if (/maps\.app\.goo\.gl|goo\.gl\/maps/i.test(raw)) {
+                  // رابط مختصر — يحتاج فك عبر edge function
+                  updateData(s.id, "embed_url", raw);
+                  (async () => {
+                    const tId = toast.loading("جارٍ فك الرابط المختصر...");
+                    try {
+                      const { data, error } = await supabase.functions.invoke("resolve-map-url", { body: { url: raw } });
+                      if (error) throw error;
+                      if (data?.embedUrl) {
+                        updateData(s.id, "embed_url", data.embedUrl);
+                        toast.success("تم استخراج موقع الخريطة", { id: tId });
+                      } else throw new Error("تعذر استخراج الموقع");
+                    } catch (err) {
+                      toast.error("تعذر فك الرابط — الرجاء استخدام كود التضمين (Embed) من خرائط Google", { id: tId });
+                    }
+                  })();
+                  return;
+                }
                 else if (/^https?:\/\//i.test(raw) && !/\/maps\/embed/i.test(raw)) {
-                  url = `https://maps.google.com/maps?q=${encodeURIComponent(raw)}&output=embed`;
+                  // محاولة استخراج إحداثيات مباشرة من الرابط
+                  const at = raw.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+                  const dd = raw.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
+                  const c = at || dd;
+                  if (c) {
+                    url = `https://www.google.com/maps?q=${c[1]},${c[2]}&z=16&output=embed`;
+                  } else {
+                    url = `https://maps.google.com/maps?q=${encodeURIComponent(raw)}&output=embed`;
+                  }
                 }
                 updateData(s.id, "embed_url", url);
               }}
               placeholder='الصق هنا كود <iframe ...> كاملاً، أو رابط الخريطة من زر "شارك"'
             />
             <p className="text-xs text-muted-foreground mt-1">
-              ✅ يمكنك لصق كود التضمين كاملاً من Google Maps (شارك ← تضمين خريطة ← نسخ HTML)، أو لصق رابط المشاركة العادي — وسيتم استخراج رابط التضمين الصحيح تلقائياً.
+              ✅ <strong>الأفضل:</strong> من Google Maps اضغط "شارك" ← تبويب "تضمين خريطة" ← انسخ كود HTML والصقه هنا.
+              <br />
+              يمكن أيضاً لصق رابط مشاركة عادي أو رابط مختصر (maps.app.goo.gl) وسيتم محاولة استخراج الموقع تلقائياً.
             </p>
             {d.embed_url && (
               <div className="mt-2 rounded-md border overflow-hidden aspect-video bg-muted">
