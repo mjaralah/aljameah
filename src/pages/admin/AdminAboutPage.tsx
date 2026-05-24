@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import { IconPicker } from "@/components/admin/IconPicker";
 import { MediaUpload } from "@/components/admin/MediaUpload";
 import { SortableList, SortableItem, persistSortOrder } from "@/components/admin/SortableList";
+import { ReorderControls } from "@/components/admin/ReorderControls";
+import { moveToPosition, moveRelativeTo } from "@/lib/reorderHelpers";
 import CustomSectionsManager from "@/components/admin/about/CustomSectionsManager";
 import AssemblyMembersEditor, { defaultAssemblyData } from "@/components/admin/about/AssemblyMembersEditor";
 import type { AssemblyData } from "@/lib/assemblyExport";
