@@ -131,16 +131,22 @@ export const Header = () => {
                   </NavLink>
                 ))}
 
-                <Button
-                  className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold mt-4"
-                  onClick={() => {
-                    setOpen(false);
-                    navigate("/donate");
-                  }}
-                >
-                  <Heart className="h-4 w-4" fill="currentColor" />
-                  {t.nav.donate}
-                </Button>
+                {donateEnabled && (
+                  <Button
+                    className={cn(
+                      "font-bold mt-4",
+                      !donateBg && "bg-accent hover:bg-accent/90 text-accent-foreground",
+                    )}
+                    style={donateStyle}
+                    onClick={() => {
+                      setOpen(false);
+                      handleDonate();
+                    }}
+                  >
+                    {DonateIcon && <DonateIcon className="h-4 w-4" fill="currentColor" />}
+                    {donateLabel}
+                  </Button>
+                )}
               </div>
             </SheetContent>
           </Sheet>
