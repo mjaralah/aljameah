@@ -460,8 +460,38 @@ export default function AdminPageContentPage() {
         </div>
       );
     }
+    if (s.section_key === "partners") {
+      const d = s.data || {};
+      const style = d.display_style ?? "swiper";
+      return (
+        <div className="space-y-3">
+          <div>
+            <Label>عنوان فرعي (Eyebrow)</Label>
+            <Input value={d.eyebrow ?? ""} onChange={(e) => updateData(s.id, "eyebrow", e.target.value)}
+              placeholder="شركاؤنا" />
+          </div>
+          <div>
+            <Label>طريقة عرض الشركاء</Label>
+            <Select value={style} onValueChange={(v) => updateData(s.id, "display_style", v)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="swiper">كاروسيل تلقائي (افتراضي)</SelectItem>
+                <SelectItem value="marquee">شريط لانهائي (Marquee)</SelectItem>
+                <SelectItem value="grid">شبكة ثابتة</SelectItem>
+                <SelectItem value="bento">شبكة Bento متدرجة</SelectItem>
+                <SelectItem value="coverflow">كاروسيل ثلاثي الأبعاد</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground mt-1">
+              اختر النمط الذي يظهر به الشركاء في الصفحة الرئيسية، ثم اضغط حفظ.
+            </p>
+          </div>
+        </div>
+      );
+    }
     return null;
   }
+
 
   // روابط سريعة لإدارة الكيانات الكاملة لكل صفحة
   const QUICK_LINKS: Record<string, { to: string; label: string; icon: any; desc: string }[]> = {
