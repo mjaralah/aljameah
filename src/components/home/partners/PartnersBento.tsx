@@ -2,16 +2,16 @@ import type { PartnerItem } from "./types";
 
 // أنماط أحجام متدرجة تتكرر — يدعم أي عدد عناصر
 const SIZES = [
-  "md:col-span-2 md:row-span-2 h-40 md:h-full",
-  "h-28",
-  "h-28",
-  "md:col-span-2 h-28",
-  "h-28",
-  "h-28",
+  "w-full sm:w-64 h-40",
+  "w-36 sm:w-40 md:w-48 h-28",
+  "w-36 sm:w-40 md:w-48 h-28",
+  "w-full sm:w-64 h-28",
+  "w-36 sm:w-40 md:w-48 h-28",
+  "w-36 sm:w-40 md:w-48 h-28",
 ];
 
 export const PartnersBento = ({ items }: { items: PartnerItem[] }) => (
-  <div className="grid grid-cols-2 md:grid-cols-4 auto-rows-[7rem] gap-3">
+  <div className="flex flex-wrap justify-center items-stretch gap-3">
     {items.map((p, i) => (
       <a
         key={p.id}
