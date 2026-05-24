@@ -92,6 +92,9 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
     categoryFilter?.includeAll ? "__all__" : (categoryFilter?.options[0]?.value ?? ""),
   );
   const [publishedFilter, setPublishedFilter] = useState<"all" | "published" | "draft">("all");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
   async function load() {
     setLoading(true);
