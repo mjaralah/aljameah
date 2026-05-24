@@ -265,7 +265,6 @@ export default function AdminGovernancePage() {
 
   return (
     <CrudPage<GovDoc>
-      key={version}
       table="governance_documents"
       title="ملفات الحوكمة"
       description="إدارة جميع وثائق الحوكمة لعرضها في صفحة الحوكمة العامة"
