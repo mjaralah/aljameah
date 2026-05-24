@@ -333,10 +333,11 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
       ) : (
         <SortableList ids={filtered.map((r) => r.id)} onReorder={handleReorder}>
           <div className="space-y-2">
-            {filtered.map((row) => (
+            {filtered.map((row, idx) => (
               <SortableItem key={row.id} id={row.id} disabled={!reorderable || activeCategory === "__all__"}>
                 {({ handleProps, setNodeRef, style }) => {
                   const allView = activeCategory === "__all__";
+                  const canReorder = reorderable && !allView && filtered.length > 1;
                   return (
                   <AdminListRow
                     ref={setNodeRef as any}
@@ -345,6 +346,24 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
                     table={table}
                     showDragHandle={reorderable && !allView}
                     dragHandleProps={handleProps}
+                    reorderControls={canReorder ? (
+                      <ReorderControls
+                        position={idx + 1}
+                        total={filtered.length}
+                        others={filtered
+                          .filter((r) => r.id !== row.id)
+                          .map((r) => ({
+                            id: r.id,
+                            label: String(titleCol ? (r[titleCol.key as keyof T] ?? "") : r.id),
+                          }))}
+                        onMoveUp={() => reorderByPosition(row.id, idx)}
+                        onMoveDown={() => reorderByPosition(row.id, idx + 2)}
+                        onSetPosition={(pos) => reorderByPosition(row.id, pos)}
+                        onMoveToStart={() => reorderByPosition(row.id, 1)}
+                        onMoveToEnd={() => reorderByPosition(row.id, filtered.length)}
+                        onMoveRelative={(targetId, where) => moveRelative(row.id, targetId, where)}
+                      />
+                    ) : undefined}
                     thumbnail={thumbCol ? renderCol(thumbCol, row) : undefined}
                     title={titleCol ? renderCol(titleCol, row) : "—"}
                     subtitle={
