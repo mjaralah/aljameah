@@ -65,12 +65,15 @@ export const PartnersCarousel = () => {
   const eyebrow = (sec?.data?.eyebrow as string | undefined) || t.partners.title;
   const style = ((sec?.data?.display_style as PartnersDisplayStyle) || "swiper");
 
-  const items: PartnerItem[] = dbPartners && dbPartners.length > 0
-    ? dbPartners.map((p) => ({ id: p.id, name: p.name, logo: p.logo_url, url: p.website_url }))
-    : fallbackPartners.map((p) => ({ id: p.id, name: tx(p.name), logo: undefined, url: undefined }));
+  // Only show partners from the database (respects published flag)
+  if (!dbPartners || dbPartners.length === 0) return null;
 
-  // Hide section if there are no visible partners
-  if (items.length === 0) return null;
+  const items: PartnerItem[] = dbPartners.map((p) => ({
+    id: p.id,
+    name: p.name,
+    logo: p.logo_url,
+    url: p.website_url,
+  }));
 
   const renderBody = () => {
     switch (style) {
