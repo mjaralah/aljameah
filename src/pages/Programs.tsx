@@ -70,12 +70,14 @@ const Programs = () => {
 
   return (
     <>
-      <PageHero
-        eyebrow={t.nav.programs}
-        title={intro?.title || t.pages.programsPage.heading}
-        lead={intro?.content || t.pages.programsPage.lead}
-        breadcrumb={[{ label: intro?.title || t.nav.programs }]}
-      />
+      {intro && (
+        <PageHero
+          eyebrow={t.nav.programs}
+          title={intro.title || t.pages.programsPage.heading}
+          lead={intro.content || t.pages.programsPage.lead}
+          breadcrumb={[{ label: intro.title || t.nav.programs }]}
+        />
+      )}
 
       <section className="container py-12 md:py-16">
         {/* شريط التصفية — يظهر فقط مع البيانات الثابتة (التي تحتوي على تصنيفات) */}

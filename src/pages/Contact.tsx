@@ -191,12 +191,14 @@ export default function Contact() {
 
   return (
     <>
-      <PageHero
-        eyebrow="نحن هنا لخدمتك"
-        title={intro?.title || "تواصل معنا"}
-        lead={intro?.content || "نُرحب بأسئلتكم وملاحظاتكم ومقترحاتكم — اختر الطريقة الأنسب للتواصل وسنردّ عليك بأسرع وقت."}
-        breadcrumb={[{ label: intro?.title || "تواصل معنا" }]}
-      />
+      {intro && (
+        <PageHero
+          eyebrow="نحن هنا لخدمتك"
+          title={intro.title || "تواصل معنا"}
+          lead={intro.content || "نُرحب بأسئلتكم وملاحظاتكم ومقترحاتكم — اختر الطريقة الأنسب للتواصل وسنردّ عليك بأسرع وقت."}
+          breadcrumb={[{ label: intro.title || "تواصل معنا" }]}
+        />
+      )}
 
       {/* قسم قنوات التواصل السريعة - شريط أفقي */}
       <section className="container -mt-10 relative z-10 mb-12">
@@ -474,6 +476,7 @@ export default function Contact() {
       </section>
 
       {/* قسم الخريطة */}
+      {mapSec && (
       <section className="container pb-20">
         <div className="max-w-6xl mx-auto rounded-3xl overflow-hidden border shadow-card">
           <div className="bg-card p-5 flex items-center gap-3 border-b">
@@ -495,6 +498,7 @@ export default function Contact() {
           </div>
         </div>
       </section>
+      )}
     </>
   );
 }

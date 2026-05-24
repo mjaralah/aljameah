@@ -110,12 +110,14 @@ const Governance = () => {
 
   return (
     <>
-      <PageHero
-        eyebrow={t.brand.verified}
-        title={introSection?.title || t.pages.governance.heading}
-        lead={introSection?.content || t.pages.governance.lead}
-        breadcrumb={[{ label: t.nav.governance }]}
-      />
+      {introSection && (
+        <PageHero
+          eyebrow={t.brand.verified}
+          title={introSection.title || t.pages.governance.heading}
+          lead={introSection.content || t.pages.governance.lead}
+          breadcrumb={[{ label: t.nav.governance }]}
+        />
+      )}
 
       <section className="container py-10 md:py-14">
         <div className="grid lg:grid-cols-[300px_1fr] gap-6 lg:gap-8 items-start">

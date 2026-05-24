@@ -71,13 +71,13 @@ export default function MembershipService() {
   const heroLead = systemForm?.description || intro?.content || "انضم رسمياً إلى أسرة الجمعية، واحصل على مزايا حصرية وحق المشاركة في صنع القرار.";
   const unavailable = systemForm && (systemForm.archived || !systemForm.published);
   const benefitsSection = (pageSections ?? []).find((s) => s.section_key === "benefits");
-  const benefits = (Array.isArray(benefitsSection?.data?.items) && benefitsSection!.data.items.length > 0)
-    ? benefitsSection!.data.items.map((it: any) => ({
+  const benefits = benefitsSection && Array.isArray(benefitsSection.data?.items) && benefitsSection.data.items.length > 0
+    ? benefitsSection.data.items.map((it: any) => ({
         icon: resolveIcon(it.icon),
         title: it.title || "",
         desc: it.description || "",
       }))
-    : defaultBenefits;
+    : benefitsSection ? defaultBenefits : [];
   const [form, setForm] = useState<MembershipForm>({
     fullName: "", phone: "", gender: "", email: "", nationalId: "",
     education: "", jobTitle: "", employer: "",
@@ -135,15 +135,17 @@ export default function MembershipService() {
 
   return (
     <>
-      <PageHero
-        eyebrow="الخدمات الإلكترونية"
-        title={intro?.title || "طلب عضوية الجمعية"}
-        lead={intro?.content || "انضم رسمياً إلى أسرة الجمعية، واحصل على مزايا حصرية وحق المشاركة في صنع القرار."}
-        breadcrumb={[
-          { label: "الخدمات الإلكترونية", to: "/e-services" },
-          { label: intro?.title || "طلب عضوية" },
-        ]}
-      />
+      {intro && (
+        <PageHero
+          eyebrow="الخدمات الإلكترونية"
+          title={intro.title || "طلب عضوية الجمعية"}
+          lead={intro.content || "انضم رسمياً إلى أسرة الجمعية، واحصل على مزايا حصرية وحق المشاركة في صنع القرار."}
+          breadcrumb={[
+            { label: "الخدمات الإلكترونية", to: "/e-services" },
+            { label: intro.title || "طلب عضوية" },
+          ]}
+        />
+      )}
 
       <section className="relative py-16 md:py-20 overflow-hidden">
         {/* خلفية بنمط شبكي مميز لخدمة العضوية - مختلفة عن نمط النقاط في التطوع */}
@@ -177,8 +179,9 @@ export default function MembershipService() {
               </div>
             </div>
           ) : (
-            <div className="grid lg:grid-cols-[1fr_1.5fr] gap-6 max-w-6xl mx-auto">
+            <div className={cn("grid gap-6 mx-auto", benefitsSection ? "max-w-6xl lg:grid-cols-[1fr_1.5fr]" : "max-w-3xl")}>
               {/* اللوحة الجانبية - مزايا العضوية بهوية ذهبية مميزة */}
+              {benefitsSection && (
               <aside className="relative bg-gradient-to-br from-accent via-accent to-accent/80 rounded-3xl p-8 text-accent-foreground overflow-hidden shadow-gold">
                 <div className="absolute -top-16 -left-16 w-48 h-48 rounded-full bg-white/15" />
                 <div className="absolute -bottom-12 -right-12 w-40 h-40 rounded-full bg-white/10" />
@@ -206,6 +209,7 @@ export default function MembershipService() {
                   </ul>
                 </div>
               </aside>
+              )}
 
               <form onSubmit={onSubmit} className="bg-card border border-border rounded-3xl p-6 md:p-8 shadow-card" noValidate>
                 <div className="mb-6 flex items-center gap-4 pb-5 border-b">

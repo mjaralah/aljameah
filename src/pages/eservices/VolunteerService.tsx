@@ -175,7 +175,7 @@ export default function VolunteerService() {
   if (submitted) {
     return (
       <>
-        <PageHero eyebrow="الخدمات الإلكترونية" title={intro?.title || "طلب التطوع"} lead={intro?.content || "انضم إلى أسرة المتطوعين معنا"} />
+        {intro && <PageHero eyebrow="الخدمات الإلكترونية" title={intro.title || "طلب التطوع"} lead={intro.content || "انضم إلى أسرة المتطوعين معنا"} />}
         <section className="container py-20">
           <div className="mx-auto max-w-2xl text-center">
             <div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-primary shadow-card">
@@ -214,15 +214,17 @@ export default function VolunteerService() {
 
   return (
     <>
-      <PageHero
-        eyebrow="الخدمات الإلكترونية"
-        title={intro?.title || "انضم لفريق المتطوعين"}
-        lead={intro?.content || "كن جزءاً من رسالتنا في خدمة المجتمع — املأ النموذج وسنتواصل معك"}
-        breadcrumb={[
-          { label: "الخدمات الإلكترونية", to: "/e-services" },
-          { label: intro?.title || "التطوع" },
-        ]}
-      />
+      {intro && (
+        <PageHero
+          eyebrow="الخدمات الإلكترونية"
+          title={intro.title || "انضم لفريق المتطوعين"}
+          lead={intro.content || "كن جزءاً من رسالتنا في خدمة المجتمع — املأ النموذج وسنتواصل معك"}
+          breadcrumb={[
+            { label: "الخدمات الإلكترونية", to: "/e-services" },
+            { label: intro.title || "التطوع" },
+          ]}
+        />
+      )}
 
       {/* خلفية بنمط نقاط مميزة لخدمة التطوع */}
       <section className="relative container py-12 lg:py-16">
