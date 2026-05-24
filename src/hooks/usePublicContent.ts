@@ -121,16 +121,22 @@ export function usePublicContentRealtime() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
+    const refreshPublicQueries = () => {
+      window.dispatchEvent(new Event("public-content-changed"));
+      void queryClient.invalidateQueries({ queryKey: ["public"] });
+      void queryClient.invalidateQueries({ queryKey: ["public-eservices-forms"] });
+      void queryClient.invalidateQueries({ queryKey: ["system-form"] });
+      void queryClient.refetchQueries({ queryKey: ["public"], type: "active" });
+      void queryClient.refetchQueries({ queryKey: ["public-eservices-forms"], type: "active" });
+      void queryClient.refetchQueries({ queryKey: ["system-form"], type: "active" });
+    };
+
     const channel = supabase
       .channel("public-content-realtime-sync")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public" },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["public"] });
-          queryClient.invalidateQueries({ queryKey: ["public-eservices-forms"] });
-          queryClient.invalidateQueries({ queryKey: ["system-form"] });
-        },
+        { event: "UPDATE", schema: "public", table: "public_content_versions" },
+        refreshPublicQueries,
       )
       .subscribe();
 
