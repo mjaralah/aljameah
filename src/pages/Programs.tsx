@@ -138,11 +138,22 @@ const Programs = () => {
                         {p.beneficiaries.toLocaleString()}+ {t.stats.beneficiaries}
                       </span>
                     ) : <span />}
-                    <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                      <Heart className="h-3.5 w-3.5" fill="currentColor" />
-                      {t.pages.programsPage.sponsor}
-                      <ArrowLeft className={dir === "rtl" ? "h-3.5 w-3.5" : "h-3.5 w-3.5 rotate-180"} />
-                    </Button>
+                    {p.sponsorEnabled !== false && (() => {
+                      const SponsorIcon =
+                        (Icons[(p.sponsorIcon || "Heart") as keyof typeof Icons] as React.FC<{ className?: string; fill?: string }>) || Heart;
+                      const label = p.sponsorLabel || t.pages.programsPage.sponsor;
+                      const href = p.sponsorUrl || "#";
+                      const external = /^https?:\/\//i.test(href);
+                      return (
+                        <Button asChild size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                          <a href={href} target={external ? "_blank" : undefined} rel={external ? "noopener noreferrer" : undefined}>
+                            <SponsorIcon className="h-3.5 w-3.5" fill="currentColor" />
+                            {label}
+                            <ArrowLeft className={dir === "rtl" ? "h-3.5 w-3.5" : "h-3.5 w-3.5 rotate-180"} />
+                          </a>
+                        </Button>
+                      );
+                    })()}
                   </div>
                 </Card>
               );
