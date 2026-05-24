@@ -126,7 +126,21 @@ export default function AdminSurveysPage() {
     if (error) toast.error(error.message); else { toast.success("تم"); load(); }
   }
 
-  return (
+  async function reorderSurveys(newIds: string[]) {
+    setSurveys(newIds.map((id) => surveys.find((s) => s.id === id)!).filter(Boolean) as Survey[]);
+    try { await persistSortOrder(supabase, "surveys", newIds); toast.success("تم تحديث الترتيب"); }
+    catch { toast.error("تعذر حفظ الترتيب"); load(); }
+  }
+
+  async function reorderQuestions(surveyId: string, newIds: string[]) {
+    const qs = questions[surveyId] ?? [];
+    const reordered = newIds.map((id) => qs.find((q) => q.id === id)!).filter(Boolean) as Question[];
+    setQuestions((prev) => ({ ...prev, [surveyId]: reordered }));
+    try { await persistSortOrder(supabase, "survey_questions", newIds); toast.success("تم تحديث الترتيب"); }
+    catch { toast.error("تعذر حفظ الترتيب"); load(); }
+  }
+
+
     <AdminLayout title="الاستبيانات">
       <AdminPageHeader
         title="الاستبيانات"
