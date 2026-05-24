@@ -14,6 +14,7 @@ const DefaultSwiper = ({ items }: { items: PartnerItem[] }) => (
   <Swiper
     modules={[Autoplay]}
     loop={items.length > 2}
+    centeredSlides={items.length < 5}
     autoplay={{ delay: 2200, disableOnInteraction: false }}
     slidesPerView={2}
     spaceBetween={24}
