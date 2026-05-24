@@ -39,7 +39,8 @@ export const AdminListRow = forwardRef<HTMLDivElement, AdminListRowProps>(functi
   {
     id, table, title, subtitle, thumbnail, badges,
     published, onTogglePublished, onEdit, onDelete, extraActions,
-    dragHandleProps, showDragHandle = true, className, style, children,
+    dragHandleProps, showDragHandle = true, reorderControls,
+    className, style, children,
   },
   ref,
 ) {
