@@ -308,15 +308,6 @@ export default function AdminSettingsPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-5 md:p-6">
-            <SectionHeader
-              icon={MessageCircle}
-              title="زر واتساب العائم"
-              description="زر تواصل سريع يظهر في زاوية الصفحة لكل الزوار."
-            />
-          </CardContent>
-        </Card>
 
         <Card>
           <CardContent className="p-5 md:p-6">
