@@ -607,7 +607,8 @@ export default function AdminPageContentPage() {
                             );
                           })}
                         </SortableList>
-                      )}
+                        );
+                      })()}
 
                       {pageSections.length === 0 && !(QUICK_LINKS[page.key]?.length) && (
                         <AdminEmptyState icon={FolderOpen} title="لا توجد أقسام بعد — اضغط ‘إضافة قسم جديد’ لبدء البناء" />
