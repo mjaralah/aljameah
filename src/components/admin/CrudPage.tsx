@@ -172,11 +172,18 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
     const reorderedSubset = newIds
       .map((id) => filtered.find((r) => r.id === id))
       .filter(Boolean) as T[];
+    // Assign new sort_order values (10-step gaps) so the in-memory order
+    // matches what's persisted and React doesn't silently revert on next sort.
+    const orderMap = new Map(newIds.map((id, i) => [id, (i + 1) * 10]));
     const newRows: T[] = [];
     let cursor = 0;
     for (const r of rows) {
-      if (subsetIds.has(r.id)) newRows.push(reorderedSubset[cursor++]);
-      else newRows.push(r);
+      if (subsetIds.has(r.id)) {
+        const next = reorderedSubset[cursor++];
+        newRows.push({ ...next, sort_order: orderMap.get(next.id) } as T);
+      } else {
+        newRows.push(r);
+      }
     }
     setRows(newRows);
     try {
@@ -186,6 +193,30 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
       toast.error("تعذر حفظ الترتيب");
       load();
     }
+  }
+
+  function reorderByPosition(rowId: string, newPos1: number) {
+    const ids = filtered.map((r) => r.id);
+    const oldIdx = ids.indexOf(rowId);
+    if (oldIdx === -1) return;
+    const target = Math.max(0, Math.min(ids.length - 1, newPos1 - 1));
+    if (target === oldIdx) return;
+    const next = [...ids];
+    const [moved] = next.splice(oldIdx, 1);
+    next.splice(target, 0, moved);
+    handleReorder(next);
+  }
+
+  function moveRelative(rowId: string, targetId: string, where: "before" | "after") {
+    const ids = filtered.map((r) => r.id);
+    const oldIdx = ids.indexOf(rowId);
+    let targetIdx = ids.indexOf(targetId);
+    if (oldIdx === -1 || targetIdx === -1 || rowId === targetId) return;
+    const next = [...ids];
+    next.splice(oldIdx, 1);
+    targetIdx = next.indexOf(targetId);
+    next.splice(where === "before" ? targetIdx : targetIdx + 1, 0, rowId);
+    handleReorder(next);
   }
 
   function setValue<K extends keyof T>(key: K, value: T[K]) {
