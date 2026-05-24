@@ -85,6 +85,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
   orderBy = { column: "sort_order", ascending: true },
   reorderable = false,
   categoryFilter,
+  extraDialogActions,
 }: CrudPageProps<T>) {
   const [rows, setRows] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
