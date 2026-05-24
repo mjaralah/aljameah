@@ -50,7 +50,7 @@ export default function AdminDashboardPage() {
         { table: "custom_pages", label: "الصفحات", icon: FileText, to: "/admin/pages", color: "from-cyan-500/10 to-cyan-500/5 text-cyan-600" },
         { table: "board_members", label: "أعضاء المجلس", icon: Users, to: "/admin/board", color: "from-violet-500/10 to-violet-500/5 text-violet-600" },
         { table: "partners", label: "الشركاء", icon: Handshake, to: "/admin/partners", color: "from-amber-500/10 to-amber-500/5 text-amber-600" },
-        { table: "hero_slides", label: "شرائح البطل", icon: ImageIcon, to: "/admin/hero", color: "from-rose-500/10 to-rose-500/5 text-rose-600" },
+        { table: "hero_slides", label: "شرائح العرض الرئيسي", icon: ImageIcon, to: "/admin/hero", color: "from-rose-500/10 to-rose-500/5 text-rose-600" },
       ] as const;
 
       const requestTables = [
