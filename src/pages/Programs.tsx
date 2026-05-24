@@ -46,6 +46,10 @@ const Programs = () => {
         icon: p.icon || "Heart",
         beneficiaries: 0,
         featured: !!p.featured,
+        sponsorEnabled: p.sponsor_button_enabled !== false,
+        sponsorLabel: (lang === "en" ? p.sponsor_button_label_en : p.sponsor_button_label) || undefined,
+        sponsorUrl: p.sponsor_button_url || undefined,
+        sponsorIcon: p.sponsor_button_icon || "Heart",
       }));
     }
     return fallbackPrograms.map((p) => ({
