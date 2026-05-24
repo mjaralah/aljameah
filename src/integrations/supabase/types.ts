@@ -331,6 +331,75 @@ export type Database = {
         }
         Relationships: []
       }
+      footer_links: {
+        Row: {
+          created_at: string
+          id: string
+          label_ar: string
+          label_en: string | null
+          published: boolean
+          section_key: string
+          sort_order: number
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label_ar: string
+          label_en?: string | null
+          published?: boolean
+          section_key: string
+          sort_order?: number
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label_ar?: string
+          label_en?: string | null
+          published?: boolean
+          section_key?: string
+          sort_order?: number
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
+      footer_sections: {
+        Row: {
+          created_at: string
+          id: string
+          published: boolean
+          section_key: string
+          sort_order: number
+          title_ar: string | null
+          title_en: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          published?: boolean
+          section_key: string
+          sort_order?: number
+          title_ar?: string | null
+          title_en?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          published?: boolean
+          section_key?: string
+          sort_order?: number
+          title_ar?: string | null
+          title_en?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       governance_categories: {
         Row: {
           created_at: string
@@ -783,6 +852,12 @@ export type Database = {
           donate_button_url: string
           favicon_url: string | null
           feedback_visibility: Json
+          footer_brand_about_ar: string | null
+          footer_brand_about_en: string | null
+          footer_brand_name_ar: string | null
+          footer_brand_name_en: string | null
+          footer_brand_tagline_ar: string | null
+          footer_brand_tagline_en: string | null
           footer_text: string | null
           id: string
           logo_url: string | null
@@ -816,6 +891,12 @@ export type Database = {
           donate_button_url?: string
           favicon_url?: string | null
           feedback_visibility?: Json
+          footer_brand_about_ar?: string | null
+          footer_brand_about_en?: string | null
+          footer_brand_name_ar?: string | null
+          footer_brand_name_en?: string | null
+          footer_brand_tagline_ar?: string | null
+          footer_brand_tagline_en?: string | null
           footer_text?: string | null
           id?: string
           logo_url?: string | null
@@ -849,6 +930,12 @@ export type Database = {
           donate_button_url?: string
           favicon_url?: string | null
           feedback_visibility?: Json
+          footer_brand_about_ar?: string | null
+          footer_brand_about_en?: string | null
+          footer_brand_name_ar?: string | null
+          footer_brand_name_en?: string | null
+          footer_brand_tagline_ar?: string | null
+          footer_brand_tagline_en?: string | null
           footer_text?: string | null
           id?: string
           logo_url?: string | null
