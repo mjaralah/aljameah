@@ -259,8 +259,9 @@ const OverviewPanel = ({
   const fin = financialsOverride ?? financials;
   return (
   <div className="space-y-8 animate-in fade-in-50 duration-500">
-    {/* بطاقات إحصائية مالية */}
+    {showFinancials && (
     <Card className="p-6 md:p-8 bg-gradient-primary text-primary-foreground border-0 overflow-hidden relative">
+
       <div className="absolute inset-0 opacity-10 [background-image:radial-gradient(circle_at_85%_15%,white_1px,transparent_1px)] [background-size:20px_20px]" aria-hidden />
       <div className="relative">
         <div className="flex items-center gap-2 mb-4">
