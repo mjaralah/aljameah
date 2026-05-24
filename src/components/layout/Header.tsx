@@ -91,13 +91,19 @@ export const Header = () => {
           >
             <Search className="h-5 w-5" />
           </Button>
-          <Button
-            className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold shadow-gold hidden sm:inline-flex"
-            onClick={() => navigate("/donate")}
-          >
-            <Heart className="h-4 w-4" fill="currentColor" />
-            {t.nav.donate}
-          </Button>
+          {donateEnabled && (
+            <Button
+              className={cn(
+                "font-bold shadow-gold hidden sm:inline-flex",
+                !donateBg && "bg-accent hover:bg-accent/90 text-accent-foreground",
+              )}
+              style={donateStyle}
+              onClick={handleDonate}
+            >
+              {DonateIcon && <DonateIcon className="h-4 w-4" fill="currentColor" />}
+              {donateLabel}
+            </Button>
+          )}
 
           {/* قائمة الجوال */}
           <Sheet open={open} onOpenChange={setOpen}>
