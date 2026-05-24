@@ -49,7 +49,7 @@ const PAGES: { key: string; label: string; description: string }[] = [
 ];
 
 const SECTION_LABELS: Record<string, string> = {
-  hero: "شريط البطل (Hero)",
+  hero: "شريط العرض الرئيسي",
   intro: "المقدمة",
   hours: "ساعات العمل",
   map: "الخريطة والعنوان",
