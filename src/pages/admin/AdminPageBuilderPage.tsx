@@ -109,55 +109,104 @@ export default function AdminPageBuilderPage() {
         <>
           {sections.length > 1 && (
             <p className="text-xs text-muted-foreground mb-2">
-              اسحب <GripVertical className="inline w-3 h-3" /> لإعادة الترتيب.
+              استخدم الأسهم <span className="inline-block">▲▼</span> أو حقل الرقم لتغيير الترتيب، أو اسحب <GripVertical className="inline w-3 h-3" />.
             </p>
           )}
-          <SortableList
-            ids={sections.map((s) => s.id)}
-            onReorder={async (newIds) => {
-              const idx = new Map(newIds.map((id, i) => [id, i]));
-              setSections((arr) => arr.map((s) => idx.has(s.id) ? { ...s, sort_order: (idx.get(s.id)! + 1) * 10 } : s));
-              try { await persistSortOrder(supabase, "page_content", newIds); toast.success("تم تحديث الترتيب"); }
-              catch { toast.error("تعذر حفظ الترتيب"); load(); }
-            }}
-          >
-            {sections.map((s) => (
-              <SortableItem key={s.id} id={s.id}>
-                {({ handleProps, setNodeRef, style }) => (
-                  <AdminListRow
-                    ref={setNodeRef as any}
-                    style={style}
-                    id={s.id}
-                    table="page_content"
-                    dragHandleProps={handleProps}
-                    title={s.data?.block_type ?? "قسم"}
-                    subtitle={s.data?.title_ar || s.data?.title_en || undefined}
-                    published={s.published}
-                    onTogglePublished={(next) => update(s.id, { published: next })}
-                    onDelete={async () => {
-                      if (!confirm("حذف هذا القسم نهائياً؟")) return;
-                      const { error } = await supabase.from("page_content").delete().eq("id", s.id);
-                      if (error) toast.error(error.message); else { toast.success("تم الحذف"); load(); }
-                    }}
-                  >
-                    <CardContent className="border-t pt-4 space-y-3">
-                      <BlockEditor
-                        data={s.data || {}}
-                        onChange={(next) => update(s.id, { data: next })}
-                        folder={`custom/${pageId}`}
-                      />
-                      <div className="flex justify-end">
-                        <Button size="sm" onClick={() => save(s)} disabled={savingId === s.id}>
-                          {savingId === s.id ? <Loader2 className="w-4 h-4 ml-1 animate-spin" /> : <Save className="w-4 h-4 ml-1" />}
-                          حفظ
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </AdminListRow>
-                )}
-              </SortableItem>
-            ))}
-          </SortableList>
+          {(() => {
+            async function applyOrder(newIds: string[]) {
+              const orderMap = new Map(newIds.map((id, i) => [id, (i + 1) * 10]));
+              const byId = new Map(sections.map((s) => [s.id, s]));
+              const next = newIds
+                .map((id) => byId.get(id))
+                .filter(Boolean)
+                .map((s) => ({ ...(s as Section), sort_order: orderMap.get((s as Section).id)! }));
+              setSections(next as Section[]);
+              try {
+                await persistSortOrder(supabase, "page_content", newIds);
+                toast.success("تم تحديث الترتيب");
+              } catch {
+                toast.error("تعذر حفظ الترتيب");
+                load();
+              }
+            }
+            function reorderByPosition(id: string, newPos1: number) {
+              const ids = sections.map((s) => s.id);
+              const oldIdx = ids.indexOf(id);
+              if (oldIdx === -1) return;
+              const target = Math.max(0, Math.min(ids.length - 1, newPos1 - 1));
+              if (target === oldIdx) return;
+              const arr = [...ids];
+              const [m] = arr.splice(oldIdx, 1);
+              arr.splice(target, 0, m);
+              applyOrder(arr);
+            }
+            function moveRelative(id: string, targetId: string, where: "before" | "after") {
+              const ids = sections.map((s) => s.id);
+              const oldIdx = ids.indexOf(id);
+              let tIdx = ids.indexOf(targetId);
+              if (oldIdx === -1 || tIdx === -1 || id === targetId) return;
+              const arr = [...ids];
+              arr.splice(oldIdx, 1);
+              tIdx = arr.indexOf(targetId);
+              arr.splice(where === "before" ? tIdx : tIdx + 1, 0, id);
+              applyOrder(arr);
+            }
+            return (
+              <SortableList ids={sections.map((s) => s.id)} onReorder={applyOrder}>
+                {sections.map((s, idx) => (
+                  <SortableItem key={s.id} id={s.id}>
+                    {({ handleProps, setNodeRef, style }) => (
+                      <AdminListRow
+                        ref={setNodeRef as any}
+                        style={style}
+                        id={s.id}
+                        table="page_content"
+                        dragHandleProps={handleProps}
+                        reorderControls={sections.length > 1 ? (
+                          <ReorderControls
+                            position={idx + 1}
+                            total={sections.length}
+                            others={sections
+                              .filter((o) => o.id !== s.id)
+                              .map((o) => ({ id: o.id, label: String(o.data?.title_ar || o.data?.title_en || o.data?.block_type || "قسم") }))}
+                            onMoveUp={() => reorderByPosition(s.id, idx)}
+                            onMoveDown={() => reorderByPosition(s.id, idx + 2)}
+                            onSetPosition={(pos) => reorderByPosition(s.id, pos)}
+                            onMoveToStart={() => reorderByPosition(s.id, 1)}
+                            onMoveToEnd={() => reorderByPosition(s.id, sections.length)}
+                            onMoveRelative={(targetId, where) => moveRelative(s.id, targetId, where)}
+                          />
+                        ) : undefined}
+                        title={s.data?.block_type ?? "قسم"}
+                        subtitle={s.data?.title_ar || s.data?.title_en || undefined}
+                        published={s.published}
+                        onTogglePublished={(next) => update(s.id, { published: next })}
+                        onDelete={async () => {
+                          if (!confirm("حذف هذا القسم نهائياً؟")) return;
+                          const { error } = await supabase.from("page_content").delete().eq("id", s.id);
+                          if (error) toast.error(error.message); else { toast.success("تم الحذف"); load(); }
+                        }}
+                      >
+                        <CardContent className="border-t pt-4 space-y-3">
+                          <BlockEditor
+                            data={s.data || {}}
+                            onChange={(next) => update(s.id, { data: next })}
+                            folder={`custom/${pageId}`}
+                          />
+                          <div className="flex justify-end">
+                            <Button size="sm" onClick={() => save(s)} disabled={savingId === s.id}>
+                              {savingId === s.id ? <Loader2 className="w-4 h-4 ml-1 animate-spin" /> : <Save className="w-4 h-4 ml-1" />}
+                              حفظ
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </AdminListRow>
+                    )}
+                  </SortableItem>
+                ))}
+              </SortableList>
+            );
+          })()}
         </>
       )}
     </AdminLayout>
