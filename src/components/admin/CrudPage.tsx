@@ -371,6 +371,21 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
         </p>
       )}
 
+      {!loading && filtered.length > 0 && (
+        <BulkActionsBar
+          count={visibleSelectedCount}
+          total={filtered.length}
+          allSelected={allVisibleSelected}
+          onToggleAll={toggleSelectAll}
+          onClear={clearSelection}
+          onPublish={() => bulkSetPublished(true)}
+          onUnpublish={() => bulkSetPublished(false)}
+          onDelete={() => setBulkDeleteOpen(true)}
+          busy={bulkBusy}
+        />
+      )}
+
+
       {loading ? (
         <Card><CardContent className="p-12 flex justify-center">
           <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
