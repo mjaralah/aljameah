@@ -30,6 +30,10 @@ export type AdminListRowProps = {
   showDragHandle?: boolean;
   /** Optional alternative reorder controls (arrows / position input / move-to menu). */
   reorderControls?: ReactNode;
+  /** Show a selection checkbox on the right. */
+  selectable?: boolean;
+  selected?: boolean;
+  onSelectChange?: (next: boolean) => void;
   className?: string;
   style?: React.CSSProperties;
   children?: ReactNode;
@@ -40,6 +44,7 @@ export const AdminListRow = forwardRef<HTMLDivElement, AdminListRowProps>(functi
     id, table, title, subtitle, thumbnail, badges,
     published, onTogglePublished, onEdit, onDelete, extraActions,
     dragHandleProps, showDragHandle = true, reorderControls,
+    selectable, selected, onSelectChange,
     className, style, children,
   },
   ref,
@@ -67,10 +72,21 @@ export const AdminListRow = forwardRef<HTMLDivElement, AdminListRowProps>(functi
       className={cn(
         "transition-smooth border-border/70",
         !published && "opacity-[0.55]",
+        selected && "ring-2 ring-primary/40 border-primary/40 bg-primary/[0.03] opacity-100",
         className,
       )}
     >
       <div className="flex items-center gap-3 p-3 md:p-4">
+        {selectable && (
+          <label className="flex items-center cursor-pointer p-1" aria-label="تحديد العنصر">
+            <input
+              type="checkbox"
+              className="h-4 w-4 rounded border-border accent-primary"
+              checked={!!selected}
+              onChange={(e) => onSelectChange?.(e.target.checked)}
+            />
+          </label>
+        )}
         {showDragHandle && (
           <button
             type="button"

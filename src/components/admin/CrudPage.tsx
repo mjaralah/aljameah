@@ -22,6 +22,7 @@ import { AdminEmptyState } from "@/components/admin/AdminEmptyState";
 import { AdminListToolbar } from "@/components/admin/AdminListToolbar";
 import { AdminDialog } from "@/components/admin/AdminDialog";
 import { ReorderControls } from "@/components/admin/ReorderControls";
+import { BulkActionsBar } from "@/components/admin/BulkActionsBar";
 
 export type Column<T> = {
   key: keyof T | string;
@@ -91,6 +92,9 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
     categoryFilter?.includeAll ? "__all__" : (categoryFilter?.options[0]?.value ?? ""),
   );
   const [publishedFilter, setPublishedFilter] = useState<"all" | "published" | "draft">("all");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -125,6 +129,55 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
 
   const publishedCount = rows.filter((r) => r.published).length;
   const draftCount = rows.length - publishedCount;
+
+  // امسح التحديد عند تغيير الفلاتر/البحث/التصنيف لمنع تنفيذ إجراءات على عناصر مخفية.
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [activeCategory, publishedFilter, search]);
+
+  const filteredIds = useMemo(() => filtered.map((r) => r.id), [filtered]);
+  const visibleSelectedCount = filteredIds.filter((id) => selectedIds.has(id)).length;
+  const allVisibleSelected = filteredIds.length > 0 && visibleSelectedCount === filteredIds.length;
+
+  function toggleSelect(id: string, next: boolean) {
+    setSelectedIds((prev) => {
+      const s = new Set(prev);
+      if (next) s.add(id); else s.delete(id);
+      return s;
+    });
+  }
+  function toggleSelectAll(next: boolean) {
+    setSelectedIds(next ? new Set(filteredIds) : new Set());
+  }
+  function clearSelection() {
+    setSelectedIds(new Set());
+  }
+
+  async function bulkSetPublished(next: boolean) {
+    const ids = Array.from(selectedIds).filter((id) => filteredIds.includes(id));
+    if (ids.length === 0) return;
+    setBulkBusy(true);
+    const { error } = await supabase.from(table).update({ published: next } as never).in("id", ids);
+    setBulkBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success(next ? `تم نشر ${ids.length} عنصراً` : `تم إخفاء ${ids.length} عنصراً`);
+    clearSelection();
+    load();
+  }
+
+  async function bulkDelete() {
+    const ids = Array.from(selectedIds).filter((id) => filteredIds.includes(id));
+    if (ids.length === 0) return;
+    setBulkBusy(true);
+    const { error } = await supabase.from(table).delete().in("id", ids);
+    setBulkBusy(false);
+    setBulkDeleteOpen(false);
+    if (error) return toast.error(error.message);
+    toast.success(`تم حذف ${ids.length} عنصراً`);
+    clearSelection();
+    load();
+  }
+
 
   async function handleSave() {
     if (!editing) return;
@@ -318,6 +371,21 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
         </p>
       )}
 
+      {!loading && filtered.length > 0 && (
+        <BulkActionsBar
+          count={visibleSelectedCount}
+          total={filtered.length}
+          allSelected={allVisibleSelected}
+          onToggleAll={toggleSelectAll}
+          onClear={clearSelection}
+          onPublish={() => bulkSetPublished(true)}
+          onUnpublish={() => bulkSetPublished(false)}
+          onDelete={() => setBulkDeleteOpen(true)}
+          busy={bulkBusy}
+        />
+      )}
+
+
       {loading ? (
         <Card><CardContent className="p-12 flex justify-center">
           <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
@@ -383,7 +451,11 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
                     onTogglePublished={() => load()}
                     onEdit={() => setEditing(row)}
                     onDelete={() => setDeleteId(row.id)}
+                    selectable
+                    selected={selectedIds.has(row.id)}
+                    onSelectChange={(next) => toggleSelect(row.id, next)}
                   />
+
                   );
                 }}
               </SortableItem>
@@ -419,6 +491,47 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               حذف
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={bulkDeleteOpen} onOpenChange={(o) => { if (!o && !bulkBusy) setBulkDeleteOpen(false); }}>
+        <AlertDialogContent dir="rtl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>تأكيد الحذف المجمّع</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2">
+                <p>
+                  سيتم حذف <span className="font-bold text-destructive">{visibleSelectedCount}</span> عنصراً نهائياً. لا يمكن التراجع عن هذا الإجراء.
+                </p>
+                {(() => {
+                  const selectedRows = filtered.filter((r) => selectedIds.has(r.id));
+                  const preview = selectedRows.slice(0, 3);
+                  const extra = selectedRows.length - preview.length;
+                  return (
+                    <ul className="text-xs text-muted-foreground list-disc pr-5 space-y-0.5">
+                      {preview.map((r) => (
+                        <li key={r.id} className="line-clamp-1">
+                          {titleCol ? String(r[titleCol.key as keyof T] ?? r.id) : r.id}
+                        </li>
+                      ))}
+                      {extra > 0 && <li>و{extra} {extra === 1 ? "عنصر آخر" : "عناصر أخرى"}</li>}
+                    </ul>
+                  );
+                })()}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2">
+            <AlertDialogCancel disabled={bulkBusy}>إلغاء</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); bulkDelete(); }}
+              disabled={bulkBusy}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {bulkBusy ? <Loader2 className="w-4 h-4 ml-1 animate-spin" /> : null}
+              حذف الكل
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
