@@ -451,7 +451,11 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
                     onTogglePublished={() => load()}
                     onEdit={() => setEditing(row)}
                     onDelete={() => setDeleteId(row.id)}
+                    selectable
+                    selected={selectedIds.has(row.id)}
+                    onSelectChange={(next) => toggleSelect(row.id, next)}
                   />
+
                   );
                 }}
               </SortableItem>
