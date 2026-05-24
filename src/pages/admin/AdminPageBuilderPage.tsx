@@ -1,10 +1,15 @@
 // محرر أقسام صفحة مخصّصة — يستخدم نفس بانِي البلوكات
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AdminListRow } from "@/components/admin/AdminListRow";
 import { AdminEmptyState } from "@/components/admin/AdminEmptyState";
+import { BulkActionsBar } from "@/components/admin/BulkActionsBar";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
 import { Loader2, Plus, Save, Blocks, ExternalLink, ArrowRight, FolderOpen, GripVertical } from "lucide-react";
@@ -13,6 +18,7 @@ import { ReorderControls } from "@/components/admin/ReorderControls";
 import { BlockEditor } from "@/components/admin/blocks/BlockEditor";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
 
 type Section = {
   id: string;
