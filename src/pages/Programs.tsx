@@ -22,10 +22,14 @@ type ViewItem = {
   category?: Program["category"];
   beneficiaries: number;
   featured?: boolean;
+  sponsorEnabled?: boolean;
+  sponsorLabel?: string;
+  sponsorUrl?: string;
+  sponsorIcon?: string;
 };
 
 const Programs = () => {
-  const { t, tx, dir } = useLanguage();
+  const { t, tx, dir, lang } = useLanguage();
   const [active, setActive] = useState<Program["category"] | "all">("all");
   const { data: dbPrograms } = usePrograms();
   const { data: pageSections } = usePageContent("programs");
