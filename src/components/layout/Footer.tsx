@@ -23,8 +23,15 @@ export const Footer = () => {
     { to: "/e-services/membership", label: t.nav.eservicesMembership },
   ];
   const visibility = (settings as any)?.pages_visibility as Record<string, boolean> | undefined;
-  const sitemapHidden = visibility && visibility.sitemap === false;
-  const legalSectionHidden = visibility && visibility.footer_legal === false;
+  const isHidden = (key: string) => visibility && visibility[key] === false;
+  const sitemapHidden = isHidden("sitemap");
+  const brandHidden = isHidden("footer_brand");
+  const socialHidden = isHidden("footer_social");
+  const quickHidden = isHidden("footer_quick");
+  const eservicesHidden = isHidden("footer_eservices");
+  const legalSectionHidden = isHidden("footer_legal");
+  const contactHidden = isHidden("footer_contact");
+  const bottomHidden = isHidden("footer_bottom");
   const legal = [
     ...((legalPages ?? []).map((p) => ({ to: `/${p.slug}`, label: p.title }))),
     ...(sitemapHidden ? [] : [{ to: "/sitemap", label: t.footer.sitemap }]),
