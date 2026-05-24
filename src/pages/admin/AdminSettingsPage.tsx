@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { MediaUpload } from "@/components/admin/MediaUpload";
-import { Loader2, Save, Settings as SettingsIcon, Palette, Phone, Share2, Image as ImageIcon, ThumbsUp, EyeOff } from "lucide-react";
+import { Loader2, Save, Settings as SettingsIcon, Palette, Phone, Share2, Image as ImageIcon, ThumbsUp, EyeOff, MessageCircle } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
@@ -32,6 +33,12 @@ type Settings = {
   footer_text: string | null;
   feedback_visibility: VisibilityMap | null;
   pages_visibility: VisibilityMap | null;
+  whatsapp_enabled: boolean | null;
+  whatsapp_number: string | null;
+  whatsapp_message: string | null;
+  whatsapp_tooltip: string | null;
+  whatsapp_show_tooltip: boolean | null;
+  whatsapp_position: string | null;
 };
 
 const FEEDBACK_PAGES: { key: string; label: string }[] = [
@@ -285,6 +292,75 @@ export default function AdminSettingsPage() {
                   />
                 </div>
               ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-5 md:p-6">
+            <SectionHeader
+              icon={MessageCircle}
+              title="زر واتساب العائم"
+              description="زر تواصل سريع يظهر في زاوية الصفحة لكل الزوار."
+            />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between rounded-lg border p-3 bg-muted/30">
+                <Label htmlFor="wa-en" className="m-0 cursor-pointer">تفعيل الزر</Label>
+                <Switch
+                  id="wa-en"
+                  checked={!!s.whatsapp_enabled}
+                  onCheckedChange={(v) => set("whatsapp_enabled", v)}
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label>رقم الواتساب (بصيغة دولية بدون +)</Label>
+                  <Input
+                    dir="ltr"
+                    placeholder="966500000000"
+                    value={s.whatsapp_number ?? ""}
+                    onChange={(e) => set("whatsapp_number", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label>موضع الزر</Label>
+                  <Select
+                    value={s.whatsapp_position ?? "left"}
+                    onValueChange={(v) => set("whatsapp_position", v)}
+                  >
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="left">يسار الصفحة</SelectItem>
+                      <SelectItem value="right">يمين الصفحة</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div>
+                <Label>الرسالة الافتراضية</Label>
+                <Textarea
+                  rows={2}
+                  placeholder="مرحباً، أرغب في الاستفسار عن..."
+                  value={s.whatsapp_message ?? ""}
+                  onChange={(e) => set("whatsapp_message", e.target.value)}
+                />
+              </div>
+              <div>
+                <Label>نص التلميح المنبثق</Label>
+                <Input
+                  placeholder="مرحباً 👋 كيف يمكننا مساعدتك؟"
+                  value={s.whatsapp_tooltip ?? ""}
+                  onChange={(e) => set("whatsapp_tooltip", e.target.value)}
+                />
+              </div>
+              <div className="flex items-center justify-between rounded-lg border p-3 bg-muted/30">
+                <Label htmlFor="wa-tip" className="m-0 cursor-pointer">إظهار التلميح تلقائياً بعد فتح الصفحة</Label>
+                <Switch
+                  id="wa-tip"
+                  checked={s.whatsapp_show_tooltip !== false}
+                  onCheckedChange={(v) => set("whatsapp_show_tooltip", v)}
+                />
+              </div>
             </div>
           </CardContent>
         </Card>

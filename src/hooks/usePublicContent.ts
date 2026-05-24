@@ -93,6 +93,12 @@ export type DBSiteSettings = {
   footer_text: string | null;
   feedback_visibility: Record<string, boolean> | null;
   pages_visibility: Record<string, boolean> | null;
+  whatsapp_enabled: boolean | null;
+  whatsapp_number: string | null;
+  whatsapp_message: string | null;
+  whatsapp_tooltip: string | null;
+  whatsapp_show_tooltip: boolean | null;
+  whatsapp_position: string | null;
 };
 
 const STALE = 1000 * 60 * 2; // 2 دقيقة
