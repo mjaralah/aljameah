@@ -170,6 +170,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
     if (error) return toast.error(error.message);
     toast.success(next ? `تم نشر ${ids.length} عنصراً` : `تم إخفاء ${ids.length} عنصراً`);
     clearSelection();
+    invalidatePublic();
     load();
   }
 
@@ -183,6 +184,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
     if (error) return toast.error(error.message);
     toast.success(`تم حذف ${ids.length} عنصراً`);
     clearSelection();
+    invalidatePublic();
     load();
   }
 
