@@ -31,6 +31,7 @@ import {
   Twitter,
   Instagram,
   Facebook,
+  Linkedin,
   Youtube,
   MessageCircle,
   HelpCircle,
