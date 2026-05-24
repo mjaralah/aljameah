@@ -30,6 +30,10 @@ export type AdminListRowProps = {
   showDragHandle?: boolean;
   /** Optional alternative reorder controls (arrows / position input / move-to menu). */
   reorderControls?: ReactNode;
+  /** Show a selection checkbox on the right. */
+  selectable?: boolean;
+  selected?: boolean;
+  onSelectChange?: (next: boolean) => void;
   className?: string;
   style?: React.CSSProperties;
   children?: ReactNode;
