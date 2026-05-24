@@ -10,34 +10,51 @@ import { PartnersBento } from "./partners/PartnersBento";
 import { PartnersCoverflow } from "./partners/PartnersCoverflow";
 import type { PartnersDisplayStyle, PartnerItem } from "./partners/types";
 
-const DefaultSwiper = ({ items }: { items: PartnerItem[] }) => (
-  <Swiper
-    modules={[Autoplay]}
-    loop={items.length > 2}
-    centeredSlides={items.length < 5}
-    autoplay={{ delay: 2200, disableOnInteraction: false }}
-    slidesPerView={2}
-    spaceBetween={24}
-    breakpoints={{ 640: { slidesPerView: 3 }, 1024: { slidesPerView: 5 } }}
+const PartnerCard = ({ p }: { p: PartnerItem }) => (
+  <a
+    href={p.url || "#"}
+    target={p.url ? "_blank" : undefined}
+    rel={p.url ? "noopener noreferrer" : undefined}
+    className="block h-24 w-full rounded-xl border border-border bg-card grid place-items-center text-primary font-bold px-4 text-center hover:border-accent/40 hover:shadow-soft transition-smooth"
   >
-    {items.map((p) => (
-      <SwiperSlide key={p.id}>
-        <a
-          href={p.url || "#"}
-          target={p.url ? "_blank" : undefined}
-          rel={p.url ? "noopener noreferrer" : undefined}
-          className="block h-24 rounded-xl border border-border bg-card grid place-items-center text-primary font-bold px-4 text-center hover:border-accent/40 hover:shadow-soft transition-smooth"
-        >
-          {p.logo ? (
-            <img src={p.logo} alt={p.name} className="max-h-14 max-w-full object-contain" loading="lazy" />
-          ) : (
-            <span>{p.name}</span>
-          )}
-        </a>
-      </SwiperSlide>
-    ))}
-  </Swiper>
+    {p.logo ? (
+      <img src={p.logo} alt={p.name} className="max-h-14 max-w-full object-contain" loading="lazy" />
+    ) : (
+      <span>{p.name}</span>
+    )}
+  </a>
 );
+
+const DefaultSwiper = ({ items }: { items: PartnerItem[] }) => {
+  // When there are few items, center them with flex instead of Swiper to avoid left alignment
+  if (items.length < 5) {
+    return (
+      <div className="flex flex-wrap justify-center gap-6">
+        {items.map((p) => (
+          <div key={p.id} className="w-40 sm:w-44 md:w-48">
+            <PartnerCard p={p} />
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return (
+    <Swiper
+      modules={[Autoplay]}
+      loop
+      autoplay={{ delay: 2200, disableOnInteraction: false }}
+      slidesPerView={2}
+      spaceBetween={24}
+      breakpoints={{ 640: { slidesPerView: 3 }, 1024: { slidesPerView: 5 } }}
+    >
+      {items.map((p) => (
+        <SwiperSlide key={p.id}>
+          <PartnerCard p={p} />
+        </SwiperSlide>
+      ))}
+    </Swiper>
+  );
+};
 
 export const PartnersCarousel = () => {
   const { t, tx } = useLanguage();
