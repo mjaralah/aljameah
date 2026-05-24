@@ -271,10 +271,11 @@ export function useAboutContent() {
     queryKey: ["public", "about_content"],
     staleTime: STALE,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("about_content")
+      // Reads from the sanitized public view (strips member emails/phones
+      // when contact_public is false). Staff use the raw table elsewhere.
+      const { data, error } = await (supabase as any)
+        .from("about_content_public")
         .select("*")
-        .eq("published", true)
         .order("sort_order", { ascending: true });
       if (error) throw error;
       return (data ?? []) as DBAboutSection[];
