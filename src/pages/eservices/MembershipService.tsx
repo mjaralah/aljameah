@@ -179,7 +179,7 @@ export default function MembershipService() {
               </div>
             </div>
           ) : (
-            <div className="grid lg:grid-cols-[1fr_1.5fr] gap-6 max-w-6xl mx-auto">
+            <div className={cn("grid gap-6 mx-auto", benefitsSection ? "max-w-6xl lg:grid-cols-[1fr_1.5fr]" : "max-w-3xl")}>
               {/* اللوحة الجانبية - مزايا العضوية بهوية ذهبية مميزة */}
               {benefitsSection && (
               <aside className="relative bg-gradient-to-br from-accent via-accent to-accent/80 rounded-3xl p-8 text-accent-foreground overflow-hidden shadow-gold">
