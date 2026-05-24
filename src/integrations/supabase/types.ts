@@ -750,6 +750,7 @@ export type Database = {
           primary_color: string | null
           secondary_color: string | null
           site_name: string | null
+          social_facebook: string | null
           social_instagram: string | null
           social_linkedin: string | null
           social_twitter: string | null
@@ -775,6 +776,7 @@ export type Database = {
           primary_color?: string | null
           secondary_color?: string | null
           site_name?: string | null
+          social_facebook?: string | null
           social_instagram?: string | null
           social_linkedin?: string | null
           social_twitter?: string | null
@@ -800,6 +802,7 @@ export type Database = {
           primary_color?: string | null
           secondary_color?: string | null
           site_name?: string | null
+          social_facebook?: string | null
           social_instagram?: string | null
           social_linkedin?: string | null
           social_twitter?: string | null
