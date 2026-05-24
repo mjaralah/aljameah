@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Facebook, Heart, Instagram, Linkedin, Mail, MapPin, Phone, Youtube } from "lucide-react";
+import { Facebook, Heart, Instagram, Linkedin, Mail, MapPin, MessageCircle, Phone, Youtube } from "lucide-react";
 import { XLogo } from "@/components/icons/XLogo";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSiteSettings } from "@/hooks/usePublicContent";
