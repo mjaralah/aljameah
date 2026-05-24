@@ -461,7 +461,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
                       ) : undefined
                     }
                     published={!!row.published}
-                    onTogglePublished={() => load()}
+                    onTogglePublished={() => { invalidatePublic(); load(); }}
                     onEdit={() => setEditing(row)}
                     onDelete={() => setDeleteId(row.id)}
                     selectable
