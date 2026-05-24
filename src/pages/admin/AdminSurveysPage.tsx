@@ -140,6 +140,7 @@ export default function AdminSurveysPage() {
     catch { toast.error("تعذر حفظ الترتيب"); load(); }
   }
 
+  return (
 
     <AdminLayout title="الاستبيانات">
       <AdminPageHeader
