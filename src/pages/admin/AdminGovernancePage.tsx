@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AdminDialog } from "@/components/admin/AdminDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Pencil, Plus, Trash2, FolderCog } from "lucide-react";
+import { Loader2, Pencil, Plus, Trash2, FolderCog, Eye, EyeOff, ArrowUp, ArrowDown, ArrowUpToLine, ArrowDownToLine } from "lucide-react";
 
 type GovDoc = {
   id: string;
@@ -94,6 +94,46 @@ function CategoryManager({ onChanged }: { onChanged: () => void }) {
     onChanged();
   }
 
+  async function togglePublished(row: GovCategory) {
+    const next = !row.published;
+    setRows((prev) => prev.map((r) => (r.id === row.id ? { ...r, published: next } : r)));
+    const { error } = await supabase.from("governance_categories").update({ published: next }).eq("id", row.id);
+    if (error) {
+      toast.error(error.message);
+      await load();
+      return;
+    }
+    toast.success(next ? "تم إظهار القسم" : "تم إخفاء القسم");
+    onChanged();
+  }
+
+  async function persistOrder(newRows: GovCategory[]) {
+    setRows(newRows);
+    const updates = newRows.map((r, idx) =>
+      supabase.from("governance_categories").update({ sort_order: (idx + 1) * 10 }).eq("id", r.id),
+    );
+    const results = await Promise.all(updates);
+    const err = results.find((r) => r.error)?.error;
+    if (err) {
+      toast.error(err.message);
+      await load();
+      return;
+    }
+    onChanged();
+  }
+
+  async function move(index: number, direction: "up" | "down" | "top" | "bottom") {
+    const next = [...rows];
+    const [item] = next.splice(index, 1);
+    let target = index;
+    if (direction === "up") target = Math.max(0, index - 1);
+    else if (direction === "down") target = Math.min(next.length, index + 1);
+    else if (direction === "top") target = 0;
+    else if (direction === "bottom") target = next.length;
+    next.splice(target, 0, item);
+    await persistOrder(next);
+  }
+
   return (
     <>
       <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
@@ -126,14 +166,31 @@ function CategoryManager({ onChanged }: { onChanged: () => void }) {
             <p className="text-sm text-muted-foreground text-center py-6">لا توجد أقسام بعد.</p>
           ) : (
             <div className="space-y-1.5">
-              {rows.map((r) => (
-                <div key={r.id} className="flex items-center justify-between gap-2 p-2 border rounded-md bg-card">
+              {rows.map((r, idx) => (
+                <div key={r.id} className={`flex items-center justify-between gap-1 p-2 border rounded-md bg-card ${!r.published ? "opacity-60" : ""}`}>
                   <div className="min-w-0 flex-1">
                     <div className="font-medium text-sm truncate">{r.label_ar} <span className="text-xs text-muted-foreground">/ {r.label_en}</span></div>
-                    <div className="text-xs text-muted-foreground">المعرّف: {r.slug} · الترتيب: {r.sort_order} {!r.published && "· مخفي"}</div>
+                    <div className="text-xs text-muted-foreground">المعرّف: {r.slug} {!r.published && "· مخفي"}</div>
                   </div>
-                  <Button size="icon" variant="ghost" onClick={() => setEditing(r)}><Pencil className="w-4 h-4" /></Button>
-                  <Button size="icon" variant="ghost" onClick={() => remove(r)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
+                  <div className="flex items-center gap-0.5 border-l pl-1 ml-1">
+                    <Button size="icon" variant="ghost" className="h-8 w-8" disabled={idx === 0} onClick={() => move(idx, "top")} title="نقل إلى الأعلى">
+                      <ArrowUpToLine className="w-4 h-4" />
+                    </Button>
+                    <Button size="icon" variant="ghost" className="h-8 w-8" disabled={idx === 0} onClick={() => move(idx, "up")} title="تحريك للأعلى">
+                      <ArrowUp className="w-4 h-4" />
+                    </Button>
+                    <Button size="icon" variant="ghost" className="h-8 w-8" disabled={idx === rows.length - 1} onClick={() => move(idx, "down")} title="تحريك للأسفل">
+                      <ArrowDown className="w-4 h-4" />
+                    </Button>
+                    <Button size="icon" variant="ghost" className="h-8 w-8" disabled={idx === rows.length - 1} onClick={() => move(idx, "bottom")} title="نقل إلى الأسفل">
+                      <ArrowDownToLine className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => togglePublished(r)} title={r.published ? "إخفاء" : "إظهار"}>
+                    {r.published ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4 text-muted-foreground" />}
+                  </Button>
+                  <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setEditing(r)} title="تعديل"><Pencil className="w-4 h-4" /></Button>
+                  <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => remove(r)} title="حذف"><Trash2 className="w-4 h-4 text-destructive" /></Button>
                 </div>
               ))}
             </div>
