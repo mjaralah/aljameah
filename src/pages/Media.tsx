@@ -5,7 +5,6 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { news as fallbackNews } from "@/data";
 import { useNews, usePageContent } from "@/hooks/usePublicContent";
 import { PageHero } from "@/components/layout/PageHero";
 import { PageFeedback } from "@/components/layout/PageFeedback";
@@ -23,36 +22,25 @@ type Item = {
 };
 
 const Media = () => {
-  const { t, tx, lang, dir } = useLanguage();
+  const { t, lang, dir } = useLanguage();
   const [filter, setFilter] = useState<string>("all");
   const [q, setQ] = useState("");
   const { data: dbNews } = useNews();
   const { data: pageSections } = usePageContent("media");
   const intro = (pageSections ?? []).find((s) => s.section_key === "intro");
 
-  // مزج بيانات قاعدة البيانات مع الاحتياطية
+  // عرض الأخبار المنشورة فقط من لوحة التحكم بدون الرجوع للبيانات التجريبية عند الإخفاء الكامل.
   const items: Item[] = useMemo(() => {
-    if (dbNews && dbNews.length > 0) {
-      return dbNews.map((n) => ({
-        id: n.id,
-        slug: n.slug || n.id,
-        title: n.title,
-        excerpt: n.excerpt ?? "",
-        image: n.cover_image_url || news1,
-        date: n.published_at || n.created_at,
-        category: n.category ?? "",
-      }));
-    }
-    return fallbackNews.map((n) => ({
+    return (dbNews ?? []).map((n) => ({
       id: n.id,
-      slug: n.id,
-      title: tx(n.title),
-      excerpt: tx(n.excerpt),
-      image: n.image,
-      date: n.date,
-      category: tx(n.category),
+      slug: n.slug || n.id,
+      title: n.title,
+      excerpt: n.excerpt ?? "",
+      image: n.cover_image_url || news1,
+      date: n.published_at || n.created_at,
+      category: n.category ?? "",
     }));
-  }, [dbNews, tx]);
+  }, [dbNews]);
 
   const cats = useMemo(() => {
     const set = new Set<string>();
