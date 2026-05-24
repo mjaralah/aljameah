@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
 import { Loader2, Plus, Save, Blocks, ExternalLink, ArrowRight, FolderOpen, GripVertical } from "lucide-react";
 import { SortableList, SortableItem, persistSortOrder } from "@/components/admin/SortableList";
+import { ReorderControls } from "@/components/admin/ReorderControls";
 import { BlockEditor } from "@/components/admin/blocks/BlockEditor";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
