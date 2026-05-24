@@ -19,12 +19,9 @@ export const WhatsAppFloat = () => {
   const [visible, setVisible] = useState(false);
   const [showTip, setShowTip] = useState(false);
 
-  // إظهار الزر بعد تمرير الصفحة قليلاً
+  // إظهار الزر فوراً عند تحميل الصفحة
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > 150);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    setVisible(true);
   }, []);
 
   // إظهار التلميح تلقائياً (مرة واحدة لكل جلسة)
