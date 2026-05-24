@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Facebook, Heart, Instagram, Linkedin, Mail, MapPin, Phone, X, Youtube } from "lucide-react";
+import { Facebook, Heart, Instagram, Linkedin, Mail, MapPin, Phone, Youtube } from "lucide-react";
+import { XLogo } from "@/components/icons/XLogo";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSiteSettings } from "@/hooks/usePublicContent";
 
@@ -46,7 +47,7 @@ export const Footer = () => {
             <div className="text-sm font-semibold mb-2">{t.footer.follow}</div>
             <div className="flex items-center gap-2">
                 {([
-                { Icon: X, href: settings?.social_twitter },
+                { Icon: XLogo, href: settings?.social_twitter },
                 { Icon: Instagram, href: settings?.social_instagram },
                 { Icon: Linkedin, href: settings?.social_linkedin },
                 { Icon: Youtube, href: settings?.social_youtube },
@@ -66,7 +67,7 @@ export const Footer = () => {
                 ))}
               {/* احتياطي عند عدم وجود إعدادات */}
                 {!(settings?.social_twitter || settings?.social_instagram || settings?.social_linkedin || settings?.social_youtube) &&
-                [X, Facebook, Instagram, Youtube].map((Icon, i) => (
+                [XLogo, Facebook, Instagram, Youtube].map((Icon, i) => (
                   <a key={i} href="#" aria-label="social" className="h-9 w-9 rounded-full bg-primary-foreground/10 hover:bg-accent hover:text-accent-foreground grid place-items-center transition-smooth">
                     <Icon className="h-4 w-4" />
                   </a>
