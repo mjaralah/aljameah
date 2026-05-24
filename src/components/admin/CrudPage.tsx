@@ -495,6 +495,47 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AlertDialog open={bulkDeleteOpen} onOpenChange={(o) => { if (!o && !bulkBusy) setBulkDeleteOpen(false); }}>
+        <AlertDialogContent dir="rtl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>تأكيد الحذف المجمّع</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2">
+                <p>
+                  سيتم حذف <span className="font-bold text-destructive">{visibleSelectedCount}</span> عنصراً نهائياً. لا يمكن التراجع عن هذا الإجراء.
+                </p>
+                {(() => {
+                  const selectedRows = filtered.filter((r) => selectedIds.has(r.id));
+                  const preview = selectedRows.slice(0, 3);
+                  const extra = selectedRows.length - preview.length;
+                  return (
+                    <ul className="text-xs text-muted-foreground list-disc pr-5 space-y-0.5">
+                      {preview.map((r) => (
+                        <li key={r.id} className="line-clamp-1">
+                          {titleCol ? String(r[titleCol.key as keyof T] ?? r.id) : r.id}
+                        </li>
+                      ))}
+                      {extra > 0 && <li>و{extra} {extra === 1 ? "عنصر آخر" : "عناصر أخرى"}</li>}
+                    </ul>
+                  );
+                })()}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2">
+            <AlertDialogCancel disabled={bulkBusy}>إلغاء</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); bulkDelete(); }}
+              disabled={bulkBusy}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {bulkBusy ? <Loader2 className="w-4 h-4 ml-1 animate-spin" /> : null}
+              حذف الكل
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 }
