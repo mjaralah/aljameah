@@ -316,6 +316,8 @@ const OverviewPanel = ({
         </div>
       </div>
     </Card>
+    )}
+
 
     {/* شبكة الأقسام */}
     <div>
