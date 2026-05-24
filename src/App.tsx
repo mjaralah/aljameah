@@ -10,6 +10,7 @@ import { Layout } from "@/components/layout/Layout";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import StubPage from "./pages/StubPage.tsx";
+import SitemapPage from "./pages/SitemapPage.tsx";
 import Programs from "./pages/Programs.tsx";
 import Governance from "./pages/Governance.tsx";
 import Media from "./pages/Media.tsx";
