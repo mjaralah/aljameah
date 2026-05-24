@@ -233,17 +233,19 @@ export default function EServicesIndex() {
 
   return (
     <>
-      <PageHero
-        eyebrow={isAr ? "بوّابة الخدمات" : "Services Portal"}
-        title={intro?.title || (isAr ? "الخدمات الإلكترونية" : "E-Services")}
-        lead={
-          intro?.content ||
-          (isAr
-            ? "منصة موحّدة لتقديم طلباتك إلى الجمعية بكل سهولة ويسر — اختر الخدمة المناسبة وابدأ التقديم الآن."
-            : "A unified platform to submit your requests easily — choose a service and start now.")
-        }
-        breadcrumb={[{ label: intro?.title || (isAr ? "الخدمات الإلكترونية" : "E-Services") }]}
-      />
+      {intro && (
+        <PageHero
+          eyebrow={isAr ? "بوّابة الخدمات" : "Services Portal"}
+          title={intro.title || (isAr ? "الخدمات الإلكترونية" : "E-Services")}
+          lead={
+            intro.content ||
+            (isAr
+              ? "منصة موحّدة لتقديم طلباتك إلى الجمعية بكل سهولة ويسر — اختر الخدمة المناسبة وابدأ التقديم الآن."
+              : "A unified platform to submit your requests easily — choose a service and start now.")
+          }
+          breadcrumb={[{ label: intro.title || (isAr ? "الخدمات الإلكترونية" : "E-Services") }]}
+        />
+      )}
 
       <section className="container py-10 md:py-14">
         {/* شريط البحث + المزايا العامة */}
