@@ -49,7 +49,7 @@ const PAGES: { key: string; label: string; description: string }[] = [
 ];
 
 const SECTION_LABELS: Record<string, string> = {
-  hero: "شريط البطل (Hero)",
+  hero: "شريط العرض الرئيسي",
   intro: "المقدمة",
   hours: "ساعات العمل",
   map: "الخريطة والعنوان",
@@ -418,7 +418,7 @@ export default function AdminPageContentPage() {
   // روابط سريعة لإدارة الكيانات الكاملة لكل صفحة
   const QUICK_LINKS: Record<string, { to: string; label: string; icon: any; desc: string }[]> = {
     home: [
-      { to: "/admin/hero", label: "السلايدر الرئيسي", icon: ExternalLink, desc: "إدارة شرائح البطل المتحركة في أعلى الصفحة" },
+      { to: "/admin/hero", label: "شريط العرض الرئيسي", icon: ExternalLink, desc: "إدارة شرائح العرض المتحركة في أعلى الصفحة" },
       { to: "/admin/partners", label: "الشركاء", icon: ExternalLink, desc: "شعارات الشركاء الظاهرة في الصفحة" },
       { to: "/admin/programs", label: "البرامج", icon: FolderKanban, desc: "البرامج الظاهرة في الصفحة الرئيسية" },
       { to: "/admin/news", label: "الأخبار", icon: Newspaper, desc: "آخر الأخبار الظاهرة في الصفحة الرئيسية" },
