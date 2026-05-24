@@ -28,6 +28,7 @@ type Settings = {
   contact_address: string | null;
   social_twitter: string | null;
   social_instagram: string | null;
+  social_facebook: string | null;
   social_linkedin: string | null;
   social_youtube: string | null;
   footer_text: string | null;
@@ -234,6 +235,10 @@ export default function AdminSettingsPage() {
                 <div>
                   <Label>إنستغرام</Label>
                   <Input dir="ltr" value={s.social_instagram ?? ""} onChange={(e) => set("social_instagram", e.target.value)} />
+                </div>
+                <div>
+                  <Label>فيسبوك</Label>
+                  <Input dir="ltr" value={s.social_facebook ?? ""} onChange={(e) => set("social_facebook", e.target.value)} />
                 </div>
                 <div>
                   <Label>لينكدإن</Label>

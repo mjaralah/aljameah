@@ -31,6 +31,7 @@ import {
   Twitter,
   Instagram,
   Facebook,
+  Linkedin,
   Youtube,
   MessageCircle,
   HelpCircle,
@@ -40,7 +41,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { IconField } from "@/components/eservices/FormFields";
-import { usePageContent } from "@/hooks/usePublicContent";
+import { usePageContent, useSiteSettings } from "@/hooks/usePublicContent";
 import { useSystemForm } from "@/hooks/useSystemForm";
 
 const contactSchema = z.object({
@@ -95,18 +96,39 @@ const channels = [
   },
 ];
 
-const socials = [
-  { icon: Twitter, label: "تويتر", href: "#", color: "hover:bg-[#1DA1F2]/10 hover:text-[#1DA1F2]" },
-  { icon: Instagram, label: "انستغرام", href: "#", color: "hover:bg-[#E4405F]/10 hover:text-[#E4405F]" },
-  { icon: Facebook, label: "فيسبوك", href: "#", color: "hover:bg-[#1877F2]/10 hover:text-[#1877F2]" },
-  { icon: Youtube, label: "يوتيوب", href: "#", color: "hover:bg-[#FF0000]/10 hover:text-[#FF0000]" },
-  { icon: MessageCircle, label: "واتساب", href: "#", color: "hover:bg-[#25D366]/10 hover:text-[#25D366]" },
-];
+// قائمة افتراضية للأيقونات — الروابط الفعلية تأتي من إعدادات الموقع
+const SOCIAL_DEFS = [
+  { key: "social_twitter",   icon: Twitter,        label: "تويتر",   color: "hover:bg-[#1DA1F2]/10 hover:text-[#1DA1F2]" },
+  { key: "social_instagram", icon: Instagram,      label: "انستغرام", color: "hover:bg-[#E4405F]/10 hover:text-[#E4405F]" },
+  { key: "social_facebook",  icon: Facebook,       label: "فيسبوك",  color: "hover:bg-[#1877F2]/10 hover:text-[#1877F2]" },
+  { key: "social_linkedin",  icon: Linkedin,       label: "لينكدإن", color: "hover:bg-[#0A66C2]/10 hover:text-[#0A66C2]" },
+  { key: "social_youtube",   icon: Youtube,        label: "يوتيوب",  color: "hover:bg-[#FF0000]/10 hover:text-[#FF0000]" },
+  { key: "whatsapp_number",  icon: MessageCircle,  label: "واتساب",  color: "hover:bg-[#25D366]/10 hover:text-[#25D366]" },
+] as const;
 
 export default function Contact() {
   const { toast } = useToast();
   const { data: pageSections } = usePageContent("contact");
+  const { data: settings } = useSiteSettings();
   const { data: systemForm } = useSystemForm("contact");
+
+  // بناء قائمة الأيقونات من إعدادات الموقع — يظهر فقط ما تم إدخاله
+  const socials = SOCIAL_DEFS
+    .map((s) => {
+      const raw = (settings as any)?.[s.key] as string | null | undefined;
+      if (!raw) return null;
+      let href = raw.trim();
+      if (s.key === "whatsapp_number") {
+        const digits = href.replace(/\D/g, "");
+        if (!digits) return null;
+        const msg = (settings as any)?.whatsapp_message;
+        href = `https://wa.me/${digits}${msg ? `?text=${encodeURIComponent(msg)}` : ""}`;
+      } else if (!/^https?:\/\//i.test(href)) {
+        href = `https://${href}`;
+      }
+      return { icon: s.icon, label: s.label, color: s.color, href };
+    })
+    .filter(Boolean) as { icon: typeof SOCIAL_DEFS[number]["icon"]; label: string; color: string; href: string }[];
   const sectionMap = (pageSections ?? []).reduce<Record<string, any>>(
     (acc, s) => ({ ...acc, [s.section_key]: s }),
     {},
@@ -260,32 +282,37 @@ export default function Contact() {
             </div>
 
             {/* وسائل التواصل الاجتماعي */}
-            <div className="rounded-3xl border bg-card p-6 shadow-card">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                  <Sparkles className="h-5 w-5" />
+            {socials.length > 0 && (
+              <div className="rounded-3xl border bg-card p-6 shadow-card">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <Sparkles className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">تابعنا</p>
+                    <p className="font-bold text-foreground">على منصات التواصل</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">تابعنا</p>
-                  <p className="font-bold text-foreground">على منصات التواصل</p>
+                <div className={cn("grid gap-2", socials.length >= 5 ? "grid-cols-5" : `grid-cols-${socials.length}`)}>
+                  {socials.map((s) => (
+                    <a
+                      key={s.label}
+                      href={s.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={s.label}
+                      title={s.label}
+                      className={cn(
+                        "flex aspect-square items-center justify-center rounded-xl border bg-background text-muted-foreground transition-smooth",
+                        s.color,
+                      )}
+                    >
+                      <s.icon className="h-5 w-5" />
+                    </a>
+                  ))}
                 </div>
               </div>
-              <div className="grid grid-cols-5 gap-2">
-                {socials.map((s) => (
-                  <a
-                    key={s.label}
-                    href={s.href}
-                    aria-label={s.label}
-                    className={cn(
-                      "flex aspect-square items-center justify-center rounded-xl border bg-background text-muted-foreground transition-smooth",
-                      s.color,
-                    )}
-                  >
-                    <s.icon className="h-5 w-5" />
-                  </a>
-                ))}
-              </div>
-            </div>
+            )}
           </aside>
 
           {/* النموذج */}
