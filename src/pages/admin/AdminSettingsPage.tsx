@@ -72,7 +72,13 @@ const PUBLIC_PAGES: { key: string; label: string }[] = [
   { key: "eservices", label: "الخدمات الإلكترونية" },
   { key: "contact", label: "تواصل معنا" },
   { key: "sitemap", label: "خريطة الموقع" },
+  { key: "footer_brand", label: "قسم تعريف الجمعية (التذييل)" },
+  { key: "footer_social", label: "أيقونات التواصل الاجتماعي (التذييل)" },
+  { key: "footer_quick", label: "قسم روابط سريعة (التذييل)" },
+  { key: "footer_eservices", label: "قسم الخدمات الإلكترونية (التذييل)" },
   { key: "footer_legal", label: "قسم المعلومات القانونية (التذييل)" },
+  { key: "footer_contact", label: "قسم معلومات التواصل (التذييل)" },
+  { key: "footer_bottom", label: "شريط الحقوق السفلي (التذييل)" },
 ];
 
 function SaveStatusIndicator({ status, onRetry }: { status: SaveStatus; onRetry: () => void }) {

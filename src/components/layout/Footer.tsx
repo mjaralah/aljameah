@@ -23,8 +23,15 @@ export const Footer = () => {
     { to: "/e-services/membership", label: t.nav.eservicesMembership },
   ];
   const visibility = (settings as any)?.pages_visibility as Record<string, boolean> | undefined;
-  const sitemapHidden = visibility && visibility.sitemap === false;
-  const legalSectionHidden = visibility && visibility.footer_legal === false;
+  const isHidden = (key: string) => visibility && visibility[key] === false;
+  const sitemapHidden = isHidden("sitemap");
+  const brandHidden = isHidden("footer_brand");
+  const socialHidden = isHidden("footer_social");
+  const quickHidden = isHidden("footer_quick");
+  const eservicesHidden = isHidden("footer_eservices");
+  const legalSectionHidden = isHidden("footer_legal");
+  const contactHidden = isHidden("footer_contact");
+  const bottomHidden = isHidden("footer_bottom");
   const legal = [
     ...((legalPages ?? []).map((p) => ({ to: `/${p.slug}`, label: p.title }))),
     ...(sitemapHidden ? [] : [{ to: "/sitemap", label: t.footer.sitemap }]),
@@ -33,6 +40,7 @@ export const Footer = () => {
   return (
     <footer className="bg-primary text-primary-foreground mt-16">
       <div className="container py-14 grid gap-10 md:grid-cols-2 lg:grid-cols-5">
+        {!brandHidden && (
         <div className="lg:col-span-2">
           <div className="flex items-center gap-2.5 mb-4">
             <div className="h-11 w-11 rounded-xl bg-accent grid place-items-center">
@@ -44,6 +52,7 @@ export const Footer = () => {
             </div>
           </div>
           <p className="text-sm opacity-90 leading-relaxed">{t.footer.aboutBody}</p>
+          {!socialHidden && (
           <div className="mt-5">
             <div className="text-sm font-semibold mb-2">{t.footer.follow}</div>
             <div className="flex items-center gap-2">
@@ -87,8 +96,11 @@ export const Footer = () => {
               })()}
             </div>
           </div>
+          )}
         </div>
+        )}
 
+        {!quickHidden && (
         <div>
           <h3 className="font-bold mb-4 text-accent">{t.footer.quickLinks}</h3>
           <ul className="space-y-2 text-sm">
@@ -101,7 +113,9 @@ export const Footer = () => {
             ))}
           </ul>
         </div>
+        )}
 
+        {!eservicesHidden && (
         <div>
           <h3 className="font-bold mb-4 text-accent">{t.nav.eservices}</h3>
           <ul className="space-y-2 text-sm">
@@ -114,6 +128,7 @@ export const Footer = () => {
             ))}
           </ul>
         </div>
+        )}
 
         {!legalSectionHidden && (
           <div>
@@ -130,6 +145,7 @@ export const Footer = () => {
           </div>
         )}
 
+        {!contactHidden && (
         <div>
           <h3 className="font-bold mb-4 text-accent">{t.footer.contact}</h3>
           <ul className="space-y-3 text-sm">
@@ -138,8 +154,10 @@ export const Footer = () => {
             <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-accent shrink-0" /> {settings?.contact_email || "info@al-ataa.org"}</li>
           </ul>
         </div>
+        )}
       </div>
 
+      {!bottomHidden && (
       <div className="border-t border-primary-foreground/15">
         <div className="container py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs opacity-90">
           <div>
@@ -150,6 +168,7 @@ export const Footer = () => {
           </div>
         </div>
       </div>
+      )}
     </footer>
   );
 };
