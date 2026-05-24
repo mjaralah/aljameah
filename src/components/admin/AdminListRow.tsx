@@ -112,7 +112,9 @@ export const AdminListRow = forwardRef<HTMLDivElement, AdminListRowProps>(functi
 
         <TooltipProvider delayDuration={200}>
           <div className="flex items-center gap-1.5">
+            {reorderControls}
             {extraActions}
+
 
             {onDelete && (
               <Tooltip>
