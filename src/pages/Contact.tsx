@@ -282,32 +282,37 @@ export default function Contact() {
             </div>
 
             {/* وسائل التواصل الاجتماعي */}
-            <div className="rounded-3xl border bg-card p-6 shadow-card">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                  <Sparkles className="h-5 w-5" />
+            {socials.length > 0 && (
+              <div className="rounded-3xl border bg-card p-6 shadow-card">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <Sparkles className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">تابعنا</p>
+                    <p className="font-bold text-foreground">على منصات التواصل</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">تابعنا</p>
-                  <p className="font-bold text-foreground">على منصات التواصل</p>
+                <div className={cn("grid gap-2", socials.length >= 5 ? "grid-cols-5" : `grid-cols-${socials.length}`)}>
+                  {socials.map((s) => (
+                    <a
+                      key={s.label}
+                      href={s.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={s.label}
+                      title={s.label}
+                      className={cn(
+                        "flex aspect-square items-center justify-center rounded-xl border bg-background text-muted-foreground transition-smooth",
+                        s.color,
+                      )}
+                    >
+                      <s.icon className="h-5 w-5" />
+                    </a>
+                  ))}
                 </div>
               </div>
-              <div className="grid grid-cols-5 gap-2">
-                {socials.map((s) => (
-                  <a
-                    key={s.label}
-                    href={s.href}
-                    aria-label={s.label}
-                    className={cn(
-                      "flex aspect-square items-center justify-center rounded-xl border bg-background text-muted-foreground transition-smooth",
-                      s.color,
-                    )}
-                  >
-                    <s.icon className="h-5 w-5" />
-                  </a>
-                ))}
-              </div>
-            </div>
+            )}
           </aside>
 
           {/* النموذج */}
