@@ -245,6 +245,7 @@ const OverviewPanel = ({
   lang,
   financialsOverride,
   financialsTitle,
+  showFinancials = true,
 }: {
   sections: Section[];
   onPick: (k: string) => void;
@@ -252,6 +253,8 @@ const OverviewPanel = ({
   lang: "ar" | "en";
   financialsOverride?: { year: number; totalRevenue: number; totalExpenses: number; allocation: { key: string; labelAr: string; labelEn: string; pct: number }[] } | null;
   financialsTitle?: string | null;
+  showFinancials?: boolean;
+
 }) => {
   const fin = financialsOverride ?? financials;
   return (
