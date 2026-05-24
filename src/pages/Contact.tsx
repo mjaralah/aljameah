@@ -28,7 +28,7 @@ import {
   AtSign,
   Smartphone,
   Headphones,
-  Twitter,
+  X,
   Instagram,
   Facebook,
   Linkedin,
@@ -98,7 +98,7 @@ const channels = [
 
 // قائمة افتراضية للأيقونات — الروابط الفعلية تأتي من إعدادات الموقع
 const SOCIAL_DEFS = [
-  { key: "social_twitter",   icon: Twitter,        label: "تويتر",   color: "hover:bg-[#1DA1F2]/10 hover:text-[#1DA1F2]" },
+  { key: "social_twitter",   icon: X,             label: "X",       color: "hover:bg-[#000000]/10 hover:text-[#000000]" },
   { key: "social_instagram", icon: Instagram,      label: "انستغرام", color: "hover:bg-[#E4405F]/10 hover:text-[#E4405F]" },
   { key: "social_facebook",  icon: Facebook,       label: "فيسبوك",  color: "hover:bg-[#1877F2]/10 hover:text-[#1877F2]" },
   { key: "social_linkedin",  icon: Linkedin,       label: "لينكدإن", color: "hover:bg-[#0A66C2]/10 hover:text-[#0A66C2]" },
@@ -303,11 +303,11 @@ export default function Contact() {
                       aria-label={s.label}
                       title={s.label}
                       className={cn(
-                        "flex h-9 w-9 items-center justify-center rounded-lg border bg-background text-muted-foreground transition-smooth",
+                        "flex h-10 w-10 items-center justify-center rounded-lg border bg-background text-muted-foreground transition-smooth",
                         s.color,
                       )}
                     >
-                      <s.icon className="h-4 w-4" />
+                      <s.icon className="h-5 w-5" />
                     </a>
                   ))}
                 </div>
