@@ -703,6 +703,11 @@ export type Database = {
           published: boolean
           slug: string
           sort_order: number
+          sponsor_button_enabled: boolean
+          sponsor_button_icon: string | null
+          sponsor_button_label: string | null
+          sponsor_button_label_en: string | null
+          sponsor_button_url: string | null
           title: string
           updated_at: string
         }
@@ -717,6 +722,11 @@ export type Database = {
           published?: boolean
           slug: string
           sort_order?: number
+          sponsor_button_enabled?: boolean
+          sponsor_button_icon?: string | null
+          sponsor_button_label?: string | null
+          sponsor_button_label_en?: string | null
+          sponsor_button_url?: string | null
           title: string
           updated_at?: string
         }
@@ -731,6 +741,11 @@ export type Database = {
           published?: boolean
           slug?: string
           sort_order?: number
+          sponsor_button_enabled?: boolean
+          sponsor_button_icon?: string | null
+          sponsor_button_label?: string | null
+          sponsor_button_label_en?: string | null
+          sponsor_button_url?: string | null
           title?: string
           updated_at?: string
         }
