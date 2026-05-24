@@ -69,6 +69,9 @@ export const PartnersCarousel = () => {
     ? dbPartners.map((p) => ({ id: p.id, name: p.name, logo: p.logo_url, url: p.website_url }))
     : fallbackPartners.map((p) => ({ id: p.id, name: tx(p.name), logo: undefined, url: undefined }));
 
+  // Hide section if there are no visible partners
+  if (items.length === 0) return null;
+
   const renderBody = () => {
     switch (style) {
       case "marquee": return <PartnersMarquee items={items} />;
