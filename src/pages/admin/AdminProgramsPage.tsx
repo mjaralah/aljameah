@@ -50,7 +50,7 @@ export default function AdminProgramsPage() {
         { key: "sort_order", label: "الترتيب" },
         {
           key: "featured",
-          label: "مُبرز",
+          label: "مميز",
           render: (r) => (r.featured ? "★" : "—"),
         },
       ]}
@@ -64,7 +64,7 @@ export default function AdminProgramsPage() {
         published: true,
         sort_order: 0,
         featured: false,
-        sponsor_button_enabled: true,
+        sponsor_button_enabled: false,
         sponsor_button_label: "",
         sponsor_button_label_en: "",
         sponsor_button_url: "",

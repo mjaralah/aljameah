@@ -120,7 +120,7 @@ const Programs = () => {
                     </div>
                     {p.featured ? (
                       <Badge className="bg-accent text-accent-foreground border-0 font-bold shadow-gold">
-                        ★ مُبرز
+                        ★ مميز
                       </Badge>
                     ) : p.category ? (
                       <Badge variant="secondary" className="bg-accent-soft text-accent border-0 font-bold">
