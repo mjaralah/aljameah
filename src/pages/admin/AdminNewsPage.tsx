@@ -136,4 +136,7 @@ export default function AdminNewsPage() {
           );
         }
       }
+    />
+  );
+}
 
