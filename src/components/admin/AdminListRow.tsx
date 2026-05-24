@@ -28,6 +28,8 @@ export type AdminListRowProps = {
   extraActions?: ReactNode;
   dragHandleProps?: Record<string, unknown>;
   showDragHandle?: boolean;
+  /** Optional alternative reorder controls (arrows / position input / move-to menu). */
+  reorderControls?: ReactNode;
   className?: string;
   style?: React.CSSProperties;
   children?: ReactNode;
