@@ -35,7 +35,7 @@ export function useFooterSections() {
         .eq("published", true)
         .order("sort_order", { ascending: true });
       if (error) throw error;
-      return (data ?? []) as DBFooterSection[];
+      return ((data as any) ?? []) as DBFooterSection[];
     },
   });
 }
@@ -51,7 +51,7 @@ export function useFooterLinks() {
         .eq("published", true)
         .order("sort_order", { ascending: true });
       if (error) throw error;
-      return (data ?? []) as DBFooterLink[];
+      return ((data as any) ?? []) as DBFooterLink[];
     },
   });
 }
@@ -66,7 +66,7 @@ export function useAdminFooterSections() {
         .select("*")
         .order("sort_order", { ascending: true });
       if (error) throw error;
-      return (data ?? []) as DBFooterSection[];
+      return ((data as any) ?? []) as DBFooterSection[];
     },
   });
 }
@@ -79,7 +79,7 @@ export function useAdminFooterLinks(sectionKey?: string) {
       if (sectionKey) q = q.eq("section_key", sectionKey);
       const { data, error } = await q;
       if (error) throw error;
-      return (data ?? []) as DBFooterLink[];
+      return ((data as any) ?? []) as DBFooterLink[];
     },
   });
 }
