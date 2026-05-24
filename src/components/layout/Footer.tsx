@@ -2,12 +2,13 @@ import { Link } from "react-router-dom";
 import { Facebook, Heart, Instagram, Linkedin, Mail, MapPin, MessageCircle, Phone, Youtube } from "lucide-react";
 import { XLogo } from "@/components/icons/XLogo";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useSiteSettings } from "@/hooks/usePublicContent";
+import { useLegalPages, useSiteSettings } from "@/hooks/usePublicContent";
 
 // تذييل الموقع الكامل
 export const Footer = () => {
   const { t } = useLanguage();
   const { data: settings } = useSiteSettings();
+  const { data: legalPages } = useLegalPages();
 
   const quick = [
     { to: "/about", label: t.nav.about },
