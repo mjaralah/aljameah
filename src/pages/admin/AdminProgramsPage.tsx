@@ -130,7 +130,7 @@ export default function AdminProgramsPage() {
 
           <div className="rounded-lg border border-border p-4 space-y-3 bg-muted/30">
             <div className="flex items-center justify-between">
-              <Label className="text-base font-semibold">زر الكفالة / الإجراء</Label>
+              <Label className="text-base font-semibold">زر الدعم / الإجراء</Label>
               <label className="flex items-center gap-2 text-sm">
                 <input
                   type="checkbox"
