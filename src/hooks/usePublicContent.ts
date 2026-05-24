@@ -1,6 +1,7 @@
 // React Query hooks لجلب المحتوى العام من قاعدة البيانات
 // يستخدم في الصفحات العامة (الرئيسية، الأخبار، البرامج، الحوكمة...)
-import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export type DBHeroSlide = {
@@ -115,6 +116,29 @@ export type DBSiteSettings = {
 };
 
 const STALE = 1000 * 60 * 2; // 2 دقيقة
+
+export function usePublicContentRealtime() {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("public-content-realtime-sync")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public" },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["public"] });
+          queryClient.invalidateQueries({ queryKey: ["public-eservices-forms"] });
+          queryClient.invalidateQueries({ queryKey: ["system-form"] });
+        },
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+}
 
 export function useHeroSlides() {
   return useQuery({
