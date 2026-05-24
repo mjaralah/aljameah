@@ -130,6 +130,55 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
   const publishedCount = rows.filter((r) => r.published).length;
   const draftCount = rows.length - publishedCount;
 
+  // امسح التحديد عند تغيير الفلاتر/البحث/التصنيف لمنع تنفيذ إجراءات على عناصر مخفية.
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [activeCategory, publishedFilter, search]);
+
+  const filteredIds = useMemo(() => filtered.map((r) => r.id), [filtered]);
+  const visibleSelectedCount = filteredIds.filter((id) => selectedIds.has(id)).length;
+  const allVisibleSelected = filteredIds.length > 0 && visibleSelectedCount === filteredIds.length;
+
+  function toggleSelect(id: string, next: boolean) {
+    setSelectedIds((prev) => {
+      const s = new Set(prev);
+      if (next) s.add(id); else s.delete(id);
+      return s;
+    });
+  }
+  function toggleSelectAll(next: boolean) {
+    setSelectedIds(next ? new Set(filteredIds) : new Set());
+  }
+  function clearSelection() {
+    setSelectedIds(new Set());
+  }
+
+  async function bulkSetPublished(next: boolean) {
+    const ids = Array.from(selectedIds).filter((id) => filteredIds.includes(id));
+    if (ids.length === 0) return;
+    setBulkBusy(true);
+    const { error } = await supabase.from(table).update({ published: next } as never).in("id", ids);
+    setBulkBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success(next ? `تم نشر ${ids.length} عنصراً` : `تم إخفاء ${ids.length} عنصراً`);
+    clearSelection();
+    load();
+  }
+
+  async function bulkDelete() {
+    const ids = Array.from(selectedIds).filter((id) => filteredIds.includes(id));
+    if (ids.length === 0) return;
+    setBulkBusy(true);
+    const { error } = await supabase.from(table).delete().in("id", ids);
+    setBulkBusy(false);
+    setBulkDeleteOpen(false);
+    if (error) return toast.error(error.message);
+    toast.success(`تم حذف ${ids.length} عنصراً`);
+    clearSelection();
+    load();
+  }
+
+
   async function handleSave() {
     if (!editing) return;
     if (validate) {
