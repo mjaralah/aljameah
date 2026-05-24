@@ -146,7 +146,7 @@ function CategoryManager({ onChanged }: { onChanged: () => void }) {
         onOpenChange={setOpen}
         title="إدارة أقسام الحوكمة"
         description="أضف أو عدّل أو احذف الأقسام التي تظهر في صفحة ملفات الحوكمة."
-        size="lg"
+        size="xl"
         hideFooter
       >
         <div className="space-y-3">
