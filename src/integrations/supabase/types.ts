@@ -741,6 +741,13 @@ export type Database = {
           contact_address: string | null
           contact_email: string | null
           contact_phone: string | null
+          donate_button_bg_color: string | null
+          donate_button_enabled: boolean
+          donate_button_icon: string
+          donate_button_label_ar: string | null
+          donate_button_label_en: string | null
+          donate_button_text_color: string | null
+          donate_button_url: string
           favicon_url: string | null
           feedback_visibility: Json
           footer_text: string | null
@@ -767,6 +774,13 @@ export type Database = {
           contact_address?: string | null
           contact_email?: string | null
           contact_phone?: string | null
+          donate_button_bg_color?: string | null
+          donate_button_enabled?: boolean
+          donate_button_icon?: string
+          donate_button_label_ar?: string | null
+          donate_button_label_en?: string | null
+          donate_button_text_color?: string | null
+          donate_button_url?: string
           favicon_url?: string | null
           feedback_visibility?: Json
           footer_text?: string | null
@@ -793,6 +807,13 @@ export type Database = {
           contact_address?: string | null
           contact_email?: string | null
           contact_phone?: string | null
+          donate_button_bg_color?: string | null
+          donate_button_enabled?: boolean
+          donate_button_icon?: string
+          donate_button_label_ar?: string | null
+          donate_button_label_en?: string | null
+          donate_button_text_color?: string | null
+          donate_button_url?: string
           favicon_url?: string | null
           feedback_visibility?: Json
           footer_text?: string | null
