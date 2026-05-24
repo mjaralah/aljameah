@@ -240,15 +240,13 @@ export default function AdminSurveysPage() {
                           ) : (
                             <SortableList
                               ids={qs.map((q) => q.id)}
-                              onReorder={async (newIds) => {
-                                const reordered = newIds.map((id) => qs.find((q) => q.id === id)!);
-                                setQuestions((prev) => ({ ...prev, [s.id]: reordered }));
-                                try { await persistSortOrder(supabase, "survey_questions", newIds); toast.success("تم تحديث الترتيب"); }
-                                catch { toast.error("تعذر حفظ الترتيب"); load(); }
-                              }}
+                              onReorder={(newIds) => reorderQuestions(s.id, newIds)}
                             >
                               <ul className="space-y-2">
-                                {qs.map((q, idx) => (
+                                {qs.map((q, idx) => {
+                                  const qIds = qs.map((x) => x.id);
+                                  const apply = (n: string[] | null) => { if (n) reorderQuestions(s.id, n); };
+                                  return (
                                   <SortableItem key={q.id} id={q.id}>
                                     {({ handleProps, setNodeRef, style }) => (
                                       <li ref={setNodeRef as any} style={style} className="flex items-start gap-2 p-2 rounded-md bg-muted/40 text-sm">
@@ -262,6 +260,19 @@ export default function AdminSurveysPage() {
                                           <p className="font-medium">{q.question}</p>
                                           <p className="text-xs text-muted-foreground">{QTYPES.find((t) => t.value === q.type)?.label ?? q.type}{q.required ? " · مطلوب" : ""}</p>
                                         </div>
+                                        {qs.length > 1 && (
+                                          <ReorderControls
+                                            position={idx + 1}
+                                            total={qs.length}
+                                            others={qs.filter((x) => x.id !== q.id).map((x) => ({ id: x.id, label: x.question }))}
+                                            onMoveUp={() => apply(moveToPosition(qIds, q.id, idx))}
+                                            onMoveDown={() => apply(moveToPosition(qIds, q.id, idx + 2))}
+                                            onSetPosition={(pos) => apply(moveToPosition(qIds, q.id, pos))}
+                                            onMoveToStart={() => apply(moveToPosition(qIds, q.id, 1))}
+                                            onMoveToEnd={() => apply(moveToPosition(qIds, q.id, qs.length))}
+                                            onMoveRelative={(t, w) => apply(moveRelativeTo(qIds, q.id, t, w))}
+                                          />
+                                        )}
                                         <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditQ(q)}>
                                           <Pencil className="w-3 h-3" />
                                         </Button>
@@ -271,7 +282,8 @@ export default function AdminSurveysPage() {
                                       </li>
                                     )}
                                   </SortableItem>
-                                ))}
+                                  );
+                                })}
                               </ul>
                             </SortableList>
                           )}
