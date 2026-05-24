@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Heart, Menu, Search } from "lucide-react";
+import { Heart, Menu, Search, Gift, HandHeart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useMenuPages } from "@/hooks/usePublicContent";
+import { useMenuPages, useSiteSettings } from "@/hooks/usePublicContent";
 import { cn } from "@/lib/utils";
 
 // رأس الصفحة بالشعار والتنقل الرئيسي
@@ -13,6 +13,27 @@ export const Header = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const { data: menuPages } = useMenuPages();
+  const { data: settings } = useSiteSettings();
+
+  // إعدادات زر التبرع (قابلة للتحكم من لوحة التحكم)
+  const donateEnabled = settings?.donate_button_enabled !== false;
+  const donateLabel =
+    (lang === "en"
+      ? settings?.donate_button_label_en || settings?.donate_button_label_ar
+      : settings?.donate_button_label_ar || settings?.donate_button_label_en) || t.nav.donate;
+  const donateUrl = settings?.donate_button_url || "/donate";
+  const isExternal = /^https?:\/\//i.test(donateUrl);
+  const donateBg = settings?.donate_button_bg_color || undefined;
+  const donateFg = settings?.donate_button_text_color || undefined;
+  const iconKey = settings?.donate_button_icon || "heart";
+  const DonateIcon =
+    iconKey === "gift" ? Gift : iconKey === "hand-heart" ? HandHeart : iconKey === "none" ? null : Heart;
+  const handleDonate = () => {
+    if (isExternal) window.open(donateUrl, "_blank", "noopener,noreferrer");
+    else navigate(donateUrl);
+  };
+  const donateStyle = donateBg || donateFg ? { backgroundColor: donateBg, color: donateFg } : undefined;
+
 
   const links = [
     { to: "/", label: t.nav.home },
