@@ -96,6 +96,13 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkBusy, setBulkBusy] = useState(false);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const queryClient = useQueryClient();
+
+  // إبطال كاش الموقع العام بعد أي تعديل، حتى تظهر التغييرات للزوار فوراً بدلاً من انتظار انتهاء صلاحية الكاش.
+  function invalidatePublic() {
+    queryClient.invalidateQueries({ queryKey: ["public"] });
+  }
+
 
   async function load() {
     setLoading(true);
