@@ -273,6 +273,23 @@ export default function AdminPageBuilderPage() {
           })()}
         </>
       )}
+
+      <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>حذف الأقسام المحددة؟</AlertDialogTitle>
+            <AlertDialogDescription>
+              سيتم حذف {visibleSelectedCount} قسماً نهائياً. لا يمكن التراجع.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={bulkBusy}>إلغاء</AlertDialogCancel>
+            <AlertDialogAction onClick={bulkDelete} disabled={bulkBusy} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {bulkBusy ? "جارٍ الحذف..." : "حذف"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 }
