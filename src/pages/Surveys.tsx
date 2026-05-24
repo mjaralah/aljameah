@@ -74,12 +74,14 @@ const SurveysPage = () => {
 
   return (
     <>
-      <PageHero
-        eyebrow={t.nav.surveys}
-        title={intro?.title || t.pages.surveys.heading}
-        lead={intro?.content || t.pages.surveys.lead}
-        breadcrumb={[{ label: intro?.title || t.nav.surveys }]}
-      />
+      {intro && (
+        <PageHero
+          eyebrow={t.nav.surveys}
+          title={intro.title || t.pages.surveys.heading}
+          lead={intro.content || t.pages.surveys.lead}
+          breadcrumb={[{ label: intro.title || t.nav.surveys }]}
+        />
+      )}
       <section className="container py-12 md:py-16">
         <Tabs defaultValue="surveys" className="w-full">
           <div className="mb-8 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
