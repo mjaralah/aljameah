@@ -567,6 +567,49 @@ export default function AdminSettingsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* مؤشر حالة الحفظ العائم — يبقى مرئياً أثناء التمرير */}
+      {status !== "idle" && (
+        <div
+          dir="rtl"
+          className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-bottom-2"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="flex items-center gap-3 rounded-full border border-border/60 bg-card/95 backdrop-blur px-4 py-2 shadow-lg">
+            {status === "dirty" && (
+              <>
+                <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+                <span className="text-sm text-foreground">تغييرات غير محفوظة</span>
+                <Button onClick={() => save()} size="sm" className="h-7 px-3 text-xs">
+                  <Save className="w-3.5 h-3.5 ml-1" /> حفظ الآن
+                </Button>
+              </>
+            )}
+            {status === "saving" && (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">جارٍ الحفظ...</span>
+              </>
+            )}
+            {status === "saved" && (
+              <>
+                <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                <span className="text-sm text-emerald-700 dark:text-emerald-300">تم حفظ التغييرات</span>
+              </>
+            )}
+            {status === "error" && (
+              <>
+                <AlertCircle className="h-4 w-4 text-destructive" />
+                <span className="text-sm text-destructive">فشل الحفظ</span>
+                <Button onClick={() => save()} size="sm" variant="destructive" className="h-7 px-3 text-xs">
+                  إعادة المحاولة
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }
