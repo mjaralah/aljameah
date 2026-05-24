@@ -24,6 +24,7 @@ export const Layout = ({ children }: { children: ReactNode }) => {
       </main>
       <Footer />
       <AccessibilityToolbar />
+      <WhatsAppFloat />
     </div>
   );
 };
