@@ -253,6 +253,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
     setRows(newRows);
     try {
       await persistSortOrder(supabase, table, newIds);
+      invalidatePublic();
       toast.success("تم تحديث الترتيب");
     } catch {
       toast.error("تعذر حفظ الترتيب");
