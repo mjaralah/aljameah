@@ -491,7 +491,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
         size="lg"
         extraActions={
           typeof extraDialogActions === "function"
-            ? extraDialogActions(editing ?? {})
+            ? (extraDialogActions as (values: Partial<T>) => ReactNode)(editing ?? ({} as Partial<T>))
             : extraDialogActions
         }
       >
