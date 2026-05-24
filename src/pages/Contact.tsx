@@ -293,7 +293,7 @@ export default function Contact() {
                     <p className="font-bold text-foreground">على منصات التواصل</p>
                   </div>
                 </div>
-                <div className={cn("grid gap-2", socials.length >= 5 ? "grid-cols-5" : `grid-cols-${socials.length}`)}>
+                <div className="flex flex-wrap gap-2">
                   {socials.map((s) => (
                     <a
                       key={s.label}
@@ -303,11 +303,11 @@ export default function Contact() {
                       aria-label={s.label}
                       title={s.label}
                       className={cn(
-                        "flex aspect-square items-center justify-center rounded-xl border bg-background text-muted-foreground transition-smooth",
+                        "flex h-9 w-9 items-center justify-center rounded-lg border bg-background text-muted-foreground transition-smooth",
                         s.color,
                       )}
                     >
-                      <s.icon className="h-5 w-5" />
+                      <s.icon className="h-4 w-4" />
                     </a>
                   ))}
                 </div>
