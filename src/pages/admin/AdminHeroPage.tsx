@@ -21,7 +21,7 @@ export default function AdminHeroPage() {
       table="hero_slides"
       reorderable
       orderBy={{ column: "sort_order", ascending: true }}
-      title="شريط البطل (Hero Slider)"
+      title="شريط العرض الرئيسي"
       description="الشرائح المتحركة في أعلى الصفحة الرئيسية"
       columns={[
         {
