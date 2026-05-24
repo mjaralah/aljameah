@@ -490,10 +490,9 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
         saving={saving}
         size="lg"
         extraActions={
-          (typeof extraDialogActions === "function"
-            ? (extraDialogActions as (values: Partial<T>) => ReactNode)(editing ?? ({} as Partial<T>))
+          typeof extraDialogActions === "function"
+            ? (extraDialogActions as any)(editing ?? {})
             : extraDialogActions
-          ) as ReactNode
         }
       >
         {editing && renderForm(editing, setValue)}
