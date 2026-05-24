@@ -417,6 +417,7 @@ export default function AdminSettingsPage() {
               icon={MessageCircle}
               title="زر واتساب العائم"
               description="زر تواصل سريع يظهر في زاوية الصفحة لكل الزوار."
+            />
             <div className="space-y-4">
               <div className="flex items-center justify-between rounded-lg border p-3 bg-muted/30">
                 <Label htmlFor="wa-en" className="m-0 cursor-pointer">تفعيل الزر</Label>
