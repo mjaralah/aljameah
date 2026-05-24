@@ -33,6 +33,12 @@ type Settings = {
   footer_text: string | null;
   feedback_visibility: VisibilityMap | null;
   pages_visibility: VisibilityMap | null;
+  whatsapp_enabled: boolean | null;
+  whatsapp_number: string | null;
+  whatsapp_message: string | null;
+  whatsapp_tooltip: string | null;
+  whatsapp_show_tooltip: boolean | null;
+  whatsapp_position: string | null;
 };
 
 const FEEDBACK_PAGES: { key: string; label: string }[] = [
