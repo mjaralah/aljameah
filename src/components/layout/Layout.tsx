@@ -3,6 +3,7 @@ import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { TopBar } from "./TopBar";
 import { AccessibilityToolbar } from "./AccessibilityToolbar";
+import { WhatsAppFloat } from "./WhatsAppFloat";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 // التخطيط الموحّد لكل الصفحات
