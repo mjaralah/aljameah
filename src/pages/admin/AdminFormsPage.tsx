@@ -330,7 +330,11 @@ export default function AdminFormsPage() {
                       table="custom_forms"
                       dragHandleProps={handleProps}
                       showDragHandle={view === "active"}
+                      selectable
+                      selected={selectedIds.has(f.id)}
+                      onSelectChange={(next) => toggleSelect(f.id, next)}
                       reorderControls={canReorder ? (
+
                         <ReorderControls
                           position={idx + 1}
                           total={visibleForms.length}
