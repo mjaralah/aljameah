@@ -295,6 +295,75 @@ export default function AdminSettingsPage() {
             </div>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardContent className="p-5 md:p-6">
+            <SectionHeader
+              icon={MessageCircle}
+              title="زر واتساب العائم"
+              description="زر تواصل سريع يظهر في زاوية الصفحة لكل الزوار."
+            />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between rounded-lg border p-3 bg-muted/30">
+                <Label htmlFor="wa-en" className="m-0 cursor-pointer">تفعيل الزر</Label>
+                <Switch
+                  id="wa-en"
+                  checked={!!s.whatsapp_enabled}
+                  onCheckedChange={(v) => set("whatsapp_enabled", v)}
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label>رقم الواتساب (بصيغة دولية بدون +)</Label>
+                  <Input
+                    dir="ltr"
+                    placeholder="966500000000"
+                    value={s.whatsapp_number ?? ""}
+                    onChange={(e) => set("whatsapp_number", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label>موضع الزر</Label>
+                  <Select
+                    value={s.whatsapp_position ?? "left"}
+                    onValueChange={(v) => set("whatsapp_position", v)}
+                  >
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="left">يسار الصفحة</SelectItem>
+                      <SelectItem value="right">يمين الصفحة</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div>
+                <Label>الرسالة الافتراضية</Label>
+                <Textarea
+                  rows={2}
+                  placeholder="مرحباً، أرغب في الاستفسار عن..."
+                  value={s.whatsapp_message ?? ""}
+                  onChange={(e) => set("whatsapp_message", e.target.value)}
+                />
+              </div>
+              <div>
+                <Label>نص التلميح المنبثق</Label>
+                <Input
+                  placeholder="مرحباً 👋 كيف يمكننا مساعدتك؟"
+                  value={s.whatsapp_tooltip ?? ""}
+                  onChange={(e) => set("whatsapp_tooltip", e.target.value)}
+                />
+              </div>
+              <div className="flex items-center justify-between rounded-lg border p-3 bg-muted/30">
+                <Label htmlFor="wa-tip" className="m-0 cursor-pointer">إظهار التلميح تلقائياً بعد فتح الصفحة</Label>
+                <Switch
+                  id="wa-tip"
+                  checked={s.whatsapp_show_tooltip !== false}
+                  onCheckedChange={(v) => set("whatsapp_show_tooltip", v)}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </AdminLayout>
   );
