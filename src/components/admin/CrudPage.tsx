@@ -1,4 +1,5 @@
 import { ReactNode, useEffect, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -95,6 +96,13 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkBusy, setBulkBusy] = useState(false);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const queryClient = useQueryClient();
+
+  // إبطال كاش الموقع العام بعد أي تعديل، حتى تظهر التغييرات للزوار فوراً بدلاً من انتظار انتهاء صلاحية الكاش.
+  function invalidatePublic() {
+    queryClient.invalidateQueries({ queryKey: ["public"] });
+  }
+
 
   async function load() {
     setLoading(true);
@@ -162,6 +170,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
     if (error) return toast.error(error.message);
     toast.success(next ? `تم نشر ${ids.length} عنصراً` : `تم إخفاء ${ids.length} عنصراً`);
     clearSelection();
+    invalidatePublic();
     load();
   }
 
@@ -175,6 +184,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
     if (error) return toast.error(error.message);
     toast.success(`تم حذف ${ids.length} عنصراً`);
     clearSelection();
+    invalidatePublic();
     load();
   }
 
@@ -201,6 +211,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
         toast.success("تمت الإضافة");
       }
       setEditing(null);
+      invalidatePublic();
       load();
     } catch (e) {
       toast.error((e as Error).message);
@@ -215,6 +226,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
     if (error) toast.error(error.message);
     else {
       toast.success("تم الحذف");
+      invalidatePublic();
       load();
     }
     setDeleteId(null);
@@ -241,6 +253,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
     setRows(newRows);
     try {
       await persistSortOrder(supabase, table, newIds);
+      invalidatePublic();
       toast.success("تم تحديث الترتيب");
     } catch {
       toast.error("تعذر حفظ الترتيب");
@@ -448,7 +461,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
                       ) : undefined
                     }
                     published={!!row.published}
-                    onTogglePublished={() => load()}
+                    onTogglePublished={() => { invalidatePublic(); load(); }}
                     onEdit={() => setEditing(row)}
                     onDelete={() => setDeleteId(row.id)}
                     selectable
