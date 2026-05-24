@@ -157,6 +157,7 @@ export const Footer = () => {
         )}
       </div>
 
+      {!bottomHidden && (
       <div className="border-t border-primary-foreground/15">
         <div className="container py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs opacity-90">
           <div>
@@ -167,6 +168,7 @@ export const Footer = () => {
           </div>
         </div>
       </div>
+      )}
     </footer>
   );
 };
