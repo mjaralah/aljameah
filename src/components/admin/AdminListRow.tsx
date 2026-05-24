@@ -44,6 +44,7 @@ export const AdminListRow = forwardRef<HTMLDivElement, AdminListRowProps>(functi
     id, table, title, subtitle, thumbnail, badges,
     published, onTogglePublished, onEdit, onDelete, extraActions,
     dragHandleProps, showDragHandle = true, reorderControls,
+    selectable, selected, onSelectChange,
     className, style, children,
   },
   ref,
