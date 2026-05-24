@@ -155,11 +155,23 @@ export default function AdminPageBuilderPage() {
         />
       ) : (
         <>
+          <BulkActionsBar
+            count={visibleSelectedCount}
+            total={sections.length}
+            allSelected={allVisibleSelected}
+            onToggleAll={toggleSelectAll}
+            onClear={clearSelection}
+            onPublish={() => bulkSetPublished(true)}
+            onUnpublish={() => bulkSetPublished(false)}
+            onDelete={() => setBulkDeleteOpen(true)}
+            busy={bulkBusy}
+          />
           {sections.length > 1 && (
             <p className="text-xs text-muted-foreground mb-2">
               استخدم الأسهم <span className="inline-block">▲▼</span> أو حقل الرقم لتغيير الترتيب، أو اسحب <GripVertical className="inline w-3 h-3" />.
             </p>
           )}
+
           {(() => {
             async function applyOrder(newIds: string[]) {
               const orderMap = new Map(newIds.map((id, i) => [id, (i + 1) * 10]));
