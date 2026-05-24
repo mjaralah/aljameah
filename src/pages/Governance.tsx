@@ -23,14 +23,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
-  policies,
-  regulations,
-  plans,
-  investmentDecisions,
-  aidReports,
-  financialReports,
-  reports as annualReports,
-  eventsReports,
   financials,
 } from "@/data/governance";
 import { useGovernanceDocs, usePageContent, useGovernanceCategories } from "@/hooks/usePublicContent";
@@ -50,16 +42,6 @@ type Section = {
 const ICON_MAP: Record<string, LucideIcon> = {
   ShieldCheck, ScrollText, Target, TrendingUp, HandCoins, Wallet, FileBarChart, CalendarDays, BookMarked, FileText, Folder,
 };
-
-const FALLBACK_DOCS: Record<string, DocItem[]> = {
-  policies, regulations, plans,
-  investments: investmentDecisions,
-  aid: aidReports,
-  financialReports,
-  annualReport: annualReports,
-  events: eventsReports,
-};
-
 
 const Governance = () => {
   const { t, tx, lang } = useLanguage();
@@ -102,24 +84,23 @@ const Governance = () => {
   const sections: Section[] = useMemo(() => {
     const cats = dbCategories ?? [];
     if (cats.length === 0) {
-      // Fallback to hardcoded sections when DB has no categories yet
+      // Keep default category navigation labels only; documents must come from the database
+      // so archived/unpublished files never reappear from static fallback data.
       return [
-        { key: "policies", label: t.pages.governance.policies as string, icon: ShieldCheck, docs: dbByCategory.policies?.length ? dbByCategory.policies : policies },
-        { key: "regulations", label: t.pages.governance.regulations as string, icon: ScrollText, docs: dbByCategory.regulations?.length ? dbByCategory.regulations : regulations },
-        { key: "plans", label: t.pages.governance.plans as string, icon: Target, docs: dbByCategory.plans?.length ? dbByCategory.plans : plans },
-        { key: "investments", label: t.pages.governance.investments as string, icon: TrendingUp, docs: dbByCategory.investments?.length ? dbByCategory.investments : investmentDecisions },
-        { key: "aid", label: t.pages.governance.aid as string, icon: HandCoins, docs: dbByCategory.aid?.length ? dbByCategory.aid : aidReports },
-        { key: "financialReports", label: t.pages.governance.financialReports as string, icon: Wallet, docs: dbByCategory.financialReports?.length ? dbByCategory.financialReports : financialReports },
-        { key: "annualReport", label: t.pages.governance.annualReport as string, icon: FileBarChart, docs: dbByCategory.annualReport?.length ? dbByCategory.annualReport : annualReports },
-        { key: "events", label: t.pages.governance.events as string, icon: CalendarDays, docs: dbByCategory.events?.length ? dbByCategory.events : eventsReports },
+        { key: "policies", label: t.pages.governance.policies as string, icon: ShieldCheck, docs: dbByCategory.policies ?? [] },
+        { key: "regulations", label: t.pages.governance.regulations as string, icon: ScrollText, docs: dbByCategory.regulations ?? [] },
+        { key: "plans", label: t.pages.governance.plans as string, icon: Target, docs: dbByCategory.plans ?? [] },
+        { key: "investments", label: t.pages.governance.investments as string, icon: TrendingUp, docs: dbByCategory.investments ?? [] },
+        { key: "aid", label: t.pages.governance.aid as string, icon: HandCoins, docs: dbByCategory.aid ?? [] },
+        { key: "financialReports", label: t.pages.governance.financialReports as string, icon: Wallet, docs: dbByCategory.financialReports ?? [] },
+        { key: "annualReport", label: t.pages.governance.annualReport as string, icon: FileBarChart, docs: dbByCategory.annualReport ?? [] },
+        { key: "events", label: t.pages.governance.events as string, icon: CalendarDays, docs: dbByCategory.events ?? [] },
       ];
     }
     return cats.map((c) => {
       const label = lang === "ar" ? c.label_ar : c.label_en;
       const Icon = (c.icon && ICON_MAP[c.icon]) || Folder;
-      const docs = dbByCategory[c.slug]?.length
-        ? dbByCategory[c.slug]
-        : (FALLBACK_DOCS[c.slug] ?? []);
+      const docs = dbByCategory[c.slug] ?? [];
       return { key: c.slug, label, icon: Icon, docs };
     });
   }, [dbCategories, dbByCategory, lang, t]);
