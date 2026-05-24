@@ -72,6 +72,7 @@ const PUBLIC_PAGES: { key: string; label: string }[] = [
   { key: "eservices", label: "الخدمات الإلكترونية" },
   { key: "contact", label: "تواصل معنا" },
   { key: "sitemap", label: "خريطة الموقع" },
+  { key: "footer_legal", label: "قسم المعلومات القانونية (التذييل)" },
 ];
 
 function SaveStatusIndicator({ status, onRetry }: { status: SaveStatus; onRetry: () => void }) {

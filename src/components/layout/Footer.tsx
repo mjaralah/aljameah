@@ -24,6 +24,7 @@ export const Footer = () => {
   ];
   const visibility = (settings as any)?.pages_visibility as Record<string, boolean> | undefined;
   const sitemapHidden = visibility && visibility.sitemap === false;
+  const legalSectionHidden = visibility && visibility.footer_legal === false;
   const legal = [
     ...((legalPages ?? []).map((p) => ({ to: `/${p.slug}`, label: p.title }))),
     ...(sitemapHidden ? [] : [{ to: "/sitemap", label: t.footer.sitemap }]),
@@ -114,18 +115,20 @@ export const Footer = () => {
           </ul>
         </div>
 
-        <div>
-          <h3 className="font-bold mb-4 text-accent">{t.footer.legal}</h3>
-          <ul className="space-y-2 text-sm">
-            {legal.map((l) => (
-              <li key={l.to}>
-                <Link to={l.to} className="opacity-90 hover:opacity-100 hover:text-accent transition-smooth">
-                  {l.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {!legalSectionHidden && (
+          <div>
+            <h3 className="font-bold mb-4 text-accent">{t.footer.legal}</h3>
+            <ul className="space-y-2 text-sm">
+              {legal.map((l) => (
+                <li key={l.to}>
+                  <Link to={l.to} className="opacity-90 hover:opacity-100 hover:text-accent transition-smooth">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <div>
           <h3 className="font-bold mb-4 text-accent">{t.footer.contact}</h3>
