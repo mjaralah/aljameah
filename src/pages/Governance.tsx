@@ -161,7 +161,9 @@ const Governance = () => {
                 lang={lang}
                 financialsOverride={finOverride}
                 financialsTitle={finSection?.title}
+                showFinancials={!!finSection}
               />
+
             ) : active ? (
               <DocsPanel
                 key={active.key}
