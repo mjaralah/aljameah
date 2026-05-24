@@ -64,6 +64,11 @@ export default function AdminProgramsPage() {
         published: true,
         sort_order: 0,
         featured: false,
+        sponsor_button_enabled: true,
+        sponsor_button_label: "",
+        sponsor_button_label_en: "",
+        sponsor_button_url: "",
+        sponsor_button_icon: "Heart",
       })}
       validate={(v) => {
         if (!v.title?.trim()) return "اسم البرنامج مطلوب";
