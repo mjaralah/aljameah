@@ -489,7 +489,11 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
         onSave={handleSave}
         saving={saving}
         size="lg"
-        extraActions={extraDialogActions}
+        extraActions={
+          typeof extraDialogActions === "function"
+            ? extraDialogActions(editing ?? {})
+            : extraDialogActions
+        }
       >
         {editing && renderForm(editing, setValue)}
       </AdminDialog>
