@@ -315,6 +315,117 @@ export default function AdminSettingsPage() {
               title="زر واتساب العائم"
               description="زر تواصل سريع يظهر في زاوية الصفحة لكل الزوار."
             />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-5 md:p-6">
+            <SectionHeader
+              icon={Heart}
+              title='زر "تبرع الآن" في الهيدر'
+              description="تحكم بإظهار الزر ونصه ورابطه وألوانه وأيقونته."
+            />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between rounded-lg border p-3 bg-muted/30">
+                <Label htmlFor="donate-enabled" className="m-0 cursor-pointer">إظهار الزر في الهيدر</Label>
+                <Switch
+                  id="donate-enabled"
+                  checked={s.donate_button_enabled !== false}
+                  onCheckedChange={(v) => set("donate_button_enabled", v)}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label>النص بالعربية</Label>
+                  <Input
+                    value={s.donate_button_label_ar ?? ""}
+                    placeholder="تبرع الآن"
+                    onChange={(e) => set("donate_button_label_ar", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label>النص بالإنجليزية</Label>
+                  <Input
+                    dir="ltr"
+                    value={s.donate_button_label_en ?? ""}
+                    placeholder="Donate Now"
+                    onChange={(e) => set("donate_button_label_en", e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label>الرابط (داخلي مثل /donate أو رابط خارجي كامل)</Label>
+                <Input
+                  dir="ltr"
+                  value={s.donate_button_url ?? ""}
+                  placeholder="/donate"
+                  onChange={(e) => set("donate_button_url", e.target.value)}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label>لون الخلفية</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      className="w-14 p-1 h-10"
+                      value={s.donate_button_bg_color ?? "#C5973A"}
+                      onChange={(e) => set("donate_button_bg_color", e.target.value)}
+                    />
+                    <Input
+                      dir="ltr"
+                      value={s.donate_button_bg_color ?? ""}
+                      placeholder="افتراضي (لون التمييز)"
+                      onChange={(e) => set("donate_button_bg_color", e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label>لون النص</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      className="w-14 p-1 h-10"
+                      value={s.donate_button_text_color ?? "#ffffff"}
+                      onChange={(e) => set("donate_button_text_color", e.target.value)}
+                    />
+                    <Input
+                      dir="ltr"
+                      value={s.donate_button_text_color ?? ""}
+                      placeholder="افتراضي"
+                      onChange={(e) => set("donate_button_text_color", e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label>الأيقونة</Label>
+                  <Select
+                    value={s.donate_button_icon ?? "heart"}
+                    onValueChange={(v) => set("donate_button_icon", v)}
+                  >
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="heart">قلب</SelectItem>
+                      <SelectItem value="gift">هدية</SelectItem>
+                      <SelectItem value="hand-heart">يد بقلب</SelectItem>
+                      <SelectItem value="none">بدون أيقونة</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-5 md:p-6">
+            <SectionHeader
+              icon={MessageCircle}
+              title="زر واتساب العائم"
+              description="زر تواصل سريع يظهر في زاوية الصفحة لكل الزوار."
             <div className="space-y-4">
               <div className="flex items-center justify-between rounded-lg border p-3 bg-muted/30">
                 <Label htmlFor="wa-en" className="m-0 cursor-pointer">تفعيل الزر</Label>
