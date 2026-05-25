@@ -11,7 +11,9 @@ export const AboutPreview = () => {
   const { data: aboutData } = useAboutContent();
   const regSec = aboutData?.find((s) => s.section_key === "registration");
   const regRows = (regSec?.data?.rows as { label?: string; value?: string }[] | undefined) ?? [];
-  const regRow = regRows.find((r) => (r.label ?? "").includes("تسجيل") || (r.label ?? "").includes("سجل"));
+  const regRow =
+    regRows.find((r) => /تسجيل|سجل|ترخيص|رخصة|license|registration/i.test(r.label ?? "")) ??
+    regRows[0];
   const regNumber = regRow?.value || t.brand.regNumber;
   const sec = data?.find((s) => s.section_key === "about_preview");
   const title = sec?.title || t.brand.name;
