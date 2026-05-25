@@ -859,6 +859,9 @@ export type Database = {
           footer_brand_tagline_ar: string | null
           footer_brand_tagline_en: string | null
           footer_text: string | null
+          header_brand_name_en: string | null
+          header_tagline_ar: string | null
+          header_tagline_en: string | null
           id: string
           language_toggle_enabled: boolean
           language_toggle_icon: string
@@ -902,6 +905,9 @@ export type Database = {
           footer_brand_tagline_ar?: string | null
           footer_brand_tagline_en?: string | null
           footer_text?: string | null
+          header_brand_name_en?: string | null
+          header_tagline_ar?: string | null
+          header_tagline_en?: string | null
           id?: string
           language_toggle_enabled?: boolean
           language_toggle_icon?: string
@@ -945,6 +951,9 @@ export type Database = {
           footer_brand_tagline_ar?: string | null
           footer_brand_tagline_en?: string | null
           footer_text?: string | null
+          header_brand_name_en?: string | null
+          header_tagline_ar?: string | null
+          header_tagline_en?: string | null
           id?: string
           language_toggle_enabled?: boolean
           language_toggle_icon?: string

@@ -51,6 +51,9 @@ type Settings = {
   language_toggle_label_ar: string | null;
   language_toggle_label_en: string | null;
   language_toggle_icon: string | null;
+  header_brand_name_en: string | null;
+  header_tagline_ar: string | null;
+  header_tagline_en: string | null;
 };
 
 type SaveStatus = "idle" | "dirty" | "saving" | "saved" | "error";
@@ -250,9 +253,23 @@ export default function AdminSettingsPage() {
               description="الشعار واسم الموقع يظهران في الترويسة والتذييل"
             />
             <div className="space-y-4">
-              <div>
-                <Label>اسم الموقع</Label>
-                <Input value={s.site_name ?? ""} onChange={(e) => set("site_name", e.target.value)} />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label>اسم الموقع (عربي)</Label>
+                  <Input value={s.site_name ?? ""} onChange={(e) => set("site_name", e.target.value)} placeholder="جمعية العطاء الخيرية" />
+                </div>
+                <div>
+                  <Label>اسم الموقع (إنجليزي)</Label>
+                  <Input value={(s as any).header_brand_name_en ?? ""} onChange={(e) => set("header_brand_name_en" as any, e.target.value)} placeholder="Al-Ataa Charity" />
+                </div>
+                <div>
+                  <Label>الوصف القصير بجوار الشعار (عربي)</Label>
+                  <Input value={(s as any).header_tagline_ar ?? ""} onChange={(e) => set("header_tagline_ar" as any, e.target.value)} placeholder="بشفافية وأمانة" />
+                </div>
+                <div>
+                  <Label>الوصف القصير بجوار الشعار (إنجليزي)</Label>
+                  <Input value={(s as any).header_tagline_en ?? ""} onChange={(e) => set("header_tagline_en" as any, e.target.value)} placeholder="With transparency" />
+                </div>
               </div>
               <MediaUpload label="شعار الجمعية" folder="branding" value={s.logo_url} onChange={(url) => set("logo_url", url)} />
               <MediaUpload label="أيقونة المتصفح (Favicon)" folder="branding" value={s.favicon_url} onChange={(url) => set("favicon_url", url)} />
