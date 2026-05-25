@@ -138,7 +138,7 @@ export default function AdminFooterPage() {
         {/* ===== Sections order + visibility + titles ===== */}
         <Card>
           <CardContent className="p-5 md:p-6">
-            <SectionHeader icon={GripVertical} title="ترتيب أعمدة التذييل" description="اسحب لإعادة الترتيب، وعدّل عنوان كل عمود أو أخفِه." />
+            <SectionHeader icon={GripVertical} title="ترتيب أعمدة التذييل" description="اسحب لإعادة الترتيب، وعدّل عنوان كل عمود أو أخفِه. هذه المفاتيح هي المصدر الوحيد لإظهار/إخفاء أعمدة التذييل في كل الصفحات." />
             <SortableList
               ids={sections.map((s) => s.id)}
               onReorder={(ids) => m.reorderSections.mutate(ids)}

@@ -21,7 +21,7 @@ export type DBFooterLink = {
   published: boolean;
 };
 
-const STALE = 1000 * 60 * 2;
+const STALE = 0;
 
 // ============ Public ============
 export function useFooterSections() {
