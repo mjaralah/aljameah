@@ -136,8 +136,12 @@ function CategoryManager({ onChanged }: { onChanged: () => void }) {
 
   return (
     <>
-      <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
-        <FolderCog className="w-4 h-4 ml-1" />
+      <Button
+        size="sm"
+        onClick={() => setOpen(true)}
+        className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold shadow-gold gap-1.5"
+      >
+        <FolderCog className="w-4 h-4" />
         إدارة الأقسام
       </Button>
 
