@@ -37,13 +37,11 @@ Deno.serve(async (req) => {
       auth: { persistSession: false },
     });
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsErr } =
-      await userClient.auth.getClaims(token);
-    if (claimsErr || !claimsData?.claims?.sub) {
+    const { data: userData, error: userErr } = await userClient.auth.getUser();
+    if (userErr || !userData?.user?.id) {
       return json(401, { ok: false, error: "Invalid session" });
     }
-    const callerId = claimsData.claims.sub;
+    const callerId = userData.user.id;
 
     // 2) Verify caller has admin role
     const admin = createClient(SUPABASE_URL, SERVICE_ROLE, {
