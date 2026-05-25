@@ -177,7 +177,7 @@ export default function AdminFooterPage() {
                             />
                           </>
                         )}
-                        <div className="ms-auto flex items-center gap-2">
+                        <div className="ms-auto flex items-center gap-2 shrink-0 px-1">
                           <Label className="text-xs m-0">ظاهر</Label>
                           <Switch
                             checked={s.published}
