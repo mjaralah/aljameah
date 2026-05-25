@@ -5,10 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Shield, Sparkles } from "lucide-react";
+import { Loader2, Shield } from "lucide-react";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
 
 export default function AdminLogin() {
   const { signIn, isStaff, loading: authLoading } = useAdminAuth();
@@ -19,8 +19,8 @@ export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [seeding, setSeeding] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
 
   if (!authLoading && isStaff) {
     return <Navigate to={from} replace />;
@@ -42,29 +42,7 @@ export default function AdminLogin() {
     navigate(from, { replace: true });
   }
 
-  async function handleSeed() {
-    setSeeding(true);
-    setError(null);
-    try {
-      const { data, error } = await supabase.functions.invoke("seed-admin");
-      if (error) throw error;
-      if (data?.alreadySeeded) {
-        toast.info("الحساب التجريبي موجود مسبقاً", {
-          description: "admin@test.com / Admin@12345",
-        });
-      } else if (data?.seeded) {
-        toast.success("تم إنشاء الحساب التجريبي", {
-          description: "admin@test.com / Admin@12345",
-        });
-      }
-      setEmail("admin@test.com");
-      setPassword("Admin@12345");
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setSeeding(false);
-    }
-  }
+
 
   return (
     <div dir="rtl" className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/10 p-4">
@@ -121,35 +99,8 @@ export default function AdminLogin() {
               </Button>
             </form>
 
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs">
-                <span className="bg-card px-2 text-muted-foreground">أو</span>
-              </div>
-            </div>
-
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={handleSeed}
-              disabled={seeding}
-            >
-              {seeding ? (
-                <Loader2 className="w-4 h-4 ml-2 animate-spin" />
-              ) : (
-                <Sparkles className="w-4 h-4 ml-2" />
-              )}
-              إنشاء/تعبئة الحساب التجريبي
-            </Button>
-
-            <p className="text-xs text-muted-foreground text-center mt-4 leading-relaxed">
-              للاختبار: <span className="font-mono" dir="ltr">admin@test.com</span> /{" "}
-              <span className="font-mono" dir="ltr">Admin@12345</span>
-            </p>
           </CardContent>
+
         </Card>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
