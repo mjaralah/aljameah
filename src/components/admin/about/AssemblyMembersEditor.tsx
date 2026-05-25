@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Trash2, Upload, Download, FileSpreadsheet, Pencil, Eye, EyeOff } from "lucide-react";
+import { Plus, Trash2, Upload, Download, FileSpreadsheet, Pencil, Eye, EyeOff, Users, Tag, Settings } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import {
@@ -74,10 +74,28 @@ export default function AssemblyMembersEditor({
 
   return (
     <Tabs defaultValue="members" className="w-full">
-      <TabsList className="grid w-full grid-cols-3">
-        <TabsTrigger value="members">الأعضاء ({members.length})</TabsTrigger>
-        <TabsTrigger value="types">أنواع العضوية</TabsTrigger>
-        <TabsTrigger value="settings">الإعدادات</TabsTrigger>
+      <TabsList className="grid w-full grid-cols-3 h-auto p-1.5 bg-muted/70 border-2 border-border rounded-xl shadow-sm gap-1.5">
+        <TabsTrigger
+          value="members"
+          className="gap-2 py-2.5 text-sm font-medium rounded-lg transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:font-bold data-[state=active]:shadow-md data-[state=active]:ring-2 data-[state=active]:ring-primary/30"
+        >
+          <Users className="w-4 h-4" />
+          الأعضاء ({members.length})
+        </TabsTrigger>
+        <TabsTrigger
+          value="types"
+          className="gap-2 py-2.5 text-sm font-medium rounded-lg transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:font-bold data-[state=active]:shadow-md data-[state=active]:ring-2 data-[state=active]:ring-primary/30"
+        >
+          <Tag className="w-4 h-4" />
+          أنواع العضوية
+        </TabsTrigger>
+        <TabsTrigger
+          value="settings"
+          className="gap-2 py-2.5 text-sm font-medium rounded-lg transition-all data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:font-bold data-[state=active]:shadow-md data-[state=active]:ring-2 data-[state=active]:ring-primary/30"
+        >
+          <Settings className="w-4 h-4" />
+          الإعدادات
+        </TabsTrigger>
       </TabsList>
 
       {/* الأعضاء */}
