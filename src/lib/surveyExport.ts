@@ -281,3 +281,108 @@ export async function exportSurveyPDF(surveyId: string) {
   w.document.write(html);
   w.document.close();
 }
+
+/* ========== تصدير جميع الاستبيانات في ملف Excel واحد (ورقة لكل استبيان) ========== */
+export async function exportAllSurveysExcel() {
+  const { data: allSurveys } = await supabase
+    .from("surveys")
+    .select("*")
+    .order("sort_order");
+  const surveys = (allSurveys ?? []) as Survey[];
+  if (!surveys.length) throw new Error("لا توجد استبيانات للتصدير");
+
+  const wb = XLSX.utils.book_new();
+
+  // ورقة فهرس عامة
+  const indexRows: (string | number)[][] = [
+    ["#", "عنوان الاستبيان", "الحالة", "تاريخ الانتهاء", "إجمالي المشاركات", "متوسط التقييم", "نسبة الرضا %"],
+  ];
+
+  const usedNames = new Set<string>();
+  const safeSheetName = (raw: string) => {
+    let name = raw.replace(/[\\/*?:[\]]/g, " ").trim().slice(0, 28) || "استبيان";
+    let candidate = name;
+    let i = 2;
+    while (usedNames.has(candidate)) {
+      const suffix = ` (${i++})`;
+      candidate = name.slice(0, 28 - suffix.length) + suffix;
+    }
+    usedNames.add(candidate);
+    return candidate;
+  };
+
+  for (let i = 0; i < surveys.length; i++) {
+    const s = surveys[i];
+    const [{ data: qs }, { data: rs }] = await Promise.all([
+      supabase.from("survey_questions").select("*").eq("survey_id", s.id).order("sort_order"),
+      supabase.from("survey_responses").select("*").eq("survey_id", s.id).order("submitted_at", { ascending: false }),
+    ]);
+    const questions = (qs ?? []) as Question[];
+    const responses = (rs ?? []) as ResponseRow[];
+    const summary = buildSummary(questions, responses);
+
+    indexRows.push([
+      i + 1,
+      s.title,
+      s.status === "active" ? "نشط" : "مغلق",
+      s.ends_at ?? "—",
+      summary.totalResponses,
+      summary.averageRating,
+      summary.satisfaction,
+    ]);
+
+    // محتوى ورقة الاستبيان: ملخص + تحليل + إجابات خام
+    const rows: (string | number)[][] = [
+      ["تقرير الاستبيان", s.title],
+      ["الوصف", s.description ?? ""],
+      ["الحالة", s.status === "active" ? "نشط" : "مغلق"],
+      ["تاريخ الانتهاء", s.ends_at ?? "—"],
+      ["إجمالي المشاركات", summary.totalResponses],
+      ["متوسط التقييم (من 5)", summary.averageRating],
+      ["نسبة الرضا %", summary.satisfaction],
+      [],
+      ["تحليل الأسئلة"],
+      ["السؤال", "النوع", "إجمالي الإجابات", "الخيار/القيمة", "العدد", "النسبة %"],
+    ];
+    questions.forEach((q, idx) => {
+      const stats = buildQuestionStats(q, responses);
+      const typeLabel = LIKERT_TYPES.includes(q.type) ? "مقياس" : CHOICE_TYPES.includes(q.type) ? "اختيار" : "نص";
+      if (stats.kind === "likert") {
+        rows.push([`${idx + 1}. ${q.question}`, typeLabel, stats.total, `المتوسط: ${stats.average}`, "", ""]);
+        stats.dist.forEach((d) => {
+          const pct = stats.total ? Math.round((d.count / stats.total) * 100) : 0;
+          rows.push(["", "", "", d.label, d.count, pct]);
+        });
+      } else if (stats.kind === "choice") {
+        rows.push([`${idx + 1}. ${q.question}`, typeLabel, stats.total, "", "", ""]);
+        stats.dist.forEach((d) => rows.push(["", "", "", d.label, d.count, d.percent]));
+      } else {
+        rows.push([`${idx + 1}. ${q.question}`, typeLabel, stats.total, "— إجابات نصية —", "", ""]);
+      }
+    });
+    rows.push([], ["الإجابات الخام"]);
+    const header = ["#", "تاريخ المشاركة", ...questions.map((q, i) => `Q${i + 1}: ${q.question}`)];
+    rows.push(header);
+    responses.forEach((r, idx) => {
+      rows.push([
+        idx + 1,
+        new Date(r.submitted_at).toLocaleString("ar-SA"),
+        ...questions.map((q) => answerToText(q, r.answers[q.id])),
+      ]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws["!cols"] = [{ wch: 50 }, { wch: 14 }, { wch: 16 }, { wch: 30 }, { wch: 10 }, { wch: 10 }];
+    ws["!sheetView"] = [{ RTL: true }];
+    XLSX.utils.book_append_sheet(wb, ws, safeSheetName(`${i + 1}. ${s.title}`));
+  }
+
+  const wsIndex = XLSX.utils.aoa_to_sheet(indexRows);
+  wsIndex["!cols"] = [{ wch: 5 }, { wch: 50 }, { wch: 10 }, { wch: 14 }, { wch: 18 }, { wch: 16 }, { wch: 14 }];
+  wsIndex["!sheetView"] = [{ RTL: true }];
+  // إدراج ورقة الفهرس في البداية
+  XLSX.utils.book_append_sheet(wb, wsIndex, "الفهرس");
+  wb.SheetNames = ["الفهرس", ...wb.SheetNames.filter((n) => n !== "الفهرس")];
+
+  XLSX.writeFile(wb, `جميع_الاستبيانات_${new Date().toISOString().slice(0, 10)}.xlsx`);
+}
