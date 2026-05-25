@@ -138,8 +138,9 @@ function CategoryManager({ onChanged }: { onChanged: () => void }) {
     <>
       <Button
         size="sm"
+        variant="outline"
         onClick={() => setOpen(true)}
-        className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold shadow-gold gap-1.5"
+        className="gap-1.5"
       >
         <FolderCog className="w-4 h-4" />
         إدارة الأقسام
@@ -274,11 +275,11 @@ export default function AdminGovernancePage() {
       description="إدارة جميع وثائق الحوكمة لعرضها في صفحة الحوكمة العامة"
       searchField="title"
       reorderable
+      headerAction={<CategoryManager onChanged={() => setVersion((v) => v + 1)} />}
       categoryFilter={{
         field: "category",
         options,
         includeAll: false,
-        extraAction: <CategoryManager onChanged={() => setVersion((v) => v + 1)} />,
       }}
       columns={[
         { key: "title", label: "العنوان", className: "font-medium" },

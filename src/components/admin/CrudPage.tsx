@@ -63,6 +63,8 @@ export type CrudPageProps<T extends { id: string; published?: boolean }> = {
   };
   /** Extra actions shown in the dialog footer between Cancel and Save */
   extraDialogActions?: ReactNode | ((values: Partial<T>) => ReactNode);
+  /** Extra action button(s) shown in the page header next to the primary "Add" button. */
+  headerAction?: ReactNode;
 };
 
 
@@ -86,6 +88,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
   reorderable = false,
   categoryFilter,
   extraDialogActions,
+  headerAction,
 }: CrudPageProps<T>) {
   const [rows, setRows] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
@@ -309,10 +312,13 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
         description={description}
         icon={icon}
         action={
-          <Button onClick={() => setEditing(createDefaults())}>
-            <Plus className="w-4 h-4 ml-1" />
-            إضافة
-          </Button>
+          <div className="flex items-center gap-2">
+            {headerAction}
+            <Button onClick={() => setEditing(createDefaults())}>
+              <Plus className="w-4 h-4 ml-1" />
+              إضافة
+            </Button>
+          </div>
         }
         searchValue={searchField ? search : undefined}
         onSearchChange={searchField ? setSearch : undefined}
