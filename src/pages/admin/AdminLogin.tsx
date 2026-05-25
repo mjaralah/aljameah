@@ -126,6 +126,33 @@ export default function AdminLogin() {
               </Button>
             </form>
 
+            <div className="relative my-5">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="bg-card px-2 text-muted-foreground">أو</span>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={handleSeedDemo}
+              disabled={seeding || submitting}
+            >
+              {seeding ? (
+                <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+              ) : (
+                <Sparkles className="w-4 h-4 ml-2" />
+              )}
+              إنشاء/تعبئة الحساب التجريبي
+            </Button>
+            <p className="text-center text-xs text-muted-foreground mt-3">
+              للاختبار: <span dir="ltr">{DEMO_EMAIL} / {DEMO_PASSWORD}</span>
+            </p>
+
           </CardContent>
 
         </Card>
