@@ -31,6 +31,13 @@ export const Footer = () => {
       .filter((l) => l.section_key === key)
       .map((l) => ({ to: l.url, label: (isEn && l.label_en) ? l.label_en : l.label_ar }));
 
+  const defaultLegalLinks = [
+    { to: "/privacy-policy", label: t.footer.privacy },
+    { to: "/terms-of-use", label: t.footer.terms },
+    { to: "/cookie-policy", label: t.footer.cookies },
+    { to: "/accessibility-statement", label: t.footer.accessibility },
+  ];
+
   const legalLinks = [
     ...((legalPages ?? []).map((p) => ({ to: `/${p.slug}`, label: p.title }))),
     ...linksFor("legal"),
@@ -101,7 +108,7 @@ export const Footer = () => {
       );
     }
 
-    const items = sectionKey === "legal" ? legalLinks : linksFor(sectionKey);
+    const items = sectionKey === "legal" ? (legalLinks.length > 0 ? legalLinks : defaultLegalLinks) : linksFor(sectionKey);
     if (items.length === 0) return null;
 
     return (
