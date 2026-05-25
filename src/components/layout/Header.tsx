@@ -63,12 +63,24 @@ export const Header = () => {
       <div className="container flex items-center justify-between gap-4 h-16 lg:h-20">
         {/* الشعار */}
         <Link to="/" className="flex items-center gap-2.5 shrink-0">
-          <div className="h-10 w-10 lg:h-11 lg:w-11 rounded-xl bg-gradient-primary grid place-items-center shadow-soft">
-            <Heart className="h-5 w-5 text-primary-foreground" fill="currentColor" />
-          </div>
+          {settings?.logo_url ? (
+            <img src={settings.logo_url} alt="" className="h-10 w-10 lg:h-11 lg:w-11 rounded-xl object-cover shadow-soft" />
+          ) : (
+            <div className="h-10 w-10 lg:h-11 lg:w-11 rounded-xl bg-gradient-primary grid place-items-center shadow-soft">
+              <Heart className="h-5 w-5 text-primary-foreground" fill="currentColor" />
+            </div>
+          )}
           <div className="leading-tight">
-            <div className="text-sm lg:text-base font-bold text-primary">{t.brand.name}</div>
-            <div className="text-[10px] lg:text-xs text-muted-foreground">{t.brand.tagline}</div>
+            <div className="text-sm lg:text-base font-bold text-primary">
+              {(lang === "en"
+                ? (settings as any)?.header_brand_name_en || settings?.site_name
+                : settings?.site_name || (settings as any)?.header_brand_name_en) || t.brand.name}
+            </div>
+            <div className="text-[10px] lg:text-xs text-muted-foreground">
+              {(lang === "en"
+                ? (settings as any)?.header_tagline_en || (settings as any)?.header_tagline_ar
+                : (settings as any)?.header_tagline_ar || (settings as any)?.header_tagline_en) || t.brand.tagline}
+            </div>
           </div>
         </Link>
 
