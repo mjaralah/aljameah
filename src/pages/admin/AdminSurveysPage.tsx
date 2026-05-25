@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, Pencil, Trash2, ChevronDown, ChevronUp, GripVertical, ClipboardList, Download, FileSpreadsheet, FileText } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, ChevronDown, ChevronUp, GripVertical, ClipboardList, Download, FileSpreadsheet, FileText, RotateCcw } from "lucide-react";
 import { SortableList, SortableItem, persistSortOrder } from "@/components/admin/SortableList";
 import { AdminListRow } from "@/components/admin/AdminListRow";
 import { ReorderControls } from "@/components/admin/ReorderControls";
