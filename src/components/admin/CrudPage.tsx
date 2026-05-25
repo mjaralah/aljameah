@@ -312,10 +312,13 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
         description={description}
         icon={icon}
         action={
-          <Button onClick={() => setEditing(createDefaults())}>
-            <Plus className="w-4 h-4 ml-1" />
-            إضافة
-          </Button>
+          <div className="flex items-center gap-2">
+            {headerAction}
+            <Button onClick={() => setEditing(createDefaults())}>
+              <Plus className="w-4 h-4 ml-1" />
+              إضافة
+            </Button>
+          </div>
         }
         searchValue={searchField ? search : undefined}
         onSearchChange={searchField ? setSearch : undefined}
