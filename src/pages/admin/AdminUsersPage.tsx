@@ -602,6 +602,16 @@ export default function AdminUsersPage() {
             </SelectContent>
           </Select>
         </div>
+        <div className="flex items-center gap-2 bg-muted/40 rounded-lg p-3">
+          <Switch
+            id="send-email"
+            checked={cSendEmail}
+            onCheckedChange={(v) => setCSendEmail(v)}
+          />
+          <Label htmlFor="send-email" className="text-sm cursor-pointer">
+            إرسال بيانات الدخول إلى البريد الإلكتروني للمستخدم
+          </Label>
+        </div>
       </AdminDialog>
 
       {/* Edit user */}
@@ -719,8 +729,10 @@ export default function AdminUsersPage() {
             <>
               <SummaryRow label="البريد" value={createdSummary.email} />
               <SummaryRow label="كلمة المرور" value={createdSummary.password} mono />
+              <SummaryRow label="رابط لوحة التحكم" value={`${window.location.origin}/admin`} />
               <Button variant="outline" className="w-full gap-2" onClick={() => {
-                navigator.clipboard.writeText(`البريد: ${createdSummary.email}\nكلمة المرور: ${createdSummary.password}`);
+                const text = `البريد: ${createdSummary.email}\nكلمة المرور: ${createdSummary.password}\nرابط لوحة التحكم: ${window.location.origin}/admin`;
+                navigator.clipboard.writeText(text);
                 toast.success("تم نسخ بيانات الدخول");
               }}>
                 <Copy className="w-4 h-4" />
