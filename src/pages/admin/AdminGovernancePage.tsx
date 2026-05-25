@@ -275,11 +275,11 @@ export default function AdminGovernancePage() {
       description="إدارة جميع وثائق الحوكمة لعرضها في صفحة الحوكمة العامة"
       searchField="title"
       reorderable
+      headerAction={<CategoryManager onChanged={() => setVersion((v) => v + 1)} />}
       categoryFilter={{
         field: "category",
         options,
         includeAll: false,
-        extraAction: <CategoryManager onChanged={() => setVersion((v) => v + 1)} />,
       }}
       columns={[
         { key: "title", label: "العنوان", className: "font-medium" },
