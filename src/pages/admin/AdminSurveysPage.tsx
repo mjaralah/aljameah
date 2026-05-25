@@ -23,7 +23,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
-import { exportSurveyExcel, exportSurveyPDF } from "@/lib/surveyExport";
+import { exportSurveyExcel, exportSurveyPDF, exportAllSurveysExcel } from "@/lib/surveyExport";
 import { toast } from "sonner";
 
 
@@ -153,9 +153,26 @@ export default function AdminSurveysPage() {
         description="إدارة الاستبيانات وأسئلتها"
         icon={ClipboardList}
         action={
-          <Button onClick={() => setEditing({ status: "active", show_public_results: true, published: true, sort_order: 0 })}>
-            <Plus className="w-4 h-4 ml-1" /> استبيان جديد
-          </Button>
+          <div className="flex items-center gap-2">
+            {surveys.length > 0 && (
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  try {
+                    await exportAllSurveysExcel();
+                    toast.success("تم تصدير جميع الاستبيانات");
+                  } catch (e) {
+                    toast.error((e as Error).message || "تعذّر التصدير");
+                  }
+                }}
+              >
+                <FileSpreadsheet className="w-4 h-4 ml-1" /> تصدير جميع الاستبيانات (Excel)
+              </Button>
+            )}
+            <Button onClick={() => setEditing({ status: "active", show_public_results: true, published: true, sort_order: 0 })}>
+              <Plus className="w-4 h-4 ml-1" /> استبيان جديد
+            </Button>
+          </div>
         }
       />
 
