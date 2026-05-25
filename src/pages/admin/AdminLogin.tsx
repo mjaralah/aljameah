@@ -5,10 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Shield, Sparkles } from "lucide-react";
+import { Loader2, Shield } from "lucide-react";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
 
 export default function AdminLogin() {
   const { signIn, isStaff, loading: authLoading } = useAdminAuth();
