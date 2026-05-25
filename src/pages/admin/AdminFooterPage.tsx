@@ -201,6 +201,7 @@ export default function AdminFooterPage() {
               <TabsList>
                 <TabsTrigger value="quick">روابط سريعة</TabsTrigger>
                 <TabsTrigger value="eservices">الخدمات الإلكترونية</TabsTrigger>
+                <TabsTrigger value="legal">المعلومات القانونية</TabsTrigger>
               </TabsList>
               <TabsContent value="quick" className="mt-4">
                 <LinksManager sectionKey="quick" />
@@ -208,9 +209,16 @@ export default function AdminFooterPage() {
               <TabsContent value="eservices" className="mt-4">
                 <LinksManager sectionKey="eservices" />
               </TabsContent>
+              <TabsContent value="legal" className="mt-4">
+                <div className="rounded-lg bg-muted/40 p-3 text-xs text-muted-foreground mb-3">
+                  ملاحظة: تظهر صفحات السياسات المُدارة في "الصفحات القانونية" تلقائياً في هذا العمود. تستخدم هذه الروابط لإضافة عناصر إضافية فقط.
+                </div>
+                <LinksManager sectionKey="legal" />
+              </TabsContent>
             </Tabs>
           </CardContent>
         </Card>
+
       </div>
     </AdminLayout>
   );
