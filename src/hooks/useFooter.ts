@@ -21,7 +21,7 @@ export type DBFooterLink = {
   published: boolean;
 };
 
-const STALE = 1000 * 60 * 2;
+const STALE = 0;
 
 // ============ Public ============
 export function useFooterSections() {
@@ -87,10 +87,10 @@ export function useAdminFooterLinks(sectionKey?: string) {
 export function useFooterMutations() {
   const qc = useQueryClient();
   const invalidate = () => {
-    qc.invalidateQueries({ queryKey: ["admin", "footer_sections"] });
-    qc.invalidateQueries({ queryKey: ["admin", "footer_links"] });
-    qc.invalidateQueries({ queryKey: ["public", "footer_sections"] });
-    qc.invalidateQueries({ queryKey: ["public", "footer_links"] });
+    qc.invalidateQueries({ queryKey: ["admin", "footer_sections"], refetchType: "all" });
+    qc.invalidateQueries({ queryKey: ["admin", "footer_links"], refetchType: "all" });
+    qc.invalidateQueries({ queryKey: ["public", "footer_sections"], refetchType: "all" });
+    qc.invalidateQueries({ queryKey: ["public", "footer_links"], refetchType: "all" });
   };
 
   return {
