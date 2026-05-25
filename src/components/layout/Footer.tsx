@@ -19,10 +19,15 @@ export const Footer = () => {
   const bottomHidden = visibility && visibility.footer_bottom === false;
 
   // قسم تعريف الجمعية: استخدام نصوص الإعدادات أو fallback من الترجمات
+  // قسم تعريف الجمعية: footer_brand_* ← يقع على hedaer/site_name ← ثم الترجمات
   const brandName =
-    (isEn ? (settings as any)?.footer_brand_name_en : (settings as any)?.footer_brand_name_ar) || t.brand.name;
+    (isEn ? (settings as any)?.footer_brand_name_en : (settings as any)?.footer_brand_name_ar) ||
+    (isEn ? (settings as any)?.header_brand_name_en || (settings as any)?.site_name : (settings as any)?.site_name || (settings as any)?.header_brand_name_en) ||
+    t.brand.name;
   const brandTagline =
-    (isEn ? (settings as any)?.footer_brand_tagline_en : (settings as any)?.footer_brand_tagline_ar) || t.brand.tagline;
+    (isEn ? (settings as any)?.footer_brand_tagline_en : (settings as any)?.footer_brand_tagline_ar) ||
+    (isEn ? (settings as any)?.header_tagline_en || (settings as any)?.header_tagline_ar : (settings as any)?.header_tagline_ar || (settings as any)?.header_tagline_en) ||
+    t.brand.tagline;
   const brandAbout =
     (isEn ? (settings as any)?.footer_brand_about_en : (settings as any)?.footer_brand_about_ar) || t.footer.aboutBody;
 
@@ -51,9 +56,13 @@ export const Footer = () => {
       return (
         <div className="lg:col-span-2">
           <div className="flex items-center gap-2.5 mb-4">
-            <div className="h-11 w-11 rounded-xl bg-accent grid place-items-center">
-              <Heart className="h-5 w-5 text-accent-foreground" fill="currentColor" />
-            </div>
+            {settings?.logo_url ? (
+              <img src={settings.logo_url} alt="" className="h-11 w-11 rounded-xl object-cover" />
+            ) : (
+              <div className="h-11 w-11 rounded-xl bg-accent grid place-items-center">
+                <Heart className="h-5 w-5 text-accent-foreground" fill="currentColor" />
+              </div>
+            )}
             <div>
               <div className="font-bold">{brandName}</div>
               <div className="text-xs opacity-80">{brandTagline}</div>
