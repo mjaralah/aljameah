@@ -88,6 +88,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
   reorderable = false,
   categoryFilter,
   extraDialogActions,
+  headerAction,
 }: CrudPageProps<T>) {
   const [rows, setRows] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
