@@ -328,23 +328,30 @@ export default function AdminAboutPage() {
 
         return (
           <div className="space-y-4">
-            <div className="flex items-center gap-1 p-1 rounded-lg bg-muted w-fit">
+            <div className="inline-flex items-center gap-1.5 p-1.5 rounded-xl bg-muted/70 border-2 border-border shadow-sm">
               {([
-                { v: "cards", label: "بطاقات تعريفية" },
-                { v: "members", label: "قائمة الأعضاء" },
-                { v: "both", label: "البطاقات + القائمة" },
-              ] as const).map((opt) => (
-                <button
-                  key={opt.v}
-                  type="button"
-                  onClick={() => updateData(s.id, "view_mode", opt.v)}
-                  className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
-                    view === opt.v ? "bg-background shadow-sm font-medium text-foreground" : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
+                { v: "cards", label: "بطاقات تعريفية", icon: IdCard },
+                { v: "members", label: "قائمة الأعضاء", icon: List },
+                { v: "both", label: "البطاقات + القائمة", icon: LayoutGrid },
+              ] as const).map((opt) => {
+                const Icon = opt.icon;
+                const active = view === opt.v;
+                return (
+                  <button
+                    key={opt.v}
+                    type="button"
+                    onClick={() => updateData(s.id, "view_mode", opt.v)}
+                    className={`inline-flex items-center gap-2 px-4 py-2 text-sm rounded-lg transition-all ${
+                      active
+                        ? "bg-primary text-primary-foreground shadow-md font-bold ring-2 ring-primary/30"
+                        : "text-muted-foreground hover:text-foreground hover:bg-background/60 font-medium"
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {opt.label}
+                  </button>
+                );
+              })}
             </div>
 
             {view === "cards" && CardsEditor}
