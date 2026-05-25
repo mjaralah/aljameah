@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { MediaUpload } from "@/components/admin/MediaUpload";
-import { Loader2, Save, Settings as SettingsIcon, Palette, Phone, Share2, Image as ImageIcon, ThumbsUp, EyeOff, MessageCircle, Heart, Check, AlertCircle } from "lucide-react";
+import { Loader2, Save, Settings as SettingsIcon, Palette, Phone, Share2, Image as ImageIcon, ThumbsUp, EyeOff, MessageCircle, Heart, Check, AlertCircle, Languages, Globe } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -47,6 +47,10 @@ type Settings = {
   donate_button_bg_color: string | null;
   donate_button_text_color: string | null;
   donate_button_icon: string | null;
+  language_toggle_enabled: boolean | null;
+  language_toggle_label_ar: string | null;
+  language_toggle_label_en: string | null;
+  language_toggle_icon: string | null;
 };
 
 type SaveStatus = "idle" | "dirty" | "saving" | "saved" | "error";
@@ -495,6 +499,63 @@ export default function AdminSettingsPage() {
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-5 md:p-6">
+            <SectionHeader
+              icon={Languages}
+              title="زر تغيير اللغة في الشريط العلوي"
+              description="تحكم بإظهار الزر ونصه وأيقونته."
+            />
+            <div className="space-y-4">
+              <div className="flex items-center justify-between rounded-lg border p-3 bg-muted/30">
+                <Label htmlFor="lang-enabled" className="m-0 cursor-pointer">إظهار الزر في الشريط العلوي</Label>
+                <Switch
+                  id="lang-enabled"
+                  checked={s.language_toggle_enabled !== false}
+                  onCheckedChange={(v) => set("language_toggle_enabled", v)}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label>نص الزر عند عرض الموقع بالعربية</Label>
+                  <Input
+                    dir="ltr"
+                    value={s.language_toggle_label_ar ?? ""}
+                    placeholder="EN"
+                    onChange={(e) => set("language_toggle_label_ar", e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">يظهر هذا النص عندما تكون اللغة الحالية عربية (للتحويل للإنجليزية).</p>
+                </div>
+                <div>
+                  <Label>نص الزر عند عرض الموقع بالإنجليزية</Label>
+                  <Input
+                    value={s.language_toggle_label_en ?? ""}
+                    placeholder="عربي"
+                    onChange={(e) => set("language_toggle_label_en", e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">يظهر هذا النص عندما تكون اللغة الحالية إنجليزية (للتحويل للعربية).</p>
+                </div>
+              </div>
+
+              <div>
+                <Label>الأيقونة</Label>
+                <Select
+                  value={s.language_toggle_icon ?? "languages"}
+                  onValueChange={(v) => set("language_toggle_icon", v)}
+                >
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="languages">لغات (Languages)</SelectItem>
+                    <SelectItem value="globe">كرة أرضية (Globe)</SelectItem>
+                    <SelectItem value="none">بدون أيقونة</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </CardContent>

@@ -860,6 +860,10 @@ export type Database = {
           footer_brand_tagline_en: string | null
           footer_text: string | null
           id: string
+          language_toggle_enabled: boolean
+          language_toggle_icon: string
+          language_toggle_label_ar: string | null
+          language_toggle_label_en: string | null
           logo_url: string | null
           pages_visibility: Json
           primary_color: string | null
@@ -899,6 +903,10 @@ export type Database = {
           footer_brand_tagline_en?: string | null
           footer_text?: string | null
           id?: string
+          language_toggle_enabled?: boolean
+          language_toggle_icon?: string
+          language_toggle_label_ar?: string | null
+          language_toggle_label_en?: string | null
           logo_url?: string | null
           pages_visibility?: Json
           primary_color?: string | null
@@ -938,6 +946,10 @@ export type Database = {
           footer_brand_tagline_en?: string | null
           footer_text?: string | null
           id?: string
+          language_toggle_enabled?: boolean
+          language_toggle_icon?: string
+          language_toggle_label_ar?: string | null
+          language_toggle_label_en?: string | null
           logo_url?: string | null
           pages_visibility?: Json
           primary_color?: string | null
