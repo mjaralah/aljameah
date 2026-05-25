@@ -20,7 +20,33 @@ export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [seeding, setSeeding] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const DEMO_EMAIL = "admin@test.com";
+  const DEMO_PASSWORD = "Admin@12345";
+
+  async function handleSeedDemo() {
+    setError(null);
+    setSeeding(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("seed-admin");
+      if (error) throw error;
+      setEmail(DEMO_EMAIL);
+      setPassword(DEMO_PASSWORD);
+      if (data?.alreadySeeded) {
+        toast.success("الحساب التجريبي موجود — تم تعبئة البيانات");
+      } else {
+        toast.success("تم إنشاء الحساب التجريبي وتعبئة البيانات");
+      }
+    } catch (e) {
+      const msg = (e as Error).message || "تعذر إنشاء الحساب التجريبي";
+      setError(msg);
+      toast.error(msg);
+    } finally {
+      setSeeding(false);
+    }
+  }
 
 
   if (!authLoading && isStaff) {
