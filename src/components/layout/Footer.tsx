@@ -57,7 +57,7 @@ export const Footer = () => {
         <div className="lg:col-span-2">
           <div className="flex items-center gap-2.5 mb-4">
             {settings?.logo_url ? (
-              <img src={settings.logo_url} alt="" className="h-11 w-11 rounded-xl object-cover" />
+              <img src={settings.logo_url} alt="" className="h-11 w-11 rounded-xl object-contain bg-white p-1" />
             ) : (
               <div className="h-11 w-11 rounded-xl bg-accent grid place-items-center">
                 <Heart className="h-5 w-5 text-accent-foreground" fill="currentColor" />
