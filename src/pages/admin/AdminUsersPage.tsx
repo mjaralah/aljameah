@@ -113,7 +113,8 @@ export default function AdminUsersPage() {
   const [cRole, setCRole] = useState<Role>("editor");
   const [cShowPwd, setCShowPwd] = useState(false);
   const [cSubmitting, setCSubmitting] = useState(false);
-  const [createdSummary, setCreatedSummary] = useState<{ email: string; password: string } | null>(null);
+  const [cSendEmail, setCSendEmail] = useState(false);
+  const [createdSummary, setCreatedSummary] = useState<{ email: string; password: string; name: string } | null>(null);
 
   // Edit
   const [eName, setEName] = useState("");
@@ -222,10 +223,33 @@ export default function AdminUsersPage() {
       if (error) throw error;
       const res = data as { ok: boolean; error?: string };
       if (!res?.ok) throw new Error(res?.error || "تعذّر إنشاء الحساب");
+
+      // Send email if requested
+      if (cSendEmail) {
+        try {
+          await supabase.functions.invoke("send-transactional-email", {
+            body: {
+              templateName: "new_account_credentials",
+              recipientEmail: cEmail.trim().toLowerCase(),
+              idempotencyKey: `account-creds-${userId}`,
+              templateData: {
+                full_name: cName.trim(),
+                email: cEmail.trim().toLowerCase(),
+                password: cPassword,
+                admin_url: `${window.location.origin}/admin`,
+              },
+            },
+          });
+          toast.success("تم إرسال البريد الإلكتروني");
+        } catch (emailErr) {
+          toast.error("تم إنشاء الحساب لكن فشل إرسال البريد — تأكد من إعداد النطاق في الإعدادات");
+        }
+      }
+
       toast.success("تم إنشاء الحساب بنجاح");
-      setCreatedSummary({ email: cEmail.trim().toLowerCase(), password: cPassword });
+      setCreatedSummary({ email: cEmail.trim().toLowerCase(), password: cPassword, name: cName.trim() });
       setCreating(false);
-      setCEmail(""); setCName(""); setCPassword(""); setCRole("editor"); setCShowPwd(false);
+      setCEmail(""); setCName(""); setCPassword(""); setCRole("editor"); setCShowPwd(false); setCSendEmail(false);
       load();
     } catch (e) {
       toast.error((e as Error).message);
