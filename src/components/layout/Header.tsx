@@ -64,7 +64,7 @@ export const Header = () => {
         {/* الشعار */}
         <Link to="/" className="flex items-center gap-2.5 shrink-0">
           {settings?.logo_url ? (
-            <img src={settings.logo_url} alt="" className="h-10 w-10 lg:h-11 lg:w-11 rounded-xl object-cover shadow-soft" />
+            <img src={settings.logo_url} alt="" className="h-10 w-10 lg:h-11 lg:w-11 rounded-xl object-contain bg-white shadow-soft" />
           ) : (
             <div className="h-10 w-10 lg:h-11 lg:w-11 rounded-xl bg-gradient-primary grid place-items-center shadow-soft">
               <Heart className="h-5 w-5 text-primary-foreground" fill="currentColor" />
