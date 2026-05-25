@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, Pencil, Trash2, ChevronDown, ChevronUp, GripVertical, ClipboardList } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, ChevronDown, ChevronUp, GripVertical, ClipboardList, Download, FileSpreadsheet, FileText } from "lucide-react";
 import { SortableList, SortableItem, persistSortOrder } from "@/components/admin/SortableList";
 import { AdminListRow } from "@/components/admin/AdminListRow";
 import { ReorderControls } from "@/components/admin/ReorderControls";
@@ -17,10 +17,15 @@ import { Button as BtnIcon } from "@/components/ui/button";
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
+import { exportSurveyExcel, exportSurveyPDF } from "@/lib/surveyExport";
 import { toast } from "sonner";
+
 
 type Survey = {
   id: string;
@@ -215,17 +220,52 @@ export default function AdminSurveysPage() {
                         />
                       ) : undefined}
                       extraActions={
-                        <BtnIcon
-                          type="button"
-                          size="icon"
-                          variant="outline"
-                          className="h-9 w-9 border-border bg-muted/40"
-                          onClick={() => setOpenId(open ? null : s.id)}
-                          aria-label="عرض الأسئلة"
-                        >
-                          {open ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                        </BtnIcon>
+                        <>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <BtnIcon
+                                type="button"
+                                size="icon"
+                                variant="outline"
+                                className="h-9 w-9 border-border bg-muted/40"
+                                aria-label="تصدير التقرير"
+                                title="تصدير التقرير"
+                              >
+                                <Download className="w-4 h-4" />
+                              </BtnIcon>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={async () => {
+                                  try { await exportSurveyExcel(s.id); toast.success("تم تصدير ملف Excel"); }
+                                  catch (e) { toast.error((e as Error).message); }
+                                }}
+                              >
+                                <FileSpreadsheet className="w-4 h-4 ml-2" /> تصدير Excel (.xlsx)
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={async () => {
+                                  try { await exportSurveyPDF(s.id); }
+                                  catch (e) { toast.error((e as Error).message); }
+                                }}
+                              >
+                                <FileText className="w-4 h-4 ml-2" /> تصدير PDF (طباعة)
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                          <BtnIcon
+                            type="button"
+                            size="icon"
+                            variant="outline"
+                            className="h-9 w-9 border-border bg-muted/40"
+                            onClick={() => setOpenId(open ? null : s.id)}
+                            aria-label="عرض الأسئلة"
+                          >
+                            {open ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                          </BtnIcon>
+                        </>
                       }
+
                     >
                       {open && (
                         <CardContent className="border-t pt-4 space-y-3">
