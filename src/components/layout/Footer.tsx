@@ -56,9 +56,13 @@ export const Footer = () => {
       return (
         <div className="lg:col-span-2">
           <div className="flex items-center gap-2.5 mb-4">
-            <div className="h-11 w-11 rounded-xl bg-accent grid place-items-center">
-              <Heart className="h-5 w-5 text-accent-foreground" fill="currentColor" />
-            </div>
+            {settings?.logo_url ? (
+              <img src={settings.logo_url} alt="" className="h-11 w-11 rounded-xl object-cover" />
+            ) : (
+              <div className="h-11 w-11 rounded-xl bg-accent grid place-items-center">
+                <Heart className="h-5 w-5 text-accent-foreground" fill="currentColor" />
+              </div>
+            )}
             <div>
               <div className="font-bold">{brandName}</div>
               <div className="text-xs opacity-80">{brandTagline}</div>
