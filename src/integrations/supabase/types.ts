@@ -331,6 +331,45 @@ export type Database = {
         }
         Relationships: []
       }
+      email_templates: {
+        Row: {
+          body: string
+          created_at: string
+          enabled: boolean
+          footer: string
+          greeting: string
+          id: string
+          name: string
+          subject: string
+          updated_at: string
+          variables: string[]
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          enabled?: boolean
+          footer?: string
+          greeting?: string
+          id?: string
+          name: string
+          subject?: string
+          updated_at?: string
+          variables?: string[]
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          enabled?: boolean
+          footer?: string
+          greeting?: string
+          id?: string
+          name?: string
+          subject?: string
+          updated_at?: string
+          variables?: string[]
+        }
+        Relationships: []
+      }
       footer_links: {
         Row: {
           created_at: string
