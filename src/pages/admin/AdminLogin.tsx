@@ -42,29 +42,7 @@ export default function AdminLogin() {
     navigate(from, { replace: true });
   }
 
-  async function handleSeed() {
-    setSeeding(true);
-    setError(null);
-    try {
-      const { data, error } = await supabase.functions.invoke("seed-admin");
-      if (error) throw error;
-      if (data?.alreadySeeded) {
-        toast.info("الحساب التجريبي موجود مسبقاً", {
-          description: "admin@test.com / Admin@12345",
-        });
-      } else if (data?.seeded) {
-        toast.success("تم إنشاء الحساب التجريبي", {
-          description: "admin@test.com / Admin@12345",
-        });
-      }
-      setEmail("admin@test.com");
-      setPassword("Admin@12345");
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setSeeding(false);
-    }
-  }
+
 
   return (
     <div dir="rtl" className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/10 p-4">
