@@ -221,8 +221,9 @@ export default function AdminUsersPage() {
         },
       });
       if (error) throw error;
-      const res = data as { ok: boolean; error?: string };
+      const res = data as { ok: boolean; user_id?: string; error?: string };
       if (!res?.ok) throw new Error(res?.error || "تعذّر إنشاء الحساب");
+      const createdUserId = res.user_id ?? crypto.randomUUID();
 
       // Send email if requested
       if (cSendEmail) {
