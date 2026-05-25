@@ -268,6 +268,19 @@ export default function AdminSurveysPage() {
                               >
                                 <FileText className="w-4 h-4 ml-2" /> تصدير PDF (طباعة)
                               </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="text-destructive focus:text-destructive"
+                                onClick={async () => {
+                                  if (!confirm(`سيتم حذف كل إجابات استبيان "${s.title}" وإعادة عدد المشاركين إلى صفر. هل تريد المتابعة؟`)) return;
+                                  const { error: e1 } = await supabase.from("survey_responses").delete().eq("survey_id", s.id);
+                                  const { error: e2 } = await supabase.from("surveys").update({ participants: 0 }).eq("id", s.id);
+                                  if (e1 || e2) { toast.error("تعذّر تصفير النتائج"); return; }
+                                  toast.success("تم تصفير نتائج الاستبيان");
+                                  load();
+                                }}
+                              >
+                                <RotateCcw className="w-4 h-4 ml-2" /> تصفير النتائج
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                           <BtnIcon
