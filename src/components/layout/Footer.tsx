@@ -76,7 +76,7 @@ export const Footer = () => {
             <div className="flex items-center gap-2">
               {(() => {
                 const waDigits = (settings?.whatsapp_number ?? "").replace(/\D/g, "");
-                const waHref = waDigits
+                const waHref = (settings?.whatsapp_enabled && waDigits)
                   ? `https://wa.me/${waDigits}${settings?.whatsapp_message ? `?text=${encodeURIComponent(settings.whatsapp_message)}` : ""}`
                   : null;
                 const items = [
