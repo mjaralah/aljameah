@@ -23,7 +23,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
-import { exportSurveyExcel, exportSurveyPDF } from "@/lib/surveyExport";
+import { exportSurveyExcel, exportSurveyPDF, exportAllSurveysExcel } from "@/lib/surveyExport";
 import { toast } from "sonner";
 
 
