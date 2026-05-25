@@ -47,6 +47,10 @@ type Settings = {
   donate_button_bg_color: string | null;
   donate_button_text_color: string | null;
   donate_button_icon: string | null;
+  language_toggle_enabled: boolean | null;
+  language_toggle_label_ar: string | null;
+  language_toggle_label_en: string | null;
+  language_toggle_icon: string | null;
 };
 
 type SaveStatus = "idle" | "dirty" | "saving" | "saved" | "error";
