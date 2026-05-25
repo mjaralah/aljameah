@@ -64,22 +64,29 @@ const Field = ({ label, children }: { label: string; children: React.ReactNode }
 );
 
 const ModeToggle = ({ value, onChange }: { value: "content" | "image"; onChange: (v: "content" | "image") => void }) => (
-  <div className="flex items-center gap-1 p-1 rounded-lg bg-muted w-fit">
+  <div className="inline-flex items-center gap-1.5 p-1.5 rounded-xl bg-muted/70 border-2 border-border shadow-sm">
     {([
-      { v: "content", label: "محتوى منظم" },
-      { v: "image", label: "صورة مضمّنة" },
-    ] as const).map((opt) => (
-      <button
-        key={opt.v}
-        type="button"
-        onClick={() => onChange(opt.v)}
-        className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
-          value === opt.v ? "bg-background shadow-sm font-medium text-foreground" : "text-muted-foreground hover:text-foreground"
-        }`}
-      >
-        {opt.label}
-      </button>
-    ))}
+      { v: "content", label: "محتوى منظم", icon: LayoutList },
+      { v: "image", label: "صورة مضمّنة", icon: ImageIcon },
+    ] as const).map((opt) => {
+      const Icon = opt.icon;
+      const active = value === opt.v;
+      return (
+        <button
+          key={opt.v}
+          type="button"
+          onClick={() => onChange(opt.v)}
+          className={`inline-flex items-center gap-2 px-4 py-2 text-sm rounded-lg transition-all ${
+            active
+              ? "bg-primary text-primary-foreground shadow-md font-bold ring-2 ring-primary/30"
+              : "text-muted-foreground hover:text-foreground hover:bg-background/60 font-medium"
+          }`}
+        >
+          <Icon className="w-4 h-4" />
+          {opt.label}
+        </button>
+      );
+    })}
   </div>
 );
 
