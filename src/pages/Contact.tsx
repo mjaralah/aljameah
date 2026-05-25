@@ -119,6 +119,7 @@ export default function Contact() {
       if (!raw) return null;
       let href = raw.trim();
       if (s.key === "whatsapp_number") {
+        if (!(settings as any)?.whatsapp_enabled) return null;
         const digits = href.replace(/\D/g, "");
         if (!digits) return null;
         const msg = (settings as any)?.whatsapp_message;
