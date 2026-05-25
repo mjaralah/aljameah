@@ -45,6 +45,7 @@ import AdminFeedbackPage from "./pages/admin/AdminFeedbackPage.tsx";
 import AdminAboutPage from "./pages/admin/AdminAboutPage.tsx";
 import AdminSurveysPage from "./pages/admin/AdminSurveysPage.tsx";
 import AdminLegalPagesPage from "./pages/admin/AdminLegalPagesPage.tsx";
+import AdminFooterPage from "./pages/admin/AdminFooterPage.tsx";
 import AdminPageContentPage from "./pages/admin/AdminPageContentPage.tsx";
 import AdminFormsPage from "./pages/admin/AdminFormsPage.tsx";
 import AdminPageBuilderPage from "./pages/admin/AdminPageBuilderPage.tsx";
@@ -257,6 +258,14 @@ const App = () => (
                 element={
                   <ProtectedAdminRoute>
                     <AdminLegalPagesPage />
+                  </ProtectedAdminRoute>
+                }
+              />
+              <Route
+                path="/admin/footer"
+                element={
+                  <ProtectedAdminRoute>
+                    <AdminFooterPage />
                   </ProtectedAdminRoute>
                 }
               />
