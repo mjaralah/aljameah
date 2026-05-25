@@ -99,11 +99,10 @@ Deno.serve(async (req) => {
     }
     const userId = created.user!.id;
 
-    // 5) Ensure profile name reflects provided full_name
+    // 5) Ensure profile exists with provided full_name (upsert as safety net)
     await admin
       .from("profiles")
-      .update({ full_name: fullName, email })
-      .eq("id", userId);
+      .upsert({ id: userId, full_name: fullName, email }, { onConflict: "id" });
 
     // 6) Assign role
     const { error: roleErr } = await admin
