@@ -232,7 +232,7 @@ export default function AdminUsersPage() {
             body: {
               templateName: "new_account_credentials",
               recipientEmail: cEmail.trim().toLowerCase(),
-              idempotencyKey: `account-creds-${userId}`,
+              idempotencyKey: `account-creds-${createdUserId}`,
               templateData: {
                 full_name: cName.trim(),
                 email: cEmail.trim().toLowerCase(),
