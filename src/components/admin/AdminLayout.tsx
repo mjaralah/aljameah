@@ -23,6 +23,7 @@ import {
   Scale,
   LayoutTemplate,
   PanelBottom,
+  Mail,
 } from "lucide-react";
 import {
   Sidebar,
@@ -78,6 +79,7 @@ const requestsItems: NavItem[] = [
 const settingsItems: NavItem[] = [
   { to: "/admin/settings", label: "الإعدادات العامة", icon: Settings, adminOnly: true },
   { to: "/admin/users", label: "المستخدمون والأدوار", icon: UserCog, adminOnly: true },
+  { to: "/admin/email-templates", label: "قوالب البريد", icon: Mail, adminOnly: true },
 ];
 
 function AdminSidebar() {

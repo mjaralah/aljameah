@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -113,7 +114,8 @@ export default function AdminUsersPage() {
   const [cRole, setCRole] = useState<Role>("editor");
   const [cShowPwd, setCShowPwd] = useState(false);
   const [cSubmitting, setCSubmitting] = useState(false);
-  const [createdSummary, setCreatedSummary] = useState<{ email: string; password: string } | null>(null);
+  const [cSendEmail, setCSendEmail] = useState(false);
+  const [createdSummary, setCreatedSummary] = useState<{ email: string; password: string; name: string } | null>(null);
 
   // Edit
   const [eName, setEName] = useState("");
@@ -220,12 +222,36 @@ export default function AdminUsersPage() {
         },
       });
       if (error) throw error;
-      const res = data as { ok: boolean; error?: string };
+      const res = data as { ok: boolean; user_id?: string; error?: string };
       if (!res?.ok) throw new Error(res?.error || "تعذّر إنشاء الحساب");
+      const createdUserId = res.user_id ?? crypto.randomUUID();
+
+      // Send email if requested
+      if (cSendEmail) {
+        try {
+          await supabase.functions.invoke("send-transactional-email", {
+            body: {
+              templateName: "new_account_credentials",
+              recipientEmail: cEmail.trim().toLowerCase(),
+              idempotencyKey: `account-creds-${createdUserId}`,
+              templateData: {
+                full_name: cName.trim(),
+                email: cEmail.trim().toLowerCase(),
+                password: cPassword,
+                admin_url: `${window.location.origin}/admin`,
+              },
+            },
+          });
+          toast.success("تم إرسال البريد الإلكتروني");
+        } catch (emailErr) {
+          toast.error("تم إنشاء الحساب لكن فشل إرسال البريد — تأكد من إعداد النطاق في الإعدادات");
+        }
+      }
+
       toast.success("تم إنشاء الحساب بنجاح");
-      setCreatedSummary({ email: cEmail.trim().toLowerCase(), password: cPassword });
+      setCreatedSummary({ email: cEmail.trim().toLowerCase(), password: cPassword, name: cName.trim() });
       setCreating(false);
-      setCEmail(""); setCName(""); setCPassword(""); setCRole("editor"); setCShowPwd(false);
+      setCEmail(""); setCName(""); setCPassword(""); setCRole("editor"); setCShowPwd(false); setCSendEmail(false);
       load();
     } catch (e) {
       toast.error((e as Error).message);
@@ -577,6 +603,16 @@ export default function AdminUsersPage() {
             </SelectContent>
           </Select>
         </div>
+        <div className="flex items-center gap-2 bg-muted/40 rounded-lg p-3">
+          <Switch
+            id="send-email"
+            checked={cSendEmail}
+            onCheckedChange={(v) => setCSendEmail(v)}
+          />
+          <Label htmlFor="send-email" className="text-sm cursor-pointer">
+            إرسال بيانات الدخول إلى البريد الإلكتروني للمستخدم
+          </Label>
+        </div>
       </AdminDialog>
 
       {/* Edit user */}
@@ -694,8 +730,10 @@ export default function AdminUsersPage() {
             <>
               <SummaryRow label="البريد" value={createdSummary.email} />
               <SummaryRow label="كلمة المرور" value={createdSummary.password} mono />
+              <SummaryRow label="رابط لوحة التحكم" value={`${window.location.origin}/admin`} />
               <Button variant="outline" className="w-full gap-2" onClick={() => {
-                navigator.clipboard.writeText(`البريد: ${createdSummary.email}\nكلمة المرور: ${createdSummary.password}`);
+                const text = `البريد: ${createdSummary.email}\nكلمة المرور: ${createdSummary.password}\nرابط لوحة التحكم: ${window.location.origin}/admin`;
+                navigator.clipboard.writeText(text);
                 toast.success("تم نسخ بيانات الدخول");
               }}>
                 <Copy className="w-4 h-4" />

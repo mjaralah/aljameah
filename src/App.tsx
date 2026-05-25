@@ -48,6 +48,7 @@ import AdminLegalPagesPage from "./pages/admin/AdminLegalPagesPage.tsx";
 import AdminFooterPage from "./pages/admin/AdminFooterPage.tsx";
 import AdminPageContentPage from "./pages/admin/AdminPageContentPage.tsx";
 import AdminFormsPage from "./pages/admin/AdminFormsPage.tsx";
+import AdminEmailTemplatesPage from "./pages/admin/AdminEmailTemplatesPage.tsx";
 import AdminPageBuilderPage from "./pages/admin/AdminPageBuilderPage.tsx";
 import CustomFormPage from "./pages/eservices/CustomFormPage.tsx";
 import CustomPage from "./pages/CustomPage.tsx";
@@ -186,6 +187,14 @@ const App = () => (
                 element={
                   <ProtectedAdminRoute requireAdmin>
                     <AdminUsersPage />
+                  </ProtectedAdminRoute>
+                }
+              />
+              <Route
+                path="/admin/email-templates"
+                element={
+                  <ProtectedAdminRoute requireAdmin>
+                    <AdminEmailTemplatesPage />
                   </ProtectedAdminRoute>
                 }
               />
