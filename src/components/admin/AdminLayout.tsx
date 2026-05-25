@@ -24,6 +24,7 @@ import {
   LayoutTemplate,
   PanelBottom,
   Mail,
+  ExternalLink,
 } from "lucide-react";
 import {
   Sidebar,
@@ -216,6 +217,14 @@ export function AdminLayout({ children, title, description, actions }: {
                 <p className="text-xs text-muted-foreground truncate">{description}</p>
               )}
             </div>
+            <Button
+              size="sm"
+              onClick={() => window.open("/", "_blank", "noopener,noreferrer")}
+              className="gap-2 bg-gradient-to-l from-accent to-accent/80 text-accent-foreground hover:from-accent/90 hover:to-accent/70 shadow-gold font-semibold animate-pulse-slow"
+            >
+              <ExternalLink className="h-4 w-4" />
+              <span className="hidden sm:inline">معاينة الموقع</span>
+            </Button>
             {actions && <div className="flex items-center gap-2">{actions}</div>}
           </header>
           <main className="flex-1 p-4 md:p-6 overflow-x-hidden">{children}</main>
