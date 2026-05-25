@@ -274,26 +274,29 @@ function LinksManager({ sectionKey }: { sectionKey: string }) {
               <SortableItem key={l.id} id={l.id}>
                 {({ handleProps, setNodeRef, style }) => (
                   <div ref={setNodeRef} style={style} className="flex items-center gap-2 rounded-lg border bg-card p-3">
-                    <button {...handleProps} className="p-1 cursor-grab text-muted-foreground hover:text-foreground" aria-label="سحب">
+                    <button {...handleProps} className="p-1 cursor-grab text-muted-foreground hover:text-foreground shrink-0" aria-label="سحب">
                       <GripVertical className="w-4 h-4" />
                     </button>
                     <div className="flex-1 min-w-0">
                       <div className="font-medium text-sm truncate">{l.label_ar}</div>
                       <div className="text-xs text-muted-foreground truncate" dir="ltr">{l.url}</div>
                     </div>
-                    <Switch
-                      checked={l.published}
-                      onCheckedChange={(v) => m.updateLink.mutate({ id: l.id, patch: { published: v } })}
-                    />
-                    <Button size="icon" variant="ghost" onClick={() => { setEditing(l); setOpen(true); }}>
+                    <div className="shrink-0 px-1">
+                      <Switch
+                        checked={l.published}
+                        onCheckedChange={(v) => m.updateLink.mutate({ id: l.id, patch: { published: v } })}
+                      />
+                    </div>
+                    <Button size="icon" variant="ghost" className="shrink-0" onClick={() => { setEditing(l); setOpen(true); }}>
                       <Pencil className="w-4 h-4" />
                     </Button>
-                    <Button size="icon" variant="ghost" onClick={() => {
+                    <Button size="icon" variant="ghost" className="shrink-0" onClick={() => {
                       if (confirm("حذف هذا الرابط؟")) m.deleteLink.mutate(l.id);
                     }}>
                       <Trash2 className="w-4 h-4 text-destructive" />
                     </Button>
                   </div>
+
                 )}
               </SortableItem>
             ))}
