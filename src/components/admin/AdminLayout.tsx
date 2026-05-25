@@ -64,6 +64,7 @@ const contentItems: NavItem[] = [
   { to: "/admin/board", label: "مجلس الإدارة", icon: Users },
   { to: "/admin/partners", label: "الشركاء", icon: Handshake },
   { to: "/admin/hero", label: "شريط العرض الرئيسي", icon: ImageIcon },
+  { to: "/admin/footer", label: "تذييل الموقع", icon: PanelBottom },
   { to: "/admin/governance", label: "ملفات الحوكمة", icon: ScrollText },
 ];
 
