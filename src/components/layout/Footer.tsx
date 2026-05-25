@@ -33,6 +33,7 @@ export const Footer = () => {
 
   const legalLinks = [
     ...((legalPages ?? []).map((p) => ({ to: `/${p.slug}`, label: p.title }))),
+    ...linksFor("legal"),
     ...(sitemapHidden ? [] : [{ to: "/sitemap", label: t.footer.sitemap }]),
   ];
 
