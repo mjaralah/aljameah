@@ -1,0 +1,1 @@
+UPDATE public.site_settings SET logo_url = 'https://nogtfhozuelaojbdkgvn.supabase.co/storage/v1/object/public/site-media/branding/logo-clean.png';
