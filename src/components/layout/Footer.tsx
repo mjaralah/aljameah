@@ -19,10 +19,15 @@ export const Footer = () => {
   const bottomHidden = visibility && visibility.footer_bottom === false;
 
   // قسم تعريف الجمعية: استخدام نصوص الإعدادات أو fallback من الترجمات
+  // قسم تعريف الجمعية: footer_brand_* ← يقع على hedaer/site_name ← ثم الترجمات
   const brandName =
-    (isEn ? (settings as any)?.footer_brand_name_en : (settings as any)?.footer_brand_name_ar) || t.brand.name;
+    (isEn ? (settings as any)?.footer_brand_name_en : (settings as any)?.footer_brand_name_ar) ||
+    (isEn ? (settings as any)?.header_brand_name_en || (settings as any)?.site_name : (settings as any)?.site_name || (settings as any)?.header_brand_name_en) ||
+    t.brand.name;
   const brandTagline =
-    (isEn ? (settings as any)?.footer_brand_tagline_en : (settings as any)?.footer_brand_tagline_ar) || t.brand.tagline;
+    (isEn ? (settings as any)?.footer_brand_tagline_en : (settings as any)?.footer_brand_tagline_ar) ||
+    (isEn ? (settings as any)?.header_tagline_en || (settings as any)?.header_tagline_ar : (settings as any)?.header_tagline_ar || (settings as any)?.header_tagline_en) ||
+    t.brand.tagline;
   const brandAbout =
     (isEn ? (settings as any)?.footer_brand_about_en : (settings as any)?.footer_brand_about_ar) || t.footer.aboutBody;
 
