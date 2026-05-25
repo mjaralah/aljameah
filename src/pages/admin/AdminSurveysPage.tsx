@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, Pencil, Trash2, ChevronDown, ChevronUp, GripVertical, ClipboardList, Download, FileSpreadsheet, FileText } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, ChevronDown, ChevronUp, GripVertical, ClipboardList, Download, FileSpreadsheet, FileText, RotateCcw } from "lucide-react";
 import { SortableList, SortableItem, persistSortOrder } from "@/components/admin/SortableList";
 import { AdminListRow } from "@/components/admin/AdminListRow";
 import { ReorderControls } from "@/components/admin/ReorderControls";
@@ -267,6 +267,19 @@ export default function AdminSurveysPage() {
                                 }}
                               >
                                 <FileText className="w-4 h-4 ml-2" /> تصدير PDF (طباعة)
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="text-destructive focus:text-destructive"
+                                onClick={async () => {
+                                  if (!confirm(`سيتم حذف كل إجابات استبيان "${s.title}" وإعادة عدد المشاركين إلى صفر. هل تريد المتابعة؟`)) return;
+                                  const { error: e1 } = await supabase.from("survey_responses").delete().eq("survey_id", s.id);
+                                  const { error: e2 } = await supabase.from("surveys").update({ participants: 0 }).eq("id", s.id);
+                                  if (e1 || e2) { toast.error("تعذّر تصفير النتائج"); return; }
+                                  toast.success("تم تصفير نتائج الاستبيان");
+                                  load();
+                                }}
+                              >
+                                <RotateCcw className="w-4 h-4 ml-2" /> تصفير النتائج
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
