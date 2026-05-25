@@ -131,7 +131,7 @@ export const Footer = () => {
 
   return (
     <footer className="bg-primary text-primary-foreground mt-16">
-      <div className="container py-14 grid gap-10 md:grid-cols-2 lg:grid-cols-5">
+      <div className="container py-14 grid gap-10 md:grid-cols-2 lg:grid-cols-6">
         {sections.filter((s) => s.published).map((s) => (
           <div key={s.id} className="contents">
             {renderSection(s.section_key, { ar: s.title_ar, en: s.title_en })}
