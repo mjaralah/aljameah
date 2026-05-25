@@ -57,9 +57,11 @@ export const Footer = () => {
         <div className="lg:col-span-2">
           <div className="flex items-center gap-2.5 mb-4">
             {settings?.logo_url ? (
-              <img src={settings.logo_url} alt="" className="h-11 w-11 object-contain" />
+              <div className="h-12 w-12 rounded-xl bg-white shadow-sm ring-1 ring-black/5 p-1.5 grid place-items-center shrink-0">
+                <img src={settings.logo_url} alt="" className="max-h-full max-w-full object-contain" />
+              </div>
             ) : (
-              <div className="h-11 w-11 rounded-xl bg-accent grid place-items-center">
+              <div className="h-12 w-12 rounded-xl bg-accent grid place-items-center shrink-0">
                 <Heart className="h-5 w-5 text-accent-foreground" fill="currentColor" />
               </div>
             )}
