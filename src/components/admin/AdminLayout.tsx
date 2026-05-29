@@ -190,6 +190,14 @@ function AdminSidebar() {
             <LogOut className="h-4 w-4 ml-2" />
             {!collapsed && "تسجيل الخروج"}
           </Button>
+          {!collapsed && (
+            <div className="mt-2 pt-2 border-t border-sidebar-border text-center">
+              <p className="text-[10px] text-muted-foreground">
+                طور بإبداع:{" "}
+                <span className="text-primary font-bold">Business Trip</span>
+              </p>
+            </div>
+          )}
         </div>
       </SidebarFooter>
     </Sidebar>
