@@ -158,6 +158,21 @@ export const Footer = () => {
           </div>
         </div>
       )}
+
+      {/* شريط حقوق المطوّر — يظهر في جميع صفحات الموقع */}
+      <div className="bg-gradient-primary border-t border-primary-foreground/20">
+        <div className="container py-3 flex items-center justify-center text-center">
+          <p className="text-sm font-medium tracking-wide">
+            <span className="text-primary-foreground/90">طور بإبداع: </span>
+            <a
+              href="#"
+              className="text-accent font-bold hover:text-accent/80 transition-smooth hover:underline underline-offset-4"
+            >
+              Business Trip
+            </a>
+          </p>
+        </div>
+      </div>
     </footer>
   );
 };
