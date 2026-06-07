@@ -30,6 +30,91 @@
   <meta name="twitter:title" content="جمعية مُصلّى | للعناية بالمساجد">
   <meta property="og:description" content="جمعية مُصلّى للعناية بالمساجد — منظمة غير ربحية مرخصة تعمل في خدمة بيوت الله — صيانةً وتطويراً وإعماراً.">
   <meta name="twitter:description" content="جمعية مُصلّى للعناية بالمساجد — منظمة غير ربحية مرخصة تعمل في خدمة بيوت الله — صيانةً وتطويراً وإعماراً.">
+  <script>
+    // تطبيق ألوان الهوية المخزّنة محلياً قبل أول رسم لمنع وميض الثيم الافتراضي
+    (function () {
+      try {
+        var raw = localStorage.getItem("site_brand_cache_v1");
+        if (!raw) return;
+        var cache = JSON.parse(raw);
+        function hexToHsl(hex) {
+          if (!hex) return null;
+          var m = String(hex).replace("#", "").match(/^([\da-f]{6}|[\da-f]{3})$/i);
+          if (!m) return null;
+          var h = m[1];
+          if (h.length === 3) h = h.split("").map(function (c) { return c + c; }).join("");
+          var r = parseInt(h.slice(0, 2), 16) / 255;
+          var g = parseInt(h.slice(2, 4), 16) / 255;
+          var b = parseInt(h.slice(4, 6), 16) / 255;
+          var max = Math.max(r, g, b), min = Math.min(r, g, b);
+          var hue = 0, sat = 0, light = (max + min) / 2;
+          if (max !== min) {
+            var d = max - min;
+            sat = light > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+              case r: hue = (g - b) / d + (g < b ? 6 : 0); break;
+              case g: hue = (b - r) / d + 2; break;
+              case b: hue = (r - g) / d + 4; break;
+            }
+            hue *= 60;
+          }
+          return { h: Math.round(hue), s: Math.round(sat * 100), l: Math.round(light * 100) };
+        }
+        function clamp(n) { return Math.max(0, Math.min(100, n)); }
+        function adj(c, o) {
+          o = o || {};
+          return { h: (c.h + (o.dh || 0) + 360) % 360, s: clamp(c.s + (o.ds || 0)), l: clamp(c.l + (o.dl || 0)) };
+        }
+        function str(c) { return c.h + " " + c.s + "% " + c.l + "%"; }
+        function css(c, a) {
+          return a != null
+            ? "hsl(" + c.h + " " + c.s + "% " + c.l + "% / " + a + ")"
+            : "hsl(" + c.h + " " + c.s + "% " + c.l + "%)";
+        }
+        function fg(c) { return c.l > 62 ? "0 0% 10%" : "0 0% 100%"; }
+        var primary = hexToHsl(cache.primary);
+        var accent = hexToHsl(cache.accent);
+        if (!primary || !accent) return;
+        var root = document.documentElement;
+        var isDark = root.classList.contains("dark");
+        function set(k, v) { root.style.setProperty(k, v); }
+        var p = isDark ? adj(primary, { dl: 18 }) : primary;
+        var pGlow = adj(p, { dl: 14, ds: -10 });
+        var pDeep = adj(p, { dl: -6 });
+        var pSoft = adj(p, { dl: isDark ? -55 : 60, ds: -30 });
+        set("--primary", str(p));
+        set("--primary-foreground", fg(p));
+        set("--primary-glow", str(pGlow));
+        set("--ring", str(p));
+        set("--secondary", str(pSoft));
+        set("--secondary-foreground", str(adj(p, { dl: -6 })));
+        var a = isDark ? adj(accent, { dl: 5 }) : accent;
+        var aSoft = adj(a, { dl: isDark ? -50 : 44, ds: 14 });
+        set("--accent", str(a));
+        set("--accent-foreground", fg(a));
+        set("--accent-soft", str(aSoft));
+        set("--gradient-primary", "linear-gradient(135deg, " + css(p) + ", " + css(adj(p, { dl: 8 })) + ")");
+        set("--gradient-gold", "linear-gradient(135deg, " + css(a) + ", " + css(adj(a, { dl: 10 })) + ")");
+        set("--gradient-hero", "linear-gradient(135deg, " + css(pDeep, 0.85) + ", " + css(adj(p, { dl: 4 }), 0.6) + ")");
+        set("--gradient-cta", "linear-gradient(120deg, " + css(p) + " 0%, " + css(adj(p, { dl: 8 })) + " 60%, " + css(a) + " 100%)");
+        set("--shadow-soft", "0 4px 20px -8px " + css(p, 0.15));
+        set("--shadow-card", "0 10px 30px -12px " + css(p, 0.18));
+        set("--shadow-gold", "0 8px 24px -10px " + css(a, 0.4));
+        set("--sidebar-primary", str(p));
+        set("--sidebar-primary-foreground", fg(p));
+        set("--sidebar-accent", str(a));
+        set("--sidebar-accent-foreground", fg(a));
+        set("--sidebar-ring", str(p));
+        set("--sidebar-border", str(adj(p, { dl: isDark ? -45 : 55, ds: -35 })));
+        if (cache.site_name) document.title = cache.site_name;
+        if (cache.favicon_url) {
+          var link = document.querySelector("link[rel='icon']");
+          if (!link) { link = document.createElement("link"); link.rel = "icon"; document.head.appendChild(link); }
+          link.href = cache.favicon_url;
+        }
+      } catch (e) {}
+    })();
+  </script>
 </head>
 
   <body>

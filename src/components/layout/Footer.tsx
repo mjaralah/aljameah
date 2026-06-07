@@ -150,10 +150,19 @@ export const Footer = () => {
         ))}
       </div>
 
-      {/* شريط سفلي موحّد — Sub-footer احترافي على نمط المواقع الرسمية */}
+      {/* شريط سفلي موحّد متمركز — سطران: التطوير (أبرز) ثم الحقوق */}
       <div className="border-t border-primary-foreground/15">
-        <div className="container py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-primary-foreground/80">
-          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+        <div className="container py-5 flex flex-col items-center justify-center gap-1.5 text-center">
+          <div className="text-sm font-semibold text-primary-foreground/90">
+            <span>{isEn ? "Developed by: " : "طُوِّر بواسطة: "}</span>
+            <a
+              href="#"
+              className="text-accent hover:underline underline-offset-4"
+            >
+              Business Trip
+            </a>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs text-primary-foreground/70">
             <span>
               © {new Date().getFullYear()}{" "}
               {isEn ? `All rights reserved to ${brandName}` : `جميع الحقوق محفوظة لـ${brandName}`}
@@ -166,15 +175,6 @@ export const Footer = () => {
                 </span>
               </>
             )}
-          </div>
-          <div className="opacity-75 hover:opacity-100 transition-smooth">
-            <span>{isEn ? "Developed by " : "طُوِّر بواسطة "}</span>
-            <a
-              href="#"
-              className="font-semibold text-accent hover:underline underline-offset-4"
-            >
-              Business Trip
-            </a>
           </div>
         </div>
       </div>
