@@ -153,7 +153,7 @@ export const Footer = () => {
       {!bottomHidden && (
         <div className="border-t border-primary-foreground/15">
           <div className="container py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs opacity-90">
-            <div>© {new Date().getFullYear()} {brandName} — {t.footer.rights}</div>
+            <div>{isEn ? `All rights reserved to ${brandName} © ${new Date().getFullYear()}` : `جميع الحقوق محفوظة لـ${brandName} © ${new Date().getFullYear()}`}</div>
             <div>{t.brand.registration}: <span className="font-semibold">{t.brand.regNumber}</span></div>
           </div>
         </div>
