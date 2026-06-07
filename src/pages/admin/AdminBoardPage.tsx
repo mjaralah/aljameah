@@ -202,7 +202,7 @@ function SettingsTab() {
       </div>
 
       <div className="border border-border rounded-xl p-4 space-y-4">
-        <h3 className="font-bold text-primary">تاريخ انتهاء الدورة</h3>
+        <h3 className="font-bold text-primary">تاريخ انتهاء العضويات لدورة المجلس</h3>
 
         <div className="grid md:grid-cols-2 gap-4">
           <div>
@@ -246,7 +246,7 @@ function SettingsTab() {
       </div>
 
       <div className="border border-border rounded-xl p-4 space-y-3">
-        <h3 className="font-bold text-primary">قرار تشكيل المجلس (PDF)</h3>
+        <h3 className="font-bold text-primary">ملف إفصاح المصالح (PDF)</h3>
         <MediaUpload
           label="ملف القرار"
           bucket="documents"
