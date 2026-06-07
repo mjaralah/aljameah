@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 import { MediaUpload } from "@/components/admin/MediaUpload";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
