@@ -65,6 +65,8 @@ export type CrudPageProps<T extends { id: string; published?: boolean }> = {
   extraDialogActions?: ReactNode | ((values: Partial<T>) => ReactNode);
   /** Extra action button(s) shown in the page header next to the primary "Add" button. */
   headerAction?: ReactNode;
+  /** Skip wrapping in AdminLayout (when this page is rendered inside another AdminLayout). */
+  noLayout?: boolean;
 };
 
 
