@@ -38,6 +38,7 @@ type Settings = {
 function MembersTab() {
   return (
     <CrudPage<Member>
+      noLayout
       table="board_members"
       reorderable
       orderBy={{ column: "sort_order", ascending: true }}
