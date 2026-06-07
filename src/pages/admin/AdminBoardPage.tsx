@@ -10,7 +10,8 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { MediaUpload } from "@/components/admin/MediaUpload";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Save } from "lucide-react";
+import { Loader2, Save, Users, Settings as SettingsIcon } from "lucide-react";
+
 
 type Member = {
   id: string;
