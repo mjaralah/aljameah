@@ -280,10 +280,23 @@ export default function AdminBoardPage() {
   return (
     <AdminLayout title="مجلس الإدارة">
       <Tabs defaultValue="members" className="w-full" dir="rtl">
-        <TabsList>
-          <TabsTrigger value="members">الأعضاء</TabsTrigger>
-          <TabsTrigger value="settings">إعدادات المجلس</TabsTrigger>
+        <TabsList className="h-auto p-1.5 bg-muted/60 border border-border rounded-xl gap-1 w-full sm:w-auto">
+          <TabsTrigger
+            value="members"
+            className="gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all"
+          >
+            <Users className="h-4 w-4" />
+            الأعضاء
+          </TabsTrigger>
+          <TabsTrigger
+            value="settings"
+            className="gap-2 px-5 py-2.5 text-sm font-semibold rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all"
+          >
+            <SettingsIcon className="h-4 w-4" />
+            إعدادات المجلس
+          </TabsTrigger>
         </TabsList>
+
         <TabsContent value="members" className="mt-4">
           <MembersTab />
         </TabsContent>
