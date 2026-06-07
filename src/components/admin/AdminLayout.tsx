@@ -103,15 +103,12 @@ function AdminSidebar() {
           isActive={active}
           tooltip={item.label}
           className={cn(
-            "relative transition-colors",
-            "data-[active=true]:!bg-[hsl(var(--primary))]/12 data-[active=true]:!text-primary data-[active=true]:font-semibold",
-            "hover:!bg-[hsl(var(--primary))]/8 hover:!text-primary",
+            "relative transition-colors rounded-lg",
+            "data-[active=true]:!bg-primary data-[active=true]:!text-primary-foreground data-[active=true]:font-semibold data-[active=true]:shadow-md",
+            "hover:!bg-primary/10 hover:!text-primary",
           )}
         >
           <NavLink to={item.to} end={item.to === "/admin"} className="flex items-center gap-3">
-            {active && (
-              <span className="absolute right-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-l-full bg-primary" />
-            )}
             <item.icon className="h-4 w-4 shrink-0" />
             {!collapsed && <span>{item.label}</span>}
           </NavLink>
