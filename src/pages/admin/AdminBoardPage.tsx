@@ -277,17 +277,20 @@ function SettingsTab() {
 
 export default function AdminBoardPage() {
   return (
-    <Tabs defaultValue="members" className="w-full">
-      <TabsList>
-        <TabsTrigger value="members">الأعضاء</TabsTrigger>
-        <TabsTrigger value="settings">إعدادات المجلس</TabsTrigger>
-      </TabsList>
-      <TabsContent value="members" className="mt-4">
-        <MembersTab />
-      </TabsContent>
-      <TabsContent value="settings" className="mt-4">
-        <SettingsTab />
-      </TabsContent>
-    </Tabs>
+    <AdminLayout title="مجلس الإدارة">
+      <Tabs defaultValue="members" className="w-full" dir="rtl">
+        <TabsList>
+          <TabsTrigger value="members">الأعضاء</TabsTrigger>
+          <TabsTrigger value="settings">إعدادات المجلس</TabsTrigger>
+        </TabsList>
+        <TabsContent value="members" className="mt-4">
+          <MembersTab />
+        </TabsContent>
+        <TabsContent value="settings" className="mt-4">
+          <SettingsTab />
+        </TabsContent>
+      </Tabs>
+    </AdminLayout>
   );
 }
+
