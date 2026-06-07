@@ -159,6 +159,15 @@ export const Footer = () => {
         </div>
       )}
 
+      {/* شريط الحقوق — يظهر دائماً في جميع صفحات الموقع */}
+      <div className="bg-primary/95 border-t border-primary-foreground/15">
+        <div className="container py-3 text-center text-xs text-primary-foreground/90">
+          {isEn
+            ? `All rights reserved to ${brandName} © ${new Date().getFullYear()}`
+            : `جميع الحقوق محفوظة لـ${brandName} © ${new Date().getFullYear()}`}
+        </div>
+      </div>
+
       {/* شريط حقوق المطوّر — يظهر في جميع صفحات الموقع */}
       <div className="bg-gradient-primary border-t border-primary-foreground/20">
         <div className="container py-3 flex items-center justify-center text-center">
