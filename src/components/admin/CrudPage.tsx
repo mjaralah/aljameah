@@ -572,6 +572,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </AdminLayout>
+    </Wrapper>
+
   );
 }
