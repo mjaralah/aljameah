@@ -308,8 +308,13 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
     return c.render ? c.render(row) : (row[c.key as keyof T] as ReactNode) ?? "—";
   }
 
+  const Wrapper = noLayout
+    ? ({ children }: { children: ReactNode }) => <>{children}</>
+    : ({ children }: { children: ReactNode }) => <AdminLayout title={title}>{children}</AdminLayout>;
+
   return (
-    <AdminLayout title={title}>
+    <Wrapper>
+
       <AdminPageHeader
         title={title}
         description={description}
