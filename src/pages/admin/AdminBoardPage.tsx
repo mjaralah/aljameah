@@ -246,7 +246,7 @@ function SettingsTab() {
       </div>
 
       <div className="border border-border rounded-xl p-4 space-y-3">
-        <h3 className="font-bold text-primary">قرار تشكيل المجلس (PDF)</h3>
+        <h3 className="font-bold text-primary">ملف إفصاح المصالح (PDF)</h3>
         <MediaUpload
           label="ملف القرار"
           bucket="documents"
