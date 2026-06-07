@@ -95,19 +95,23 @@ function AdminSidebar() {
 
   const renderItem = (item: NavItem) => {
     if (item.adminOnly && role !== "admin") return null;
+    const active = isActive(item.to);
     return (
       <SidebarMenuItem key={item.to}>
-        <SidebarMenuButton asChild isActive={isActive(item.to)} tooltip={item.label}>
-          <NavLink
-            to={item.to}
-            end={item.to === "/admin"}
-            className={cn(
-              "flex items-center gap-3 transition-colors",
-              isActive(item.to)
-                ? "bg-primary/10 text-primary font-medium"
-                : "hover:bg-muted/60",
+        <SidebarMenuButton
+          asChild
+          isActive={active}
+          tooltip={item.label}
+          className={cn(
+            "relative transition-colors",
+            "data-[active=true]:!bg-[hsl(var(--primary))]/12 data-[active=true]:!text-primary data-[active=true]:font-semibold",
+            "hover:!bg-[hsl(var(--primary))]/8 hover:!text-primary",
+          )}
+        >
+          <NavLink to={item.to} end={item.to === "/admin"} className="flex items-center gap-3">
+            {active && (
+              <span className="absolute right-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-l-full bg-primary" />
             )}
-          >
             <item.icon className="h-4 w-4 shrink-0" />
             {!collapsed && <span>{item.label}</span>}
           </NavLink>
@@ -115,6 +119,7 @@ function AdminSidebar() {
       </SidebarMenuItem>
     );
   };
+
 
   async function handleLogout() {
     await signOut();
