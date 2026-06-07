@@ -450,7 +450,7 @@ const About = () => {
                       <div className="p-5">
                         <div className="flex items-center gap-2 mb-3">
                           <ScrollText className="h-5 w-5 text-accent" />
-                          <h4 className="font-bold text-primary text-sm">قرار تشكيل المجلس</h4>
+                          <h4 className="font-bold text-primary text-sm">ملف إفصاح المصالح</h4>
                         </div>
                         <Button asChild variant="outline" className="w-full">
                           <a
