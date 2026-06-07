@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 import { MediaUpload } from "@/components/admin/MediaUpload";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -37,6 +38,7 @@ type Settings = {
 function MembersTab() {
   return (
     <CrudPage<Member>
+      noLayout
       table="board_members"
       reorderable
       orderBy={{ column: "sort_order", ascending: true }}
@@ -275,17 +277,20 @@ function SettingsTab() {
 
 export default function AdminBoardPage() {
   return (
-    <Tabs defaultValue="members" className="w-full">
-      <TabsList>
-        <TabsTrigger value="members">الأعضاء</TabsTrigger>
-        <TabsTrigger value="settings">إعدادات المجلس</TabsTrigger>
-      </TabsList>
-      <TabsContent value="members" className="mt-4">
-        <MembersTab />
-      </TabsContent>
-      <TabsContent value="settings" className="mt-4">
-        <SettingsTab />
-      </TabsContent>
-    </Tabs>
+    <AdminLayout title="مجلس الإدارة">
+      <Tabs defaultValue="members" className="w-full" dir="rtl">
+        <TabsList>
+          <TabsTrigger value="members">الأعضاء</TabsTrigger>
+          <TabsTrigger value="settings">إعدادات المجلس</TabsTrigger>
+        </TabsList>
+        <TabsContent value="members" className="mt-4">
+          <MembersTab />
+        </TabsContent>
+        <TabsContent value="settings" className="mt-4">
+          <SettingsTab />
+        </TabsContent>
+      </Tabs>
+    </AdminLayout>
   );
 }
+

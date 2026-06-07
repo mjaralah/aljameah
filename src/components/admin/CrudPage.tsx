@@ -65,6 +65,8 @@ export type CrudPageProps<T extends { id: string; published?: boolean }> = {
   extraDialogActions?: ReactNode | ((values: Partial<T>) => ReactNode);
   /** Extra action button(s) shown in the page header next to the primary "Add" button. */
   headerAction?: ReactNode;
+  /** Skip wrapping in AdminLayout (when this page is rendered inside another AdminLayout). */
+  noLayout?: boolean;
 };
 
 
@@ -89,6 +91,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
   categoryFilter,
   extraDialogActions,
   headerAction,
+  noLayout = false,
 }: CrudPageProps<T>) {
   const [rows, setRows] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
@@ -305,8 +308,13 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
     return c.render ? c.render(row) : (row[c.key as keyof T] as ReactNode) ?? "—";
   }
 
+  const Wrapper = noLayout
+    ? ({ children }: { children: ReactNode }) => <>{children}</>
+    : ({ children }: { children: ReactNode }) => <AdminLayout title={title}>{children}</AdminLayout>;
+
   return (
-    <AdminLayout title={title}>
+    <Wrapper>
+
       <AdminPageHeader
         title={title}
         description={description}
@@ -564,6 +572,7 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </AdminLayout>
+    </Wrapper>
+
   );
 }
