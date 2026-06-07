@@ -150,36 +150,32 @@ export const Footer = () => {
         ))}
       </div>
 
-      {!bottomHidden && (
-        <div className="border-t border-primary-foreground/15">
-          <div className="container py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs opacity-90">
-            <div>{isEn ? `All rights reserved to ${brandName} © ${new Date().getFullYear()}` : `جميع الحقوق محفوظة لـ${brandName} © ${new Date().getFullYear()}`}</div>
-            <div>{t.brand.registration}: <span className="font-semibold">{t.brand.regNumber}</span></div>
+      {/* شريط سفلي موحّد — Sub-footer احترافي على نمط المواقع الرسمية */}
+      <div className="border-t border-primary-foreground/15">
+        <div className="container py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-primary-foreground/80">
+          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+            <span>
+              © {new Date().getFullYear()}{" "}
+              {isEn ? `All rights reserved to ${brandName}` : `جميع الحقوق محفوظة لـ${brandName}`}
+            </span>
+            {!bottomHidden && (
+              <>
+                <span aria-hidden className="opacity-50">·</span>
+                <span>
+                  {t.brand.registration}: <span className="font-semibold">{t.brand.regNumber}</span>
+                </span>
+              </>
+            )}
           </div>
-        </div>
-      )}
-
-      {/* شريط الحقوق — يظهر دائماً في جميع صفحات الموقع */}
-      <div className="bg-primary/95 border-t border-primary-foreground/15">
-        <div className="container py-3 text-center text-xs text-primary-foreground/90">
-          {isEn
-            ? `All rights reserved to ${brandName} © ${new Date().getFullYear()}`
-            : `جميع الحقوق محفوظة لـ${brandName} © ${new Date().getFullYear()}`}
-        </div>
-      </div>
-
-      {/* شريط حقوق المطوّر — يظهر في جميع صفحات الموقع */}
-      <div className="bg-gradient-primary border-t border-primary-foreground/20">
-        <div className="container py-3 flex items-center justify-center text-center">
-          <p className="text-sm font-medium tracking-wide">
-            <span className="text-primary-foreground/90">طور بإبداع: </span>
+          <div className="opacity-75 hover:opacity-100 transition-smooth">
+            <span>{isEn ? "Developed by " : "طُوِّر بواسطة "}</span>
             <a
               href="#"
-              className="text-accent font-bold hover:text-accent/80 transition-smooth hover:underline underline-offset-4"
+              className="font-semibold text-accent hover:underline underline-offset-4"
             >
               Business Trip
             </a>
-          </p>
+          </div>
         </div>
       </div>
     </footer>
