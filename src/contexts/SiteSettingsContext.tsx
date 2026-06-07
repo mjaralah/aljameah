@@ -128,8 +128,22 @@ export const SiteSettingsProvider = ({ children }: { children: React.ReactNode }
       link.href = data.favicon_url;
     }
 
+    // حفظ الألوان والاسم والأيقونة محلياً لتطبيقها فوراً عند التحديث (يمنع وميض الهوية القديمة)
+    try {
+      localStorage.setItem(
+        "site_brand_cache_v1",
+        JSON.stringify({
+          primary: data?.primary_color || primaryHex,
+          accent: data?.secondary_color || accentHex,
+          site_name: data?.site_name || null,
+          favicon_url: data?.favicon_url || null,
+        }),
+      );
+    } catch {}
+
     return () => obs.disconnect();
   }, [data]);
 
   return <>{children}</>;
 };
+
