@@ -568,7 +568,9 @@ export function CrudPage<T extends { id: string; published?: boolean }>({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </Wrapper>
-
+    </>
   );
+
+  return noLayout ? content : <AdminLayout title={title}>{content}</AdminLayout>;
+
 }
