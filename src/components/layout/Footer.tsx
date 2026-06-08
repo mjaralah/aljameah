@@ -162,20 +162,22 @@ export const Footer = () => {
               Business Trip
             </a>
           </div>
-          <div className="w-full flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-primary-foreground/70" dir="ltr">
-            <span>© {new Date().getFullYear()}</span>
-            <span dir={isEn ? "ltr" : "rtl"} className="text-center flex-1">
+          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs text-primary-foreground/70 text-center">
+            <span>
               {isEn ? `All rights reserved to ${brandName}` : `جميع الحقوق محفوظة لـ${brandName}`}
-              {!bottomHidden && (
-                <>
-                  <span aria-hidden className="opacity-50 mx-2">·</span>
-                  <span>
-                    {t.brand.registration}: <span className="font-semibold">{t.brand.regNumber}</span>
-                  </span>
-                </>
-              )}
             </span>
+            {!bottomHidden && (
+              <>
+                <span aria-hidden className="opacity-50">·</span>
+                <span>
+                  {t.brand.registration}: <span className="font-semibold">{t.brand.regNumber}</span>
+                </span>
+              </>
+            )}
+            <span aria-hidden className="opacity-50">·</span>
+            <span dir="ltr">© {new Date().getFullYear()}</span>
           </div>
+
         </div>
       </div>
 
