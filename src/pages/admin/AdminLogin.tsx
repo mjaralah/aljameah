@@ -5,14 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Shield, Sparkles } from "lucide-react";
+import { Loader2, Shield } from "lucide-react";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
-import { supabase } from "@/integrations/supabase/client";
+import { useSiteSettings } from "@/hooks/usePublicContent";
 import { toast } from "sonner";
 
 
 export default function AdminLogin() {
   const { signIn, isStaff, loading: authLoading } = useAdminAuth();
+  const { data: settings } = useSiteSettings();
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname ?? "/admin";
@@ -20,34 +21,7 @@ export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [seeding, setSeeding] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const DEMO_EMAIL = "admin@test.com";
-  const DEMO_PASSWORD = "Admin@12345";
-
-  async function handleSeedDemo() {
-    setError(null);
-    setSeeding(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("seed-admin");
-      if (error) throw error;
-      setEmail(DEMO_EMAIL);
-      setPassword(DEMO_PASSWORD);
-      if (data?.alreadySeeded) {
-        toast.success("الحساب التجريبي موجود — تم تعبئة البيانات");
-      } else {
-        toast.success("تم إنشاء الحساب التجريبي وتعبئة البيانات");
-      }
-    } catch (e) {
-      const msg = (e as Error).message || "تعذر إنشاء الحساب التجريبي";
-      setError(msg);
-      toast.error(msg);
-    } finally {
-      setSeeding(false);
-    }
-  }
-
 
   if (!authLoading && isStaff) {
     return <Navigate to={from} replace />;
@@ -69,14 +43,23 @@ export default function AdminLogin() {
     navigate(from, { replace: true });
   }
 
-
+  const logoUrl = settings?.logo_url;
+  const siteName = settings?.site_name || "الموقع";
 
   return (
     <div dir="rtl" className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/10 p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/70 shadow-card mb-4">
-            <Shield className="w-8 h-8 text-primary-foreground" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white shadow-card mb-4 overflow-hidden ring-1 ring-border/50">
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt={siteName}
+                className="w-full h-full object-contain p-2"
+              />
+            ) : (
+              <Shield className="w-8 h-8 text-primary" />
+            )}
           </div>
           <h1 className="text-2xl font-bold text-foreground">لوحة التحكم</h1>
           <p className="text-sm text-muted-foreground mt-1">تسجيل دخول مدير الموقع</p>
@@ -125,36 +108,7 @@ export default function AdminLogin() {
                 دخول
               </Button>
             </form>
-
-            <div className="relative my-5">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-border" />
-              </div>
-              <div className="relative flex justify-center text-xs">
-                <span className="bg-card px-2 text-muted-foreground">أو</span>
-              </div>
-            </div>
-
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={handleSeedDemo}
-              disabled={seeding || submitting}
-            >
-              {seeding ? (
-                <Loader2 className="w-4 h-4 ml-2 animate-spin" />
-              ) : (
-                <Sparkles className="w-4 h-4 ml-2" />
-              )}
-              إنشاء/تعبئة الحساب التجريبي
-            </Button>
-            <p className="text-center text-xs text-muted-foreground mt-3">
-              للاختبار: <span dir="ltr">{DEMO_EMAIL} / {DEMO_PASSWORD}</span>
-            </p>
-
           </CardContent>
-
         </Card>
 
         <p className="text-center text-xs text-muted-foreground mt-6">
