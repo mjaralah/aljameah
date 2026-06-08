@@ -152,9 +152,9 @@ export const Footer = () => {
 
       {/* شريط سفلي موحّد متمركز — سطران: التطوير (أبرز) ثم الحقوق */}
       <div className="border-t border-primary-foreground/15">
-        <div className="container py-5 flex flex-col items-center justify-center gap-1.5 text-center">
-          <div className="text-sm font-semibold text-primary-foreground/90">
-            <span>{isEn ? "Developed by: " : "طُوِّر بواسطة: "}</span>
+        <div className="container py-5 flex flex-col items-center gap-1.5">
+          <div className="text-sm font-semibold text-primary-foreground/90 text-center">
+            <span>{isEn ? "Crafted by: " : "طُوِّر بإبداع: "}</span>
             <a
               href="#"
               className="text-accent hover:underline underline-offset-4"
@@ -162,22 +162,23 @@ export const Footer = () => {
               Business Trip
             </a>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs text-primary-foreground/70">
-            <span>
-              © {new Date().getFullYear()}{" "}
+          <div className="w-full flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-primary-foreground/70" dir="ltr">
+            <span>© {new Date().getFullYear()}</span>
+            <span dir={isEn ? "ltr" : "rtl"} className="text-center flex-1">
               {isEn ? `All rights reserved to ${brandName}` : `جميع الحقوق محفوظة لـ${brandName}`}
+              {!bottomHidden && (
+                <>
+                  <span aria-hidden className="opacity-50 mx-2">·</span>
+                  <span>
+                    {t.brand.registration}: <span className="font-semibold">{t.brand.regNumber}</span>
+                  </span>
+                </>
+              )}
             </span>
-            {!bottomHidden && (
-              <>
-                <span aria-hidden className="opacity-50">·</span>
-                <span>
-                  {t.brand.registration}: <span className="font-semibold">{t.brand.regNumber}</span>
-                </span>
-              </>
-            )}
           </div>
         </div>
       </div>
+
     </footer>
   );
 };
