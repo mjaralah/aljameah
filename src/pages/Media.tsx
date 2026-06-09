@@ -80,8 +80,8 @@ const Media = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6 max-w-4xl mx-auto">
             {sectionItems.map((it, i) => {
               const isGallery = i === 1 || /معرض|gallery/i.test(it.title || "");
-              const Icon = isGallery ? ImageIcon : Newspaper;
-              const href = it.url || (isGallery ? "#gallery" : "#news");
+              const Icon = isGallery ? Camera : Newspaper;
+              const href = it.url || (isGallery ? "/gallery" : "#news");
               const active = !isGallery; // إبراز الأخبار كقسم نشط في صفحة المركز الإعلامي
               return (
                 <Link
