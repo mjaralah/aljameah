@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import AdminNewsPage from "./AdminNewsPage";
 
 type Section = {
   id: string;
