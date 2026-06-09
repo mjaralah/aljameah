@@ -1,6 +1,6 @@
 // المركز الإعلامي — صفحة موحّدة لإدارة محتوى /media و /gallery
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AdminEmptyState } from "@/components/admin/AdminEmptyState";
@@ -10,17 +10,18 @@ import { SortableList, SortableItem, persistSortOrder } from "@/components/admin
 import { moveToPosition, moveRelativeTo } from "@/lib/reorderHelpers";
 import { BlockEditor } from "@/components/admin/blocks/BlockEditor";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Loader2, Save, Plus, Newspaper, ExternalLink,
+  Loader2, Save, Plus, Newspaper,
   Images, Video, GripVertical, FolderOpen, Blocks, Clapperboard,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import AdminNewsPage from "./AdminNewsPage";
 
 type Section = {
   id: string;
@@ -278,49 +279,40 @@ export default function AdminMediaCenterPage() {
             </TabsList>
 
             {/* الأخبار */}
-            <TabsContent value="news" className="space-y-4 mt-4">
-              <p className="text-sm text-muted-foreground">
-                النصوص التعريفية لصفحة المركز الإعلامي + إدارة الأخبار.
-              </p>
-
-              <Card className="border-primary/30 bg-primary/5">
-                <CardContent className="flex items-center justify-between p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-primary/10 text-primary grid place-items-center">
-                      <Newspaper className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="font-semibold">إدارة الأخبار</p>
-                      <p className="text-xs text-muted-foreground">إضافة وتعديل وحذف وأرشفة الأخبار</p>
-                    </div>
-                  </div>
-                  <Button asChild size="sm">
-                    <Link to="/admin/news">
-                      فتح
-                      <ExternalLink className="h-4 w-4 mr-1" />
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-muted-foreground">
-                  {mediaSections.length > 1 && (
-                    <>اسحب أيقونة <GripVertical className="inline w-3 h-3" /> لإعادة ترتيب الأقسام.</>
-                  )}
-                </p>
-                <Button size="sm" onClick={() => addSection("media", "text_media")}>
-                  <Plus className="w-4 h-4 ml-1" />
-                  إضافة قسم جديد
-                </Button>
+            <TabsContent value="news" className="space-y-6 mt-4">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Newspaper className="w-4 h-4 text-primary" />
+                  <h2 className="font-bold text-lg">إدارة الأخبار</h2>
+                </div>
+                <AdminNewsPage noLayout />
               </div>
 
-              {renderSectionsList(
-                mediaSections,
-                "page/media",
-                "لا توجد أقسام بعد — اضغط ‘إضافة قسم جديد’ لبدء البناء",
-              )}
+              <div className="border-t pt-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <Blocks className="w-4 h-4 text-primary" />
+                  <h2 className="font-bold text-lg">النصوص التعريفية لصفحة المركز الإعلامي</h2>
+                </div>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-xs text-muted-foreground">
+                    {mediaSections.length > 1 && (
+                      <>اسحب أيقونة <GripVertical className="inline w-3 h-3" /> لإعادة ترتيب الأقسام.</>
+                    )}
+                  </p>
+                  <Button size="sm" onClick={() => addSection("media", "text_media")}>
+                    <Plus className="w-4 h-4 ml-1" />
+                    إضافة قسم جديد
+                  </Button>
+                </div>
+
+                {renderSectionsList(
+                  mediaSections,
+                  "page/media",
+                  "لا توجد أقسام بعد — اضغط ‘إضافة قسم جديد’ لبدء البناء",
+                )}
+              </div>
             </TabsContent>
+
 
             {/* المعرض */}
             <TabsContent value="gallery" className="space-y-4 mt-4">
