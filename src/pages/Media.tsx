@@ -99,7 +99,7 @@ const Media = () => {
             {sectionItems.map((it, i) => {
               const isGallery = i === 1 || /معرض|gallery/i.test(it.title || "");
               const Icon = isGallery ? Camera : Newspaper;
-              const href = it.url || (isGallery ? "/gallery" : "#news");
+              const href = it.url || (isGallery ? "#gallery" : "#news");
               const active = !isGallery; // إبراز الأخبار كقسم نشط في صفحة المركز الإعلامي
               return (
                 <Link
