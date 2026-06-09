@@ -198,29 +198,25 @@ export function SectionRenderer({ section }: { section: BlockSection }) {
 
   // ------------------ gallery ------------------
   if (type === "gallery") {
-    const items = Array.isArray(d.items) ? d.items : [];
+    const items = (Array.isArray(d.items) ? d.items : []).filter((it: any) => it?.image_url);
+    const layout = (d.layout as string) || "grid";
+    const cols = (d.columns as number) || 3;
     return (
       <SectionWrap>
         <SectionHeading />
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-          {items.map((it: any, i: number) => (
-            <div key={i} className="rounded-lg overflow-hidden group relative">
-              <AspectRatio ratio={1}>
-                <img
-                  src={it.image_url}
-                  alt={pick(it.caption_ar, it.caption_en)}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  loading="lazy"
-                />
-              </AspectRatio>
-              {(it.caption_ar || it.caption_en) && (
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent text-white p-2 text-xs">
-                  {pick(it.caption_ar, it.caption_en)}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+        <GalleryView items={items} layout={layout} cols={cols} pick={pick} />
+      </SectionWrap>
+    );
+  }
+
+  // ------------------ video_gallery ------------------
+  if (type === "video_gallery") {
+    const items = (Array.isArray(d.items) ? d.items : []).filter((it: any) => it?.video_url);
+    const layout = (d.layout as string) || "grid";
+    return (
+      <SectionWrap>
+        <SectionHeading />
+        <VideoGalleryView items={items} layout={layout} pick={pick} lang={lang} />
       </SectionWrap>
     );
   }
