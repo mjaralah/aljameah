@@ -1,6 +1,6 @@
 // المركز الإعلامي — صفحة موحّدة لإدارة محتوى /media و /gallery
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AdminEmptyState } from "@/components/admin/AdminEmptyState";
@@ -10,13 +10,13 @@ import { SortableList, SortableItem, persistSortOrder } from "@/components/admin
 import { moveToPosition, moveRelativeTo } from "@/lib/reorderHelpers";
 import { BlockEditor } from "@/components/admin/blocks/BlockEditor";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Loader2, Save, Plus, Newspaper, ExternalLink,
+  Loader2, Save, Plus, Newspaper,
   Images, Video, GripVertical, FolderOpen, Blocks, Clapperboard,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
