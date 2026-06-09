@@ -48,6 +48,7 @@ import AdminSurveysPage from "./pages/admin/AdminSurveysPage.tsx";
 import AdminLegalPagesPage from "./pages/admin/AdminLegalPagesPage.tsx";
 import AdminFooterPage from "./pages/admin/AdminFooterPage.tsx";
 import AdminPageContentPage from "./pages/admin/AdminPageContentPage.tsx";
+import AdminMediaCenterPage from "./pages/admin/AdminMediaCenterPage.tsx";
 import AdminFormsPage from "./pages/admin/AdminFormsPage.tsx";
 import AdminEmailTemplatesPage from "./pages/admin/AdminEmailTemplatesPage.tsx";
 import AdminPageBuilderPage from "./pages/admin/AdminPageBuilderPage.tsx";
@@ -141,6 +142,14 @@ const App = () => (
                 element={
                   <ProtectedAdminRoute>
                     <AdminNewsPage />
+                  </ProtectedAdminRoute>
+                }
+              />
+              <Route
+                path="/admin/media-center"
+                element={
+                  <ProtectedAdminRoute>
+                    <AdminMediaCenterPage />
                   </ProtectedAdminRoute>
                 }
               />
