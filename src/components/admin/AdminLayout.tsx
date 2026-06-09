@@ -55,7 +55,6 @@ type NavItem = {
 
 const contentItems: NavItem[] = [
   { to: "/admin", label: "الرئيسية", icon: LayoutDashboard },
-  { to: "/admin/news", label: "الأخبار", icon: Newspaper },
   { to: "/admin/media-center", label: "المركز الإعلامي", icon: Newspaper },
   { to: "/admin/programs", label: "البرامج", icon: FolderKanban },
   { to: "/admin/about", label: "محتوى من نحن", icon: Info },
