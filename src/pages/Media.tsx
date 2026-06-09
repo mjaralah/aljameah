@@ -228,6 +228,54 @@ const Media = () => {
         )}
       </section>
 
+      {(hasPhotos || hasVideos) && (
+        <section id="gallery" className="container pb-12 md:pb-16 scroll-mt-24" aria-labelledby="gallery-heading">
+          <div className="flex flex-col items-center gap-2 mb-6">
+            <h2 id="gallery-heading" className="text-2xl lg:text-3xl font-bold text-primary">
+              {lang === "ar" ? "المعرض" : "Gallery"}
+            </h2>
+            <span className="w-12 h-1 rounded-full bg-accent" aria-hidden="true" />
+            <p className="text-sm text-muted-foreground text-center max-w-xl">
+              {lang === "ar" ? "صور ومقاطع من فعالياتنا وأنشطتنا." : "Photos and videos from our events."}
+            </p>
+          </div>
+
+          <Tabs value={galleryTab} onValueChange={setGalleryTab} className="w-full">
+            <div className="flex justify-center mb-8">
+              <TabsList className="h-12 p-1 bg-muted/50">
+                {hasPhotos && (
+                  <TabsTrigger value="photos" className="gap-2 px-5 h-10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                    <Camera className="w-4 h-4" />
+                    {lang === "ar" ? "الصور" : "Photos"}
+                  </TabsTrigger>
+                )}
+                {hasVideos && (
+                  <TabsTrigger value="videos" className="gap-2 px-5 h-10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                    <Youtube className="w-4 h-4" />
+                    {lang === "ar" ? "الفيديوهات" : "Videos"}
+                  </TabsTrigger>
+                )}
+              </TabsList>
+            </div>
+
+            {hasPhotos && (
+              <TabsContent value="photos" className="space-y-10">
+                {photoBlocks.map((s: any) => (
+                  <SectionRenderer key={s.id} section={s as BlockSection} />
+                ))}
+              </TabsContent>
+            )}
+            {hasVideos && (
+              <TabsContent value="videos" className="space-y-10">
+                {videoBlocks.map((s: any) => (
+                  <SectionRenderer key={s.id} section={s as BlockSection} />
+                ))}
+              </TabsContent>
+            )}
+          </Tabs>
+        </section>
+      )}
+
       <PageFeedback pageKey="media" />
     </>
   );
