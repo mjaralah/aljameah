@@ -11,16 +11,17 @@ import { IconPicker } from "@/components/admin/IconPicker";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import {
   Type, LayoutGrid, BarChart3, Images, GalleryHorizontal,
-  Video, ListTree, Megaphone, FileText,
+  Video, ListTree, Megaphone, FileText, Youtube,
 } from "lucide-react";
 
 export const BLOCK_TYPES = [
   { value: "text_media", label: "نص + صورة + زر", icon: Type, desc: "عنوان ووصف وصورة جانبية مع زر دعوة." },
   { value: "cards_grid", label: "شبكة بطاقات", icon: LayoutGrid, desc: "مجموعة بطاقات (أيقونة + عنوان + وصف)." },
   { value: "stats", label: "إحصائيات وعدّادات", icon: BarChart3, desc: "أرقام بارزة مع أيقونات وتسميات." },
-  { value: "gallery", label: "معرض صور", icon: Images, desc: "شبكة صور مربعة مع تعليق اختياري." },
+  { value: "gallery", label: "معرض صور", icon: Images, desc: "صور بعدة أنماط عرض احترافية + Lightbox." },
+  { value: "video_gallery", label: "معرض فيديوهات (YouTube)", icon: Youtube, desc: "فيديوهات يوتيوب مع أنماط عرض متعددة." },
   { value: "carousel", label: "كاروسيل/سلايدر", icon: GalleryHorizontal, desc: "شرائح متحركة (صورة + عنوان + رابط)." },
-  { value: "video", label: "فيديو", icon: Video, desc: "فيديو YouTube أو Vimeo أو ملف." },
+  { value: "video", label: "فيديو منفرد", icon: Video, desc: "فيديو واحد YouTube أو Vimeo أو ملف." },
   { value: "accordion", label: "أسئلة شائعة (أكورديون)", icon: ListTree, desc: "أسئلة قابلة للطي وإجاباتها." },
   { value: "cta_banner", label: "شريط دعوة (CTA)", icon: Megaphone, desc: "بانر بعنوان كبير وزر دعوة." },
   { value: "rich_text", label: "نص حر (محرر غني)", icon: FileText, desc: "محتوى نصي حر بتنسيق كامل." },
