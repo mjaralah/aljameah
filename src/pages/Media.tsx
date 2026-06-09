@@ -300,99 +300,95 @@ const Media = () => {
           </>
         )}
 
-        {view === "gallery" && hasGallery && (
-          <>
-            <Tabs value={galleryTab} onValueChange={setGalleryTab} className="w-full">
-              <div className="flex justify-center mb-8">
-                <TabsList className="h-12 p-1 bg-muted/50">
-                  {hasPhotos && (
-                    <TabsTrigger value="photos" className="gap-2 px-5 h-10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                      <Camera className="w-4 h-4" />
-                      {lang === "ar" ? "الصور" : "Photos"}
-                      <span className="ms-1 text-xs opacity-70">({photoItems.length})</span>
-                    </TabsTrigger>
-                  )}
-                  {hasVideos && (
-                    <TabsTrigger value="videos" className="gap-2 px-5 h-10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                      <Youtube className="w-4 h-4" />
-                      {lang === "ar" ? "الفيديوهات" : "Videos"}
-                      <span className="ms-1 text-xs opacity-70">({videoItems.length})</span>
-                    </TabsTrigger>
-                  )}
-                </TabsList>
-              </div>
+        {view === "gallery" && (
+          <Tabs value={galleryTab} onValueChange={setGalleryTab} className="w-full">
+            <div className="flex justify-center mb-8">
+              <TabsList className="h-12 p-1 bg-muted/50">
+                <TabsTrigger value="photos" className="gap-2 px-5 h-10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                  <Camera className="w-4 h-4" />
+                  {lang === "ar" ? "الصور" : "Photos"}
+                  <span className="ms-1 text-xs opacity-70">({photoItems.length})</span>
+                </TabsTrigger>
+                <TabsTrigger value="videos" className="gap-2 px-5 h-10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                  <Youtube className="w-4 h-4" />
+                  {lang === "ar" ? "الفيديوهات" : "Videos"}
+                  <span className="ms-1 text-xs opacity-70">({videoItems.length})</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
-              {hasPhotos && (
-                <TabsContent value="photos">
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {photoItems.map((p, idx) => (
-                      <Card
-                        key={idx}
-                        onClick={() => openLightbox(idx)}
-                        className="overflow-hidden group cursor-pointer hover:shadow-card transition-smooth border-border hover:-translate-y-1 flex flex-col"
-                      >
-                        <div className="aspect-[16/10] overflow-hidden bg-muted relative">
-                          <img
-                            src={p.image_url}
-                            alt={p.caption || (lang === "ar" ? "صورة من المعرض" : "Gallery image")}
-                            loading="lazy"
-                            className="h-full w-full object-cover group-hover:scale-105 transition-smooth"
-                          />
+            <TabsContent value="photos">
+              {hasPhotos ? (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {photoItems.map((p, idx) => (
+                    <Card
+                      key={idx}
+                      onClick={() => openLightbox(idx)}
+                      className="overflow-hidden group cursor-pointer hover:shadow-card transition-smooth border-border hover:-translate-y-1 flex flex-col"
+                    >
+                      <div className="aspect-[16/10] overflow-hidden bg-muted relative">
+                        <img
+                          src={p.image_url}
+                          alt={p.caption || (lang === "ar" ? "صورة من المعرض" : "Gallery image")}
+                          loading="lazy"
+                          className="h-full w-full object-cover group-hover:scale-105 transition-smooth"
+                        />
+                      </div>
+                      {p.caption && (
+                        <div className="p-4">
+                          <p className="text-sm text-foreground line-clamp-2">{p.caption}</p>
                         </div>
-                        {p.caption && (
-                          <div className="p-4">
-                            <p className="text-sm text-foreground line-clamp-2">{p.caption}</p>
-                          </div>
-                        )}
-                      </Card>
-                    ))}
-                  </div>
-                </TabsContent>
+                      )}
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center text-muted-foreground py-16">
+                  {lang === "ar" ? "لا توجد صور حالياً." : "No photos yet."}
+                </p>
               )}
+            </TabsContent>
 
-              {hasVideos && (
-                <TabsContent value="videos">
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {videoItems.map((v, idx) => (
-                      <Card
-                        key={idx}
-                        onClick={() => setPlayingVideo(v)}
-                        className="overflow-hidden group cursor-pointer hover:shadow-card transition-smooth border-border hover:-translate-y-1 flex flex-col"
-                      >
-                        <div className="aspect-[16/10] overflow-hidden bg-muted relative">
-                          <img
-                            src={`https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`}
-                            alt={v.title || "YouTube video"}
-                            loading="lazy"
-                            className="h-full w-full object-cover group-hover:scale-105 transition-smooth"
-                          />
-                          <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                            <span className="flex items-center justify-center w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg group-hover:scale-110 transition-transform">
-                              <Play className="w-6 h-6 ms-0.5" fill="currentColor" />
-                            </span>
-                          </div>
-                          <Badge className="absolute top-3 start-3 bg-accent text-accent-foreground border-0 font-bold shadow-gold">
-                            <Youtube className="w-3.5 h-3.5 me-1" />
-                            {lang === "ar" ? "فيديو" : "Video"}
-                          </Badge>
+            <TabsContent value="videos">
+              {hasVideos ? (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {videoItems.map((v, idx) => (
+                    <Card
+                      key={idx}
+                      onClick={() => setPlayingVideo(v)}
+                      className="overflow-hidden group cursor-pointer hover:shadow-card transition-smooth border-border hover:-translate-y-1 flex flex-col"
+                    >
+                      <div className="aspect-[16/10] overflow-hidden bg-muted relative">
+                        <img
+                          src={`https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`}
+                          alt={v.title || "YouTube video"}
+                          loading="lazy"
+                          className="h-full w-full object-cover group-hover:scale-105 transition-smooth"
+                        />
+                        <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                          <span className="flex items-center justify-center w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg group-hover:scale-110 transition-transform">
+                            <Play className="w-6 h-6 ms-0.5" fill="currentColor" />
+                          </span>
                         </div>
-                        <div className="p-5 flex flex-col flex-1">
-                          {v.title && <h3 className="font-bold text-primary mb-2 line-clamp-2">{v.title}</h3>}
-                          {v.description && <p className="text-sm text-muted-foreground line-clamp-3 flex-1">{v.description}</p>}
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-                </TabsContent>
+                        <Badge className="absolute top-3 start-3 bg-accent text-accent-foreground border-0 font-bold shadow-gold">
+                          <Youtube className="w-3.5 h-3.5 me-1" />
+                          {lang === "ar" ? "فيديو" : "Video"}
+                        </Badge>
+                      </div>
+                      <div className="p-5 flex flex-col flex-1">
+                        {v.title && <h3 className="font-bold text-primary mb-2 line-clamp-2">{v.title}</h3>}
+                        {v.description && <p className="text-sm text-muted-foreground line-clamp-3 flex-1">{v.description}</p>}
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center text-muted-foreground py-16">
+                  {lang === "ar" ? "لا توجد فيديوهات حالياً." : "No videos yet."}
+                </p>
               )}
-            </Tabs>
-          </>
-        )}
-
-        {view === "gallery" && !hasGallery && (
-          <p className="text-center text-muted-foreground py-16">
-            {lang === "ar" ? "لا يوجد محتوى في المعرض حالياً." : "No gallery content yet."}
-          </p>
+            </TabsContent>
+          </Tabs>
         )}
       </section>
 
