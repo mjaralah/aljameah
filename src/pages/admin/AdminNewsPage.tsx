@@ -23,9 +23,10 @@ type News = {
 const slugify = (s: string) =>
   s.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^\w\u0600-\u06FF-]/g, "").slice(0, 80);
 
-export default function AdminNewsPage() {
+export default function AdminNewsPage({ noLayout = false }: { noLayout?: boolean } = {}) {
   return (
     <CrudPage<News>
+      noLayout={noLayout}
       table="news"
       title="إدارة الأخبار"
       description="أضف أو حرّر أو احذف الأخبار المنشورة على الموقع"
