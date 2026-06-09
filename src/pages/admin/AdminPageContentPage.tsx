@@ -43,12 +43,10 @@ const PAGES: { key: string; label: string; description: string }[] = [
   { key: "governance", label: "الحوكمة", description: "النصوص التعريفية والمؤشرات المالية" },
   { key: "contact", label: "تواصل معنا", description: "نصوص ومعلومات صفحة التواصل" },
   { key: "eservices", label: "الخدمات الإلكترونية", description: "نصوص وقائمة جميع الخدمات (المتاحة والقادمة)" },
-  { key: "media", label: "المركز الإعلامي", description: "النصوص التعريفية + إدارة الأخبار" },
   { key: "surveys", label: "الاستبيانات", description: "النص التعريفي + إدارة الاستبيانات" },
   { key: "programs", label: "البرامج والخدمات", description: "النص التعريفي + إدارة البرامج" },
   { key: "eservices_volunteer", label: "نموذج التطوع", description: "نصوص ومزايا صفحة طلب التطوع" },
   { key: "eservices_membership", label: "نموذج طلب العضوية", description: "نصوص ومزايا صفحة طلب العضوية" },
-  { key: "gallery", label: "المعرض (صور وفيديوهات)", description: "إدارة صور ومقاطع YouTube مع اختيار نمط العرض" },
 ];
 
 const SECTION_LABELS: Record<string, string> = {
@@ -510,7 +508,7 @@ export default function AdminPageContentPage() {
     governance: [
       { to: "/admin/governance", label: "ملفات الحوكمة", icon: ExternalLink, desc: "رفع وحذف وثائق السياسات والتقارير" },
     ],
-    media: [{ to: "/admin/news", label: "إدارة الأخبار", icon: Newspaper, desc: "إضافة وتعديل وحذف وأرشفة الأخبار" }],
+    
     surveys: [{ to: "/admin/surveys", label: "إدارة الاستبيانات", icon: ClipboardList, desc: "إضافة وتعديل الاستبيانات والأسئلة" }],
     programs: [{ to: "/admin/programs", label: "إدارة البرامج", icon: FolderKanban, desc: "إضافة وتعديل وحذف البرامج" }],
     eservices: [{ to: "/admin/forms", label: "إدارة بطاقات الخدمات والنماذج", icon: ClipboardList, desc: "تحرير عناوين/أوصاف بطاقات الخدمات وحقول النماذج وحالات (نشط/قريباً/مؤرشف)" }],
