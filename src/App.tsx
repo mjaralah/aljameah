@@ -88,6 +88,7 @@ const PublicRoutes = () => (
       <Route path="/governance" element={<PublicRouteGuard pageKey="governance"><Governance /></PublicRouteGuard>} />
       <Route path="/media" element={<PublicRouteGuard pageKey="media"><Media /></PublicRouteGuard>} />
       <Route path="/media/:slug" element={<PublicRouteGuard pageKey="media"><NewsDetail /></PublicRouteGuard>} />
+      <Route path="/gallery" element={<PublicRouteGuard pageKey="gallery"><Gallery /></PublicRouteGuard>} />
       <Route path="/e-services" element={<PublicRouteGuard pageKey="eservices"><EServicesIndex /></PublicRouteGuard>} />
       <Route path="/e-services/volunteer" element={<PublicRouteGuard pageKey="eservices"><VolunteerService /></PublicRouteGuard>} />
       <Route path="/e-services/membership" element={<PublicRouteGuard pageKey="eservices"><MembershipService /></PublicRouteGuard>} />
