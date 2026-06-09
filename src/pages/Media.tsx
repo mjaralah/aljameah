@@ -303,16 +303,16 @@ const Media = () => {
         {view === "gallery" && (
           <Tabs value={galleryTab} onValueChange={setGalleryTab} className="w-full">
             <div className="flex justify-center mb-8">
-              <TabsList className="h-12 p-1 bg-muted/50">
-                <TabsTrigger value="photos" className="gap-2 px-5 h-10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                  <Camera className="w-4 h-4" />
-                  {lang === "ar" ? "الصور" : "Photos"}
-                  <span className="ms-1 text-xs opacity-70">({photoItems.length})</span>
-                </TabsTrigger>
+              <TabsList className={cn("h-12 p-1 bg-muted/50", dir === "ltr" && "flex-row-reverse")}>
                 <TabsTrigger value="videos" className="gap-2 px-5 h-10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <Youtube className="w-4 h-4" />
                   {lang === "ar" ? "الفيديوهات" : "Videos"}
                   <span className="ms-1 text-xs opacity-70">({videoItems.length})</span>
+                </TabsTrigger>
+                <TabsTrigger value="photos" className="gap-2 px-5 h-10 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                  <Camera className="w-4 h-4" />
+                  {lang === "ar" ? "الصور" : "Photos"}
+                  <span className="ms-1 text-xs opacity-70">({photoItems.length})</span>
                 </TabsTrigger>
               </TabsList>
             </div>
