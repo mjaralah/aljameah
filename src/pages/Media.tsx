@@ -29,10 +29,26 @@ const Media = () => {
   const [q, setQ] = useState("");
   const { data: dbNews } = useNews();
   const { data: pageSections } = usePageContent("media");
+  const { data: gallerySections } = usePageContent("gallery");
   const intro = (pageSections ?? []).find((s) => s.section_key === "intro");
   const sectionsBlock = (pageSections ?? []).find((s) => s.section_key === "sections");
   const sectionItems: Array<{ title?: string; description?: string; image_url?: string; url?: string }> =
     Array.isArray((sectionsBlock?.data as any)?.items) ? (sectionsBlock!.data as any).items : [];
+
+  const photoBlocks = useMemo(
+    () => (gallerySections ?? []).filter((s: any) => s?.data?.block_type === "gallery"),
+    [gallerySections],
+  );
+  const videoBlocks = useMemo(
+    () => (gallerySections ?? []).filter((s: any) => s?.data?.block_type === "video_gallery"),
+    [gallerySections],
+  );
+  const hasPhotos = photoBlocks.length > 0;
+  const hasVideos = videoBlocks.length > 0;
+  const [galleryTab, setGalleryTab] = useState<string>("photos");
+  useEffect(() => {
+    if (!hasPhotos && hasVideos) setGalleryTab("videos");
+  }, [hasPhotos, hasVideos]);
 
   // عرض الأخبار المنشورة فقط من لوحة التحكم بدون الرجوع للبيانات التجريبية عند الإخفاء الكامل.
   const items: Item[] = useMemo(() => {
