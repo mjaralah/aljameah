@@ -74,6 +74,7 @@ const BLOCK_LABEL: Record<string, string> = {
   cards_grid: "شبكة بطاقات",
   stats: "إحصائيات وعدّادات",
   gallery: "معرض صور",
+  video_gallery: "معرض فيديوهات (YouTube)",
   carousel: "كاروسيل/سلايدر",
   video: "فيديو",
   accordion: "أسئلة شائعة",
