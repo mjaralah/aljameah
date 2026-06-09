@@ -48,6 +48,7 @@ const PAGES: { key: string; label: string; description: string }[] = [
   { key: "programs", label: "البرامج والخدمات", description: "النص التعريفي + إدارة البرامج" },
   { key: "eservices_volunteer", label: "نموذج التطوع", description: "نصوص ومزايا صفحة طلب التطوع" },
   { key: "eservices_membership", label: "نموذج طلب العضوية", description: "نصوص ومزايا صفحة طلب العضوية" },
+  { key: "gallery", label: "المعرض (صور وفيديوهات)", description: "إدارة صور ومقاطع YouTube مع اختيار نمط العرض" },
 ];
 
 const SECTION_LABELS: Record<string, string> = {
@@ -73,6 +74,7 @@ const BLOCK_LABEL: Record<string, string> = {
   cards_grid: "شبكة بطاقات",
   stats: "إحصائيات وعدّادات",
   gallery: "معرض صور",
+  video_gallery: "معرض فيديوهات (YouTube)",
   carousel: "كاروسيل/سلايدر",
   video: "فيديو",
   accordion: "أسئلة شائعة",

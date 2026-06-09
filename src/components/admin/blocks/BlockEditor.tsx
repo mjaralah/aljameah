@@ -11,16 +11,17 @@ import { IconPicker } from "@/components/admin/IconPicker";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import {
   Type, LayoutGrid, BarChart3, Images, GalleryHorizontal,
-  Video, ListTree, Megaphone, FileText,
+  Video, ListTree, Megaphone, FileText, Youtube,
 } from "lucide-react";
 
 export const BLOCK_TYPES = [
   { value: "text_media", label: "نص + صورة + زر", icon: Type, desc: "عنوان ووصف وصورة جانبية مع زر دعوة." },
   { value: "cards_grid", label: "شبكة بطاقات", icon: LayoutGrid, desc: "مجموعة بطاقات (أيقونة + عنوان + وصف)." },
   { value: "stats", label: "إحصائيات وعدّادات", icon: BarChart3, desc: "أرقام بارزة مع أيقونات وتسميات." },
-  { value: "gallery", label: "معرض صور", icon: Images, desc: "شبكة صور مربعة مع تعليق اختياري." },
+  { value: "gallery", label: "معرض صور", icon: Images, desc: "صور بعدة أنماط عرض احترافية + Lightbox." },
+  { value: "video_gallery", label: "معرض فيديوهات (YouTube)", icon: Youtube, desc: "فيديوهات يوتيوب مع أنماط عرض متعددة." },
   { value: "carousel", label: "كاروسيل/سلايدر", icon: GalleryHorizontal, desc: "شرائح متحركة (صورة + عنوان + رابط)." },
-  { value: "video", label: "فيديو", icon: Video, desc: "فيديو YouTube أو Vimeo أو ملف." },
+  { value: "video", label: "فيديو منفرد", icon: Video, desc: "فيديو واحد YouTube أو Vimeo أو ملف." },
   { value: "accordion", label: "أسئلة شائعة (أكورديون)", icon: ListTree, desc: "أسئلة قابلة للطي وإجاباتها." },
   { value: "cta_banner", label: "شريط دعوة (CTA)", icon: Megaphone, desc: "بانر بعنوان كبير وزر دعوة." },
   { value: "rich_text", label: "نص حر (محرر غني)", icon: FileText, desc: "محتوى نصي حر بتنسيق كامل." },
@@ -248,12 +249,74 @@ export function BlockEditor({ data, onChange, folder = "page" }: {
       {type === "gallery" && (
         <>
           {Common}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <Label>نمط العرض</Label>
+              <Select value={d.layout ?? "grid"} onValueChange={(v) => set({ layout: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="grid">شبكة مربعات (Grid)</SelectItem>
+                  <SelectItem value="masonry">ماسونري (أحجام متفاوتة)</SelectItem>
+                  <SelectItem value="carousel">كاروسيل تلقائي</SelectItem>
+                  <SelectItem value="featured">صورة بارزة + مصغّرات</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>عدد الأعمدة (للشبكة/الماسونري)</Label>
+              <Select value={String(d.columns ?? 3)} onValueChange={(v) => set({ columns: Number(v) })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="2">2</SelectItem>
+                  <SelectItem value="3">3</SelectItem>
+                  <SelectItem value="4">4</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground bg-muted/40 rounded-md p-2">
+            النقر على أي صورة في الواجهة سيفتح عارض صور كامل (Lightbox) مع تنقّل.
+          </p>
           <ItemsList items={items} onAddDefault={() => setItems([...items, { image_url: "", caption_ar: "", caption_en: "" }])} onMove={move} onRemove={(i) => setItems(items.filter((_, j) => j !== i))} renderItem={(it, i) => (
             <>
               <MediaUpload label="الصورة" folder={`${folder}/gallery`} value={it.image_url ?? ""}
                 onChange={(url) => updateItem(i, { image_url: url ?? "" })} />
               <BilingualText label="تعليق (اختياري)" valueAr={it.caption_ar ?? ""} valueEn={it.caption_en ?? ""}
                 onAr={(v) => updateItem(i, { caption_ar: v })} onEn={(v) => updateItem(i, { caption_en: v })} />
+            </>
+          )} />
+        </>
+      )}
+
+      {/* ===== video_gallery ===== */}
+      {type === "video_gallery" && (
+        <>
+          {Common}
+          <div>
+            <Label>نمط العرض</Label>
+            <Select value={d.layout ?? "grid"} onValueChange={(v) => set({ layout: v })}>
+              <SelectTrigger className="w-full md:w-72"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="grid">شبكة بطاقات</SelectItem>
+                <SelectItem value="featured">فيديو رئيسي + قائمة جانبية</SelectItem>
+                <SelectItem value="carousel">كاروسيل أفقي</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <p className="text-xs text-muted-foreground bg-muted/40 rounded-md p-2">
+            الصق رابط الفيديو من YouTube (مثل: https://youtu.be/XXXX أو https://www.youtube.com/watch?v=XXXX). سيتم التضمين وتشغيله داخل الموقع تلقائياً.
+          </p>
+          <ItemsList items={items} onAddDefault={() => setItems([...items, { video_url: "", title_ar: "", title_en: "" }])} onMove={move} onRemove={(i) => setItems(items.filter((_, j) => j !== i))} renderItem={(it, i) => (
+            <>
+              <div>
+                <Label>رابط YouTube</Label>
+                <Input dir="ltr" value={it.video_url ?? ""} onChange={(e) => updateItem(i, { video_url: e.target.value })}
+                  placeholder="https://youtu.be/..." />
+              </div>
+              <BilingualText label="عنوان الفيديو" valueAr={it.title_ar ?? ""} valueEn={it.title_en ?? ""}
+                onAr={(v) => updateItem(i, { title_ar: v })} onEn={(v) => updateItem(i, { title_en: v })} />
+              <BilingualText label="وصف قصير (اختياري)" rows={2} valueAr={it.description_ar ?? ""} valueEn={it.description_en ?? ""}
+                onAr={(v) => updateItem(i, { description_ar: v })} onEn={(v) => updateItem(i, { description_en: v })} />
             </>
           )} />
         </>

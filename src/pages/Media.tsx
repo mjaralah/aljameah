@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Calendar, Search, Newspaper, ImageIcon, ChevronLeft } from "lucide-react";
+import { ArrowLeft, Calendar, Search, Newspaper, Camera, ChevronLeft } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -80,8 +80,8 @@ const Media = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6 max-w-4xl mx-auto">
             {sectionItems.map((it, i) => {
               const isGallery = i === 1 || /معرض|gallery/i.test(it.title || "");
-              const Icon = isGallery ? ImageIcon : Newspaper;
-              const href = it.url || (isGallery ? "#gallery" : "#news");
+              const Icon = isGallery ? Camera : Newspaper;
+              const href = it.url || (isGallery ? "/gallery" : "#news");
               const active = !isGallery; // إبراز الأخبار كقسم نشط في صفحة المركز الإعلامي
               return (
                 <Link

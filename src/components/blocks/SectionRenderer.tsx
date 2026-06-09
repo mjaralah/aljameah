@@ -18,6 +18,8 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import { Link } from "react-router-dom";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { ChevronLeft, ChevronRight, X, Play } from "lucide-react";
 
 export type BlockData = {
   block_type?: string;
@@ -196,29 +198,25 @@ export function SectionRenderer({ section }: { section: BlockSection }) {
 
   // ------------------ gallery ------------------
   if (type === "gallery") {
-    const items = Array.isArray(d.items) ? d.items : [];
+    const items = (Array.isArray(d.items) ? d.items : []).filter((it: any) => it?.image_url);
+    const layout = (d.layout as string) || "grid";
+    const cols = (d.columns as number) || 3;
     return (
       <SectionWrap>
         <SectionHeading />
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-          {items.map((it: any, i: number) => (
-            <div key={i} className="rounded-lg overflow-hidden group relative">
-              <AspectRatio ratio={1}>
-                <img
-                  src={it.image_url}
-                  alt={pick(it.caption_ar, it.caption_en)}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  loading="lazy"
-                />
-              </AspectRatio>
-              {(it.caption_ar || it.caption_en) && (
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent text-white p-2 text-xs">
-                  {pick(it.caption_ar, it.caption_en)}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+        <GalleryView items={items} layout={layout} cols={cols} pick={pick} />
+      </SectionWrap>
+    );
+  }
+
+  // ------------------ video_gallery ------------------
+  if (type === "video_gallery") {
+    const items = (Array.isArray(d.items) ? d.items : []).filter((it: any) => it?.video_url);
+    const layout = (d.layout as string) || "grid";
+    return (
+      <SectionWrap>
+        <SectionHeading />
+        <VideoGalleryView items={items} layout={layout} pick={pick} lang={lang} />
       </SectionWrap>
     );
   }
@@ -354,6 +352,343 @@ export function SectionRenderer({ section }: { section: BlockSection }) {
         </div>
       )}
     </SectionWrap>
+  );
+}
+
+// ============================================================
+// Gallery sub-components
+// ============================================================
+
+type Pick = (a?: string, e?: string) => string;
+
+function colsClass(c: number) {
+  if (c === 2) return "grid-cols-1 sm:grid-cols-2";
+  if (c === 4) return "grid-cols-2 md:grid-cols-3 lg:grid-cols-4";
+  return "grid-cols-2 md:grid-cols-3";
+}
+
+function GalleryView({ items, layout, cols, pick }: { items: any[]; layout: string; cols: number; pick: Pick }) {
+  const [open, setOpen] = useState(false);
+  const [idx, setIdx] = useState(0);
+  const openAt = (i: number) => { setIdx(i); setOpen(true); };
+  const next = () => setIdx((i) => (i + 1) % items.length);
+  const prev = () => setIdx((i) => (i - 1 + items.length) % items.length);
+
+  if (items.length === 0) return null;
+
+  const Caption = (it: any) =>
+    (it.caption_ar || it.caption_en) ? (
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent text-white p-2 text-xs">
+        {pick(it.caption_ar, it.caption_en)}
+      </div>
+    ) : null;
+
+  // --- carousel ---
+  if (layout === "carousel") {
+    return (
+      <>
+        <Swiper
+          modules={[Autoplay, Pagination, Navigation]}
+          autoplay={{ delay: 4000, disableOnInteraction: false }}
+          pagination={{ clickable: true }}
+          navigation
+          loop={items.length > 1}
+          className="rounded-2xl overflow-hidden shadow-lg"
+        >
+          {items.map((it, i) => (
+            <SwiperSlide key={i}>
+              <button type="button" onClick={() => openAt(i)} className="block w-full text-start">
+                <div className="relative">
+                  <AspectRatio ratio={16 / 9}>
+                    <img src={it.image_url} alt={pick(it.caption_ar, it.caption_en)} className="w-full h-full object-cover" loading="lazy" />
+                  </AspectRatio>
+                  {Caption(it)}
+                </div>
+              </button>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+        <Lightbox open={open} onOpenChange={setOpen} items={items} idx={idx} onNext={next} onPrev={prev} pick={pick} />
+      </>
+    );
+  }
+
+  // --- featured ---
+  if (layout === "featured") {
+    const main = items[idx] ?? items[0];
+    return (
+      <>
+        <div className="grid lg:grid-cols-[2fr_1fr] gap-4">
+          <button type="button" onClick={() => openAt(idx)} className="relative rounded-2xl overflow-hidden shadow-lg group">
+            <AspectRatio ratio={16 / 10}>
+              <img src={main.image_url} alt={pick(main.caption_ar, main.caption_en)} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]" />
+            </AspectRatio>
+            {Caption(main)}
+          </button>
+          <div className="grid grid-cols-3 lg:grid-cols-2 gap-2 max-h-[420px] overflow-y-auto pr-1">
+            {items.map((it, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setIdx(i)}
+                onDoubleClick={() => openAt(i)}
+                aria-label={pick(it.caption_ar, it.caption_en) || `image-${i + 1}`}
+                className={`relative rounded-lg overflow-hidden border-2 transition-all ${i === idx ? "border-primary" : "border-transparent hover:border-accent/50"}`}
+              >
+                <AspectRatio ratio={1}>
+                  <img src={it.image_url} alt="" className="w-full h-full object-cover" loading="lazy" />
+                </AspectRatio>
+              </button>
+            ))}
+          </div>
+        </div>
+        <Lightbox open={open} onOpenChange={setOpen} items={items} idx={idx} onNext={next} onPrev={prev} pick={pick} />
+      </>
+    );
+  }
+
+  // --- masonry ---
+  if (layout === "masonry") {
+    const colCount = cols === 2 ? 2 : cols === 4 ? 4 : 3;
+    return (
+      <>
+        <div className={`columns-2 ${colCount === 3 ? "md:columns-3" : colCount === 4 ? "md:columns-3 lg:columns-4" : ""} gap-3 [column-fill:_balance]`}>
+          {items.map((it, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => openAt(i)}
+              className="mb-3 block w-full break-inside-avoid rounded-lg overflow-hidden group relative"
+            >
+              <img
+                src={it.image_url}
+                alt={pick(it.caption_ar, it.caption_en)}
+                className="w-full h-auto object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                loading="lazy"
+              />
+              {Caption(it)}
+            </button>
+          ))}
+        </div>
+        <Lightbox open={open} onOpenChange={setOpen} items={items} idx={idx} onNext={next} onPrev={prev} pick={pick} />
+      </>
+    );
+  }
+
+  // --- grid (default) ---
+  return (
+    <>
+      <div className={`grid ${colsClass(cols)} gap-3`}>
+        {items.map((it, i) => (
+          <button
+            key={i}
+            type="button"
+            onClick={() => openAt(i)}
+            className="rounded-lg overflow-hidden group relative text-start"
+            aria-label={pick(it.caption_ar, it.caption_en) || `صورة ${i + 1}`}
+          >
+            <AspectRatio ratio={1}>
+              <img
+                src={it.image_url}
+                alt={pick(it.caption_ar, it.caption_en)}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+              />
+            </AspectRatio>
+            {Caption(it)}
+          </button>
+        ))}
+      </div>
+      <Lightbox open={open} onOpenChange={setOpen} items={items} idx={idx} onNext={next} onPrev={prev} pick={pick} />
+    </>
+  );
+}
+
+function Lightbox({ open, onOpenChange, items, idx, onNext, onPrev, pick }: {
+  open: boolean; onOpenChange: (v: boolean) => void;
+  items: any[]; idx: number; onNext: () => void; onPrev: () => void; pick: Pick;
+}) {
+  const it = items[idx];
+  if (!it) return null;
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-5xl p-0 bg-black/95 border-0">
+        <div className="relative">
+          <img src={it.image_url} alt={pick(it.caption_ar, it.caption_en)} className="w-full h-auto max-h-[80vh] object-contain" />
+          <button onClick={() => onOpenChange(false)} aria-label="إغلاق" className="absolute top-3 end-3 h-9 w-9 rounded-full bg-black/60 text-white grid place-items-center hover:bg-black/80">
+            <X className="w-5 h-5" />
+          </button>
+          {items.length > 1 && (
+            <>
+              <button onClick={onPrev} aria-label="السابق" className="absolute top-1/2 -translate-y-1/2 start-2 h-10 w-10 rounded-full bg-black/60 text-white grid place-items-center hover:bg-black/80">
+                <ChevronRight className="w-5 h-5" />
+              </button>
+              <button onClick={onNext} aria-label="التالي" className="absolute top-1/2 -translate-y-1/2 end-2 h-10 w-10 rounded-full bg-black/60 text-white grid place-items-center hover:bg-black/80">
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+            </>
+          )}
+          {(it.caption_ar || it.caption_en) && (
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent text-white p-4 text-sm">
+              {pick(it.caption_ar, it.caption_en)}
+              <span className="ms-2 opacity-70">({idx + 1} / {items.length})</span>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ---------- video gallery ----------
+
+function ytId(url: string): string | null {
+  try {
+    const u = new URL(url);
+    if (u.hostname.includes("youtu.be")) return u.pathname.replace("/", "") || null;
+    if (u.hostname.includes("youtube.com")) {
+      const v = u.searchParams.get("v");
+      if (v) return v;
+      const m = u.pathname.match(/\/embed\/([^/?]+)/);
+      if (m) return m[1];
+    }
+  } catch { /* ignore */ }
+  return null;
+}
+
+function ytThumb(url: string): string | null {
+  const id = ytId(url);
+  return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : null;
+}
+
+function VideoGalleryView({ items, layout, pick, lang }: { items: any[]; layout: string; pick: Pick; lang: string }) {
+  const [active, setActive] = useState(0);
+  const [open, setOpen] = useState(false);
+  const [playIdx, setPlayIdx] = useState(0);
+  if (items.length === 0) return null;
+
+  const openPlayer = (i: number) => { setPlayIdx(i); setOpen(true); };
+
+  const Card = ({ it, i, onClick }: { it: any; i: number; onClick: () => void }) => {
+    const thumb = ytThumb(it.video_url);
+    const title = pick(it.title_ar, it.title_en);
+    return (
+      <button type="button" onClick={onClick} className="group text-start rounded-xl overflow-hidden border bg-card hover:shadow-lg transition-all hover:-translate-y-0.5">
+        <div className="relative">
+          <AspectRatio ratio={16 / 9}>
+            {thumb ? (
+              <img src={thumb} alt={title} className="w-full h-full object-cover" loading="lazy" />
+            ) : (
+              <div className="w-full h-full bg-muted" />
+            )}
+          </AspectRatio>
+          <div className="absolute inset-0 grid place-items-center bg-black/30 opacity-90 group-hover:bg-black/40 transition-colors">
+            <span className="h-14 w-14 rounded-full bg-white/95 text-primary grid place-items-center shadow-lg group-hover:scale-110 transition-transform">
+              <Play className="w-6 h-6 ms-0.5" fill="currentColor" />
+            </span>
+          </div>
+        </div>
+        {(title || it.description_ar || it.description_en) && (
+          <div className="p-3">
+            {title && <h3 className="font-bold text-sm line-clamp-2 text-foreground">{title}</h3>}
+            {(it.description_ar || it.description_en) && (
+              <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{pick(it.description_ar, it.description_en)}</p>
+            )}
+          </div>
+        )}
+      </button>
+    );
+  };
+
+  let content: React.ReactNode;
+
+  if (layout === "featured") {
+    const main = items[active];
+    const mainEmbed = youtubeEmbed(main.video_url);
+    content = (
+      <div className="grid lg:grid-cols-[2fr_1fr] gap-4">
+        <div className="rounded-2xl overflow-hidden shadow-lg bg-black">
+          {mainEmbed && (
+            <AspectRatio ratio={16 / 9}>
+              <iframe src={mainEmbed} title={pick(main.title_ar, main.title_en) || "video"} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+            </AspectRatio>
+          )}
+          {(main.title_ar || main.title_en) && (
+            <div className="p-4 bg-card">
+              <h3 className="font-bold text-lg text-foreground">{pick(main.title_ar, main.title_en)}</h3>
+              {(main.description_ar || main.description_en) && (
+                <p className="text-sm text-muted-foreground mt-1">{pick(main.description_ar, main.description_en)}</p>
+              )}
+            </div>
+          )}
+        </div>
+        <div className="space-y-2 max-h-[520px] overflow-y-auto pr-1">
+          {items.map((it, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setActive(i)}
+              className={`w-full flex gap-3 text-start p-2 rounded-lg border transition-all ${i === active ? "border-primary bg-primary/5" : "border-border hover:border-accent/40 hover:bg-muted/40"}`}
+            >
+              <div className="relative w-28 shrink-0 rounded-md overflow-hidden">
+                <AspectRatio ratio={16 / 9}>
+                  <img src={ytThumb(it.video_url) || ""} alt="" className="w-full h-full object-cover" loading="lazy" />
+                  <span className="absolute inset-0 grid place-items-center bg-black/30">
+                    <Play className="w-4 h-4 text-white" fill="currentColor" />
+                  </span>
+                </AspectRatio>
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="font-semibold text-sm line-clamp-2">{pick(it.title_ar, it.title_en)}</div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  } else if (layout === "carousel") {
+    content = (
+      <Swiper
+        modules={[Pagination, Navigation]}
+        pagination={{ clickable: true }}
+        navigation
+        spaceBetween={16}
+        slidesPerView={1.1}
+        breakpoints={{ 640: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } }}
+        className="!pb-10"
+      >
+        {items.map((it, i) => (
+          <SwiperSlide key={i}><Card it={it} i={i} onClick={() => openPlayer(i)} /></SwiperSlide>
+        ))}
+      </Swiper>
+    );
+  } else {
+    // grid (default)
+    content = (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {items.map((it, i) => <Card key={i} it={it} i={i} onClick={() => openPlayer(i)} />)}
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {content}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-4xl p-0 bg-black border-0">
+          {(() => {
+            const it = items[playIdx];
+            const embed = it ? youtubeEmbed(it.video_url) : null;
+            return embed ? (
+              <AspectRatio ratio={16 / 9}>
+                <iframe src={`${embed}?autoplay=1`} title="video" className="w-full h-full" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />
+              </AspectRatio>
+            ) : null;
+          })()}
+        </DialogContent>
+      </Dialog>
+      {lang === "en" && null}
+    </>
   );
 }
 
