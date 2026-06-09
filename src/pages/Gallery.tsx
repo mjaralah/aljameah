@@ -45,7 +45,7 @@ export default function Gallery() {
         eyebrow={t.nav.media}
         title={heading}
         lead={lead}
-        breadcrumb={[{ label: t.nav.media, href: "/media" }, { label: heading }]}
+        breadcrumb={[{ label: t.nav.media, to: "/media" }, { label: heading }]}
       />
 
       <section className="container py-10 md:py-14">
