@@ -170,22 +170,18 @@ const Media = () => {
               const Icon = isGallery ? Camera : Newspaper;
               const target: "news" | "gallery" = isGallery ? "gallery" : "news";
               const active = view === target;
-              const disabled = isGallery && !hasGallery;
               return (
                 <button
                   key={i}
                   type="button"
-                  onClick={() => !disabled && onPickView(target)}
+                  onClick={() => onPickView(target)}
                   aria-pressed={active}
                   aria-label={it.title}
-                  disabled={disabled}
                   className={cn(
-                    "group relative flex items-center gap-5 p-5 lg:p-6 rounded-2xl border-2 bg-card transition-all duration-300 text-start w-full",
-                    !disabled && "hover:-translate-y-1",
+                    "group relative flex items-center gap-5 p-5 lg:p-6 rounded-2xl border-2 bg-card transition-all duration-300 text-start w-full hover:-translate-y-1",
                     active
                       ? "border-primary shadow-lg shadow-primary/5"
                       : "border-border shadow-sm hover:border-accent/40 hover:shadow-lg",
-                    disabled && "opacity-50 cursor-not-allowed",
                   )}
                 >
                   {active && (
