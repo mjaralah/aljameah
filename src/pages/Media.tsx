@@ -28,6 +28,9 @@ const Media = () => {
   const { data: dbNews } = useNews();
   const { data: pageSections } = usePageContent("media");
   const intro = (pageSections ?? []).find((s) => s.section_key === "intro");
+  const sectionsBlock = (pageSections ?? []).find((s) => s.section_key === "sections");
+  const sectionItems: Array<{ title?: string; description?: string; image_url?: string; url?: string }> =
+    Array.isArray((sectionsBlock?.data as any)?.items) ? (sectionsBlock!.data as any).items : [];
 
   // عرض الأخبار المنشورة فقط من لوحة التحكم بدون الرجوع للبيانات التجريبية عند الإخفاء الكامل.
   const items: Item[] = useMemo(() => {
