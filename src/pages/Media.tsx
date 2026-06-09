@@ -1,13 +1,15 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Calendar, Search, Newspaper, Camera, ChevronLeft } from "lucide-react";
+import { ArrowLeft, Calendar, Search, Newspaper, Camera, ChevronLeft, Youtube } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useNews, usePageContent } from "@/hooks/usePublicContent";
 import { PageHero } from "@/components/layout/PageHero";
 import { PageFeedback } from "@/components/layout/PageFeedback";
+import { SectionRenderer, type BlockSection } from "@/components/blocks/SectionRenderer";
 import { cn } from "@/lib/utils";
 import news1 from "@/assets/news-1.jpg";
 
