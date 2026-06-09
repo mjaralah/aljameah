@@ -14,6 +14,7 @@ import SitemapPage from "./pages/SitemapPage.tsx";
 import Programs from "./pages/Programs.tsx";
 import Governance from "./pages/Governance.tsx";
 import Media from "./pages/Media.tsx";
+import Gallery from "./pages/Gallery.tsx";
 import NewsDetail from "./pages/NewsDetail.tsx";
 import SurveysPage from "./pages/Surveys.tsx";
 import SurveyResults from "./pages/SurveyResults.tsx";
