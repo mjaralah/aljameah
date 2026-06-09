@@ -69,35 +69,83 @@ const Media = () => {
       )}
 
       {sectionsBlock && sectionItems.length > 0 && (
-        <section className="container pt-10 md:pt-14">
-          {sectionsBlock.title && (
-            <h2 className="text-2xl lg:text-3xl font-bold text-primary mb-6 text-center">
-              {sectionsBlock.title}
+        <section className="container pt-10 md:pt-14" aria-labelledby="media-sections-heading">
+          <div className="flex flex-col items-center gap-2 mb-8">
+            <h2 id="media-sections-heading" className="text-2xl lg:text-3xl font-bold text-primary">
+              {sectionsBlock.title || (lang === "ar" ? "الأقسام" : "Sections")}
             </h2>
-          )}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {sectionItems.map((it, i) => (
-              <Card key={i} className="overflow-hidden hover:shadow-card transition-smooth border-border hover:-translate-y-1">
-                {it.image_url && (
-                  <div className="aspect-[16/10] overflow-hidden bg-muted">
-                    <img src={it.image_url} alt={it.title || ""} loading="lazy" className="h-full w-full object-cover" />
-                  </div>
-                )}
-                <div className="p-5">
-                  {it.title && <h3 className="font-bold text-primary mb-2">{it.title}</h3>}
-                  {it.description && <p className="text-sm text-muted-foreground">{it.description}</p>}
-                  {it.url && (
-                    <Link to={it.url} className="mt-3 inline-flex text-sm font-semibold text-accent hover:underline items-center gap-1">
-                      {t.pages.media.readArticle}
-                      <ArrowLeft className={dir === "rtl" ? "h-3.5 w-3.5" : "h-3.5 w-3.5 rotate-180"} />
-                    </Link>
+            <span className="w-12 h-1 rounded-full bg-accent" aria-hidden="true" />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6 max-w-4xl mx-auto">
+            {sectionItems.map((it, i) => {
+              const isGallery = i === 1 || /معرض|gallery/i.test(it.title || "");
+              const Icon = isGallery ? ImageIcon : Newspaper;
+              const href = it.url || (isGallery ? "#gallery" : "#news");
+              const active = !isGallery; // إبراز الأخبار كقسم نشط في صفحة المركز الإعلامي
+              return (
+                <Link
+                  key={i}
+                  to={href}
+                  aria-label={it.title}
+                  className={cn(
+                    "group relative flex items-center gap-5 p-5 lg:p-6 rounded-2xl border-2 bg-card transition-all duration-300 hover:-translate-y-1 text-start",
+                    active
+                      ? "border-primary shadow-lg shadow-primary/5"
+                      : "border-border shadow-sm hover:border-accent/40 hover:shadow-lg",
                   )}
-                </div>
-              </Card>
-            ))}
+                >
+                  {active && (
+                    <span className="absolute inset-0 rounded-2xl bg-gradient-to-l from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" aria-hidden="true" />
+                  )}
+
+                  <div
+                    className={cn(
+                      "relative flex items-center justify-center w-14 h-14 lg:w-16 lg:h-16 rounded-xl shrink-0 transition-colors",
+                      active
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-muted-foreground group-hover:bg-accent/10 group-hover:text-accent",
+                    )}
+                    aria-hidden="true"
+                  >
+                    <Icon className="w-7 h-7 lg:w-8 lg:h-8" strokeWidth={1.6} />
+                  </div>
+
+                  <div className="relative min-w-0 flex-1">
+                    {it.title && (
+                      <span
+                        className={cn(
+                          "block text-lg lg:text-xl font-bold truncate transition-colors",
+                          active ? "text-primary" : "text-foreground group-hover:text-accent",
+                        )}
+                      >
+                        {it.title}
+                      </span>
+                    )}
+                    {it.description && (
+                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{it.description}</p>
+                    )}
+                  </div>
+
+                  <span
+                    className={cn(
+                      "ms-auto shrink-0 flex items-center justify-center w-8 h-8 rounded-full transition-all",
+                      active
+                        ? "bg-primary text-primary-foreground"
+                        : "border border-accent text-accent opacity-0 group-hover:opacity-100",
+                    )}
+                    aria-hidden="true"
+                  >
+                    <ChevronLeft className={cn("w-4 h-4", dir === "ltr" && "rotate-180")} />
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         </section>
       )}
+
+
 
       <section className="container py-12 md:py-16">
 
