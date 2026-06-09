@@ -68,7 +68,39 @@ const Media = () => {
         />
       )}
 
+      {sectionsBlock && sectionItems.length > 0 && (
+        <section className="container pt-10 md:pt-14">
+          {sectionsBlock.title && (
+            <h2 className="text-2xl lg:text-3xl font-bold text-primary mb-6 text-center">
+              {sectionsBlock.title}
+            </h2>
+          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {sectionItems.map((it, i) => (
+              <Card key={i} className="overflow-hidden hover:shadow-card transition-smooth border-border hover:-translate-y-1">
+                {it.image_url && (
+                  <div className="aspect-[16/10] overflow-hidden bg-muted">
+                    <img src={it.image_url} alt={it.title || ""} loading="lazy" className="h-full w-full object-cover" />
+                  </div>
+                )}
+                <div className="p-5">
+                  {it.title && <h3 className="font-bold text-primary mb-2">{it.title}</h3>}
+                  {it.description && <p className="text-sm text-muted-foreground">{it.description}</p>}
+                  {it.url && (
+                    <Link to={it.url} className="mt-3 inline-flex text-sm font-semibold text-accent hover:underline items-center gap-1">
+                      {t.pages.media.readArticle}
+                      <ArrowLeft className={dir === "rtl" ? "h-3.5 w-3.5" : "h-3.5 w-3.5 rotate-180"} />
+                    </Link>
+                  )}
+                </div>
+              </Card>
+            ))}
+          </div>
+        </section>
+      )}
+
       <section className="container py-12 md:py-16">
+
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="relative md:w-80">
             <Search className="h-4 w-4 absolute top-1/2 -translate-y-1/2 start-3 text-muted-foreground" />
