@@ -156,13 +156,8 @@ const Media = () => {
       )}
 
       {sectionsBlock && sectionItems.length > 0 && (
-        <section className="container pt-10 md:pt-14" aria-labelledby="media-sections-heading">
-          <div className="flex flex-col items-center gap-2 mb-8">
-            <h2 id="media-sections-heading" className="text-2xl lg:text-3xl font-bold text-primary">
-              {sectionsBlock.title || (lang === "ar" ? "الأقسام" : "Sections")}
-            </h2>
-            <span className="w-12 h-1 rounded-full bg-accent" aria-hidden="true" />
-          </div>
+        <section className="container pt-10 md:pt-14">
+
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6 max-w-4xl mx-auto">
             {sectionItems.map((it, i) => {
