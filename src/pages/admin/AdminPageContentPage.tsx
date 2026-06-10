@@ -489,6 +489,17 @@ export default function AdminPageContentPage() {
         </div>
       );
     }
+    if (s.section_key === "programs" || s.section_key === "news") {
+      const d = s.data || {};
+      return (
+        <div>
+          <Label>العنوان الفرعي (Eyebrow)</Label>
+          <Input value={d.eyebrow ?? ""}
+            onChange={(e) => updateData(s.id, "eyebrow", e.target.value)}
+            placeholder={s.section_key === "programs" ? "ما نقدّمه" : "الأخبار"} />
+        </div>
+      );
+    }
     return null;
   }
 
