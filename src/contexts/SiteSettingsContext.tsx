@@ -118,15 +118,6 @@ export const SiteSettingsProvider = ({ children }: { children: React.ReactNode }
     obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
 
     if (data?.site_name) document.title = data.site_name;
-    if (data?.favicon_url) {
-      let link = document.querySelector<HTMLLinkElement>("link[rel='icon']");
-      if (!link) {
-        link = document.createElement("link");
-        link.rel = "icon";
-        document.head.appendChild(link);
-      }
-      link.href = data.favicon_url;
-    }
 
     // حفظ الألوان والاسم والأيقونة محلياً لتطبيقها فوراً عند التحديث (يمنع وميض الهوية القديمة)
     try {

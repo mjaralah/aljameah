@@ -85,10 +85,5 @@ export function applyCachedBrand() {
     set("--sidebar-border", hslStr(adjust(p, { dl: isDark ? -45 : +55, ds: -35 })));
 
     if (cache.site_name) document.title = cache.site_name;
-    if (cache.favicon_url) {
-      let link = document.querySelector<HTMLLinkElement>("link[rel='icon']");
-      if (!link) { link = document.createElement("link"); link.rel = "icon"; document.head.appendChild(link); }
-      link.href = cache.favicon_url;
-    }
   } catch {}
 }
