@@ -2,6 +2,7 @@ import { BadgeCheck } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAboutContent } from "@/hooks/usePublicContent";
 import { LanguageToggle } from "./LanguageToggle";
+import { ThemeToggle } from "./ThemeToggle";
 
 // شريط علوي ثابت يحوي شارة التوثيق ورقم السجل ومبدّل اللغة
 export const TopBar = () => {
