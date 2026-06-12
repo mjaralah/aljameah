@@ -55,6 +55,7 @@ import AdminPageBuilderPage from "./pages/admin/AdminPageBuilderPage.tsx";
 import AdminHelpCenterPage from "./pages/admin/AdminHelpCenterPage.tsx";
 import AdminHelpPage from "./pages/admin/AdminHelpPage.tsx";
 import AdminSupportPage from "./pages/admin/AdminSupportPage.tsx";
+import AdminHeaderMenuPage from "./pages/admin/AdminHeaderMenuPage.tsx";
 
 import Support from "./pages/Support.tsx";
 import CustomFormPage from "./pages/eservices/CustomFormPage.tsx";
@@ -345,6 +346,16 @@ const App = () => (
                   </ProtectedAdminRoute>
                 }
               />
+
+              <Route
+                path="/admin/header-menu"
+                element={
+                  <ProtectedAdminRoute requireAdmin>
+                    <AdminHeaderMenuPage />
+                  </ProtectedAdminRoute>
+                }
+              />
+
 
 
               {/* Public site (catch-all) */}

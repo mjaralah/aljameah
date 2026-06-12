@@ -4,7 +4,7 @@ import { Heart, Menu, Search, Gift, HandHeart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useMenuPages, useSiteSettings } from "@/hooks/usePublicContent";
+import { useMenuPages, useSiteSettings, useHeaderMenu } from "@/hooks/usePublicContent";
 import { cn } from "@/lib/utils";
 
 // رأس الصفحة بالشعار والتنقل الرئيسي
@@ -14,6 +14,7 @@ export const Header = () => {
   const navigate = useNavigate();
   const { data: menuPages } = useMenuPages();
   const { data: settings } = useSiteSettings();
+  const { data: headerMenu } = useHeaderMenu();
 
   // إعدادات زر التبرع (قابلة للتحكم من لوحة التحكم)
   const donateEnabled = settings?.donate_button_enabled !== false;
@@ -35,19 +36,36 @@ export const Header = () => {
   const donateStyle = donateBg || donateFg ? { backgroundColor: donateBg, color: donateFg } : undefined;
 
 
+  // افتراضات الترجمة لكل مفتاح نظامي (تُستخدم لو لم يضع المدير تسمية مخصّصة)
+  const defaultLabelFor = (key: string | null): string => {
+    switch (key) {
+      case "home": return t.nav.home;
+      case "about": return t.nav.about;
+      case "programs": return t.nav.programs;
+      case "governance": return t.nav.governance;
+      case "media": return t.nav.media;
+      case "eservices": return t.nav.eservices;
+      case "surveys": return t.nav.surveys;
+      case "contact": return t.nav.contact;
+      case "support": return lang === "en" ? "Support" : "الدعم والمساعدة";
+      default: return "";
+    }
+  };
+
+  const headerLinks = (headerMenu ?? []).map((item) => {
+    const customLabel = lang === "en"
+      ? item.label_en || item.label_ar
+      : item.label_ar || item.label_en;
+    const label = customLabel || defaultLabelFor(item.key);
+    return { to: item.url, label, external: item.is_external };
+  });
+
   const links = [
-    { to: "/", label: t.nav.home },
-    { to: "/about", label: t.nav.about },
-    { to: "/programs", label: t.nav.programs },
-    { to: "/governance", label: t.nav.governance },
-    { to: "/media", label: t.nav.media },
-    { to: "/e-services", label: t.nav.eservices },
-    { to: "/surveys", label: t.nav.surveys },
-    { to: "/contact", label: t.nav.contact },
-    { to: "/support", label: lang === "en" ? "Support" : "الدعم والمساعدة" },
+    ...headerLinks,
     ...(menuPages ?? []).map((p) => ({
       to: `/p/${p.slug}`,
       label: (lang === "en" ? p.title_en : null) || p.title,
+      external: false,
     })),
   ];
 
@@ -87,11 +105,23 @@ export const Header = () => {
 
         {/* التنقل لسطح المكتب */}
         <nav className="hidden xl:flex items-center gap-0.5" aria-label="Main">
-          {links.map((l) => (
-            <NavLink key={l.to} to={l.to} end={l.to === "/"} className={linkClass}>
-              {l.label}
-            </NavLink>
-          ))}
+          {links.map((l) =>
+            l.external ? (
+              <a
+                key={l.to}
+                href={l.to}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-2 rounded-md text-sm font-semibold text-foreground/80 hover:text-primary hover:bg-primary/5 whitespace-nowrap"
+              >
+                {l.label}
+              </a>
+            ) : (
+              <NavLink key={l.to} to={l.to} end={l.to === "/"} className={linkClass}>
+                {l.label}
+              </NavLink>
+            )
+          )}
         </nav>
 
         <div className="flex items-center gap-1.5">
@@ -127,22 +157,35 @@ export const Header = () => {
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[360px]">
               <div className="flex flex-col gap-1 mt-6">
-                {links.map((l) => (
-                  <NavLink
-                    key={l.to}
-                    to={l.to}
-                    end={l.to === "/"}
-                    onClick={() => setOpen(false)}
-                    className={({ isActive }) =>
-                      cn(
-                        "px-4 py-3 rounded-lg font-semibold transition-smooth",
-                        isActive ? "bg-primary text-primary-foreground" : "hover:bg-muted",
-                      )
-                    }
-                  >
-                    {l.label}
-                  </NavLink>
-                ))}
+                {links.map((l) =>
+                  l.external ? (
+                    <a
+                      key={l.to}
+                      href={l.to}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setOpen(false)}
+                      className="px-4 py-3 rounded-lg font-semibold hover:bg-muted"
+                    >
+                      {l.label}
+                    </a>
+                  ) : (
+                    <NavLink
+                      key={l.to}
+                      to={l.to}
+                      end={l.to === "/"}
+                      onClick={() => setOpen(false)}
+                      className={({ isActive }) =>
+                        cn(
+                          "px-4 py-3 rounded-lg font-semibold transition-smooth",
+                          isActive ? "bg-primary text-primary-foreground" : "hover:bg-muted",
+                        )
+                      }
+                    >
+                      {l.label}
+                    </NavLink>
+                  )
+                )}
 
                 {donateEnabled && (
                   <Button

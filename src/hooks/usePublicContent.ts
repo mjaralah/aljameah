@@ -462,3 +462,33 @@ export function useMenuPages() {
     },
   });
 }
+
+export type DBHeaderMenuItem = {
+  id: string;
+  key: string | null;
+  kind: "system" | "custom";
+  label_ar: string | null;
+  label_en: string | null;
+  url: string;
+  is_external: boolean;
+  is_visible: boolean;
+  sort_order: number;
+};
+
+// عناصر القائمة الرئيسية القابلة للإدارة من لوحة التحكم
+export function useHeaderMenu() {
+  return useQuery({
+    queryKey: ["public", "header_menu_items"],
+    staleTime: STALE,
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("header_menu_items")
+        .select("id,key,kind,label_ar,label_en,url,is_external,is_visible,sort_order")
+        .eq("is_visible", true)
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as DBHeaderMenuItem[];
+    },
+  });
+}
+

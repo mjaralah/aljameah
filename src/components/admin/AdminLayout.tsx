@@ -28,6 +28,9 @@ import {
   HelpCircle,
   BookOpen,
   LifeBuoy,
+  Navigation,
+
+
 
 } from "lucide-react";
 import {
@@ -84,6 +87,7 @@ const requestsItems: NavItem[] = [
 
 const settingsItems: NavItem[] = [
   { to: "/admin/settings", label: "الإعدادات العامة", icon: Settings, adminOnly: true },
+  { to: "/admin/header-menu", label: "قائمة رأس الموقع", icon: Navigation, adminOnly: true },
   { to: "/admin/users", label: "المستخدمون والأدوار", icon: UserCog, adminOnly: true },
   { to: "/admin/email-templates", label: "قوالب البريد", icon: Mail, adminOnly: true },
   { to: "/admin/help", label: "مركز المساعدة للمدير", icon: HelpCircle, adminOnly: true },
