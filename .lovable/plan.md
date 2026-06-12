@@ -1,37 +1,45 @@
+## المشكلة
+الوضع الليلي يعمل على الإطار العام (الخلفية، البطاقات، النصوص) لأن المكونات تستخدم semantic tokens، لكن توجد عناصر تستخدم ألواناً ثابتة (`bg-white`, `text-gray-*`, `#308450`، إلخ) لا تستجيب لتبديل المظهر، بالإضافة إلى عدم تحقق بصري كافٍ لباقي الصفحات في الوضع الداكن.
+
 ## الخطة
 
-إضافة زر تبديل الوضع الليلي بتصميم Eclipse Morph في الـ TopBar.
+### 1) تدقيق وإصلاح الألوان الثابتة (الموقع العام فقط)
 
-### الملفات الجديدة
+ملفات تحتاج تعديل لاستبدال الألوان الثابتة بـ semantic tokens مع الإبقاء على الألوان المقصودة فوق التدرجات الداكنة (hero/CTA):
 
-1. **`src/contexts/ThemeContext.tsx`** — Context يدير الوضع:
-   - state: `theme: "light" | "dark"`
-   - يحفظ في `localStorage` بمفتاح `site_theme`
-   - يحترم `prefers-color-scheme` كقيمة أولية
-   - يطبق/يزيل class `dark` على `<html>`
+- **`src/components/layout/Footer.tsx`** (سطر 60): استبدال `bg-white shadow-sm ring-1 ring-black/5` بـ `bg-card ring-1 ring-border` لحاوية الشعار حتى تتكيّف مع الوضع الليلي.
+- **`src/components/layout/WhatsAppFloat.tsx`**: زر دائري بـ `bg-white` ولون hex ثابت `#308450` — تحويله ليستعمل tokens (`bg-card`, `text-success`) أو على الأقل إضافة `dark:bg-card dark:text-success` ليبقى متباينًا في الوضع الليلي.
+- **`src/pages/Media.tsx`**: مراجعة lightbox — الألوان `bg-white/10` و `text-white` فوق خلفية سوداء صحيحة (lightbox دائماً داكن) — لا تغيير.
+- **`src/components/blocks/SectionRenderer.tsx`**: overlays السوداء فوق الصور (`from-black/70 ... text-white`) مقصودة وتعمل في الوضعين — لا تغيير. التحقق فقط من بطاقات النصوص.
+- **`src/components/about/CustomAboutSection.tsx`**: overlay فوق صور — مقصود — لا تغيير.
+- **`src/components/home/HeroSlider.tsx` و `VolunteerCta.tsx` و `MembershipService.tsx` و `Contact.tsx`**: استخدام `bg-white/10`، `text-white` فوق `bg-gradient-primary/hero/cta` — مقصودة لأن الخلفية داكنة دائماً.
+- **`src/components/layout/ThemeToggle.tsx`**: `hover:bg-white/10` على شريط علوي ملوّن — مقبول.
+- **`src/pages/Contact.tsx`** (سطور 101–106): ألوان شبكات التواصل hex (تويتر/فيسبوك/إلخ) — هويات علامات تجارية ثابتة — لا تغيير، فقط ضبط `hover:bg-[#000000]/10` لتويتر لتعمل في الوضع الليلي عبر استبداله بـ `hover:bg-foreground/10 hover:text-foreground`.
 
-2. **`src/components/layout/ThemeToggle.tsx`** — الزر بتصميم Eclipse Morph:
-   - أيقونة دائرية بأشعة شمس + قمر منزلق (ظل دائري ينزلق ليكسف الشمس)
-   - الأشعة تتقلص وتختفي عند التحول للوضع الليلي
-   - الظل ينزلق من الزاوية ليغطي الشمس جزئياً مكوناً هلالاً
-   - يستخدم `aria-label="تبديل الوضع الليلي / النهاري"` و `aria-pressed`
-   - tooltip "المظهر" يظهر عند hover
-   - الحركة تشتغل عند **النقر** (state-based) وليس فقط hover
+### 2) ضبط ألوان `.dark` في `src/index.css`
 
-### الملفات المعدّلة
+تحسين القيم الحالية لتمنح تباينًا أفضل ومظهرًا "أنيقًا" بدل أن تبدو مسطّحة:
+- رفع تباين الحدود (`--border`) قليلاً.
+- ضبط `--muted-foreground` ليكون أكثر وضوحًا.
+- التأكد من أن `--popover` و `--card` و `--background` متدرجة بشكل صحيح (background ≤ card ≤ popover من حيث الإضاءة).
+- إبقاء الأخضر والذهبي كهوية أساسية مع تعديل بسيط للذهبي ليعطي إحساساً دافئاً في الوضع الليلي.
 
-3. **`src/components/layout/TopBar.tsx`** — إضافة `<ThemeToggle />` بجانب `LanguageToggle`.
+### 3) إصلاح تفاعل `applyCachedBrand` مع تبديل المظهر
 
-4. **`src/main.tsx`** — لف التطبيق بـ `<ThemeProvider>`.
+`SiteSettingsContext` يعيد توليد الـ palette عند تبديل الوضع الداكن عبر `MutationObserver` — جيد.
+لكن السكربت المضمّن في `index.html` يطبّق ألوان الكاش مرة واحدة فقط عند التحميل. عند تبديل المظهر قبل تحميل `SiteSettingsProvider` لا توجد مشكلة لأن MutationObserver يلتقطه. لا تغيير في هذا الجزء.
 
-5. **`src/index.css`** — مراجعة أن `.dark` معرّف ويحتوي على متغيرات HSL مناسبة (موجود مسبقاً حسب فحص الكود).
+### 4) فحص بصري بعد التعديلات
+
+استعراض الصفحات الأساسية في وضع داكن للتحقق:
+- الرئيسية، من نحن، البرامج، الحوكمة، المركز الإعلامي، الاستبيانات، الخدمات الإلكترونية، تواصل معنا، الدعم والمساعدة، الفوتر.
 
 ### ما لن يتغير
-- باقي مكونات TopBar وHeader.
-- نظام الألوان الأساسي — فقط نضمن أن `.dark` يعمل على كل المكونات التي تستخدم semantic tokens.
-- لوحة التحكم (الزر يظهر فقط في TopBar للموقع العام).
+- لوحة التحكم (admin) — تستخدم semantic tokens بالفعل.
+- مكونات shadcn في `ui/` — تستعمل tokens.
+- منطق `ThemeContext` و `ThemeToggle` — يعمل بشكل صحيح.
+- نظام ألوان الهوية الأساسي (الأخضر/الذهبي).
+- Overlays السوداء فوق الصور والفيديوهات (مقصودة في الوضعين).
 
-### السلوك
-- النقر يبدل الوضع فوراً مع animation 500ms للانكساف.
-- الاختيار يُحفظ ويستمر بين الجلسات.
-- لا flash عند تحميل الصفحة (يُطبق الوضع قبل render عبر inline script في `index.html` أو effect مبكر).
+### النتيجة المتوقعة
+كل عناصر الموقع تستجيب لتبديل الوضع الليلي بشكل متسق، الشعار في الفوتر وزر واتساب يندمجان مع الخلفية الداكنة، وكل النصوص والحدود تحافظ على تباين كافٍ.
