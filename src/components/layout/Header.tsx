@@ -36,19 +36,36 @@ export const Header = () => {
   const donateStyle = donateBg || donateFg ? { backgroundColor: donateBg, color: donateFg } : undefined;
 
 
+  // افتراضات الترجمة لكل مفتاح نظامي (تُستخدم لو لم يضع المدير تسمية مخصّصة)
+  const defaultLabelFor = (key: string | null): string => {
+    switch (key) {
+      case "home": return t.nav.home;
+      case "about": return t.nav.about;
+      case "programs": return t.nav.programs;
+      case "governance": return t.nav.governance;
+      case "media": return t.nav.media;
+      case "eservices": return t.nav.eservices;
+      case "surveys": return t.nav.surveys;
+      case "contact": return t.nav.contact;
+      case "support": return lang === "en" ? "Support" : "الدعم والمساعدة";
+      default: return "";
+    }
+  };
+
+  const headerLinks = (headerMenu ?? []).map((item) => {
+    const customLabel = lang === "en"
+      ? item.label_en || item.label_ar
+      : item.label_ar || item.label_en;
+    const label = customLabel || defaultLabelFor(item.key);
+    return { to: item.url, label, external: item.is_external };
+  });
+
   const links = [
-    { to: "/", label: t.nav.home },
-    { to: "/about", label: t.nav.about },
-    { to: "/programs", label: t.nav.programs },
-    { to: "/governance", label: t.nav.governance },
-    { to: "/media", label: t.nav.media },
-    { to: "/e-services", label: t.nav.eservices },
-    { to: "/surveys", label: t.nav.surveys },
-    { to: "/contact", label: t.nav.contact },
-    { to: "/support", label: lang === "en" ? "Support" : "الدعم والمساعدة" },
+    ...headerLinks,
     ...(menuPages ?? []).map((p) => ({
       to: `/p/${p.slug}`,
       label: (lang === "en" ? p.title_en : null) || p.title,
+      external: false,
     })),
   ];
 
