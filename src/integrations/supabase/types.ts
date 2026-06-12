@@ -514,6 +514,48 @@ export type Database = {
         }
         Relationships: []
       }
+      header_menu_items: {
+        Row: {
+          created_at: string
+          id: string
+          is_external: boolean
+          is_visible: boolean
+          key: string | null
+          kind: string
+          label_ar: string | null
+          label_en: string | null
+          sort_order: number
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_external?: boolean
+          is_visible?: boolean
+          key?: string | null
+          kind?: string
+          label_ar?: string | null
+          label_en?: string | null
+          sort_order?: number
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_external?: boolean
+          is_visible?: boolean
+          key?: string | null
+          kind?: string
+          label_ar?: string | null
+          label_en?: string | null
+          sort_order?: number
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       help_articles: {
         Row: {
           action_label: string | null
