@@ -105,11 +105,23 @@ export const Header = () => {
 
         {/* التنقل لسطح المكتب */}
         <nav className="hidden xl:flex items-center gap-0.5" aria-label="Main">
-          {links.map((l) => (
-            <NavLink key={l.to} to={l.to} end={l.to === "/"} className={linkClass}>
-              {l.label}
-            </NavLink>
-          ))}
+          {links.map((l) =>
+            l.external ? (
+              <a
+                key={l.to}
+                href={l.to}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-2 rounded-md text-sm font-semibold text-foreground/80 hover:text-primary hover:bg-primary/5 whitespace-nowrap"
+              >
+                {l.label}
+              </a>
+            ) : (
+              <NavLink key={l.to} to={l.to} end={l.to === "/"} className={linkClass}>
+                {l.label}
+              </NavLink>
+            )
+          )}
         </nav>
 
         <div className="flex items-center gap-1.5">
