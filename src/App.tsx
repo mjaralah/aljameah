@@ -347,6 +347,16 @@ const App = () => (
                 }
               />
 
+              <Route
+                path="/admin/header-menu"
+                element={
+                  <ProtectedAdminRoute requireAdmin>
+                    <AdminHeaderMenuPage />
+                  </ProtectedAdminRoute>
+                }
+              />
+
+
 
               {/* Public site (catch-all) */}
               <Route path="/*" element={<PublicRoutes />} />
