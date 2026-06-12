@@ -26,6 +26,9 @@ import {
   Mail,
   ExternalLink,
   HelpCircle,
+  BookOpen,
+  LifeBuoy,
+
 } from "lucide-react";
 import {
   Sidebar,
