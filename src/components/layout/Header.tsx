@@ -44,6 +44,7 @@ export const Header = () => {
     { to: "/e-services", label: t.nav.eservices },
     { to: "/surveys", label: t.nav.surveys },
     { to: "/contact", label: t.nav.contact },
+    { to: "/support", label: lang === "en" ? "Support" : "الدعم والمساعدة" },
     ...(menuPages ?? []).map((p) => ({
       to: `/p/${p.slug}`,
       label: (lang === "en" ? p.title_en : null) || p.title,
