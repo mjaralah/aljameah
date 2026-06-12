@@ -367,6 +367,7 @@ const App = () => (
         </TooltipProvider>
         </SiteSettingsProvider>
       </A11yProvider>
+      </ThemeProvider>
     </LanguageProvider>
   </QueryClientProvider>
 );
