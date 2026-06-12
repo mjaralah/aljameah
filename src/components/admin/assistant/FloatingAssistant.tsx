@@ -158,7 +158,8 @@ export function FloatingAssistant() {
           { name: "__search", weight: 0.7 },
           { name: "keywords", weight: 0.3 },
         ],
-        threshold: 0.45,
+        threshold: 0.4,
+        distance: 200,
         ignoreLocation: true,
         minMatchCharLength: 2,
         includeScore: true,
@@ -190,7 +191,17 @@ export function FloatingAssistant() {
 
     setTimeout(() => {
       const expanded = expandQuery(trimmed);
-      const results = fuse.search(expanded).slice(0, 6).map((r) => r.item);
+      let results = fuse.search(expanded).slice(0, 6).map((r) => r.item);
+
+      // Fallback: substring match on normalized + stemmed search index
+      if (results.length === 0) {
+        const tokens = expanded.split(" ").filter((t) => t.length >= 2);
+        const matched = articles.filter((a) =>
+          tokens.some((t) => a.__search.includes(t)),
+        );
+        results = matched.slice(0, 6);
+      }
+
       if (results.length === 0) {
         setMessages((m) =>
           pushActions([

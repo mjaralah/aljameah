@@ -1,84 +1,46 @@
-## الملاحظات والتشخيص
+## 1) ترتيب تبويبات صفحة `/admin/support-page`
 
-### 1) كثرة الألوان في بطاقات التصنيفات (مركز مساعدة المدير `/admin/help`)
-نعم — كخبير UI/UX، تعدد ألوان الخلفيات في البطاقات (وردي، أصفر، بنفسجي، أخضر، أزرق، خوخي…) **يُضعف الاحترافية** ويصرف الانتباه عن المحتوى. كبار اللاعبين (Intercom, Notion, Linear, Stripe, Atlassian) يستخدمون **بطاقات محايدة موحّدة** مع لمسة لون واحدة في الأيقونة فقط أو في الحد العلوي.
+**المشكلة:** رغم وجود `dir="rtl"` على الحاوية، تبويب «الإعدادات العامة» يظهر في أقصى اليسار بدل اليمين.
 
-### 2) صفحة الدعم العامة في لوحة التحكم (`/admin/support-page`)
-- تبويب «الإعدادات العامة» لا يُحاذي محتواه لليمين بشكل كامل (الحقول، التبديل، الزر).
-- التبويبات الحالية ملوّنة (أزرق/بنفسجي/برتقالي) — نفس مشكلة تعدد الألوان.
+**السبب:** مكوّن `Tabs` من Radix يستخدم `dir` خاص به (يقرأه من السياق)، وفي بعض الحالات لا يلتقط الاتجاه من الـ wrapper.
 
----
-
-## الخطة
-
-### أ) توحيد بطاقات التصنيفات — نمط احترافي بهوية واحدة
-
-**يطبَّق على:**
-- `src/pages/admin/AdminHelpPage.tsx` (لوحة التحكم)
-- `src/pages/Support.tsx` (الصفحة العامة) — لضمان الاتساق
-
-**التغيير البصري:**
-
-```text
-قبل (الحالي):                    بعد (المقترح):
-┌─────────┐ ┌─────────┐          ┌─────────┐ ┌─────────┐
-│ وردي    │ │ أصفر    │          │ ⬜ محايد│ │ ⬜ محايد│
-│ 🔴 من…  │ │ 🟡 برام…│          │ 🟢 من…  │ │ 🟢 برام…│
-└─────────┘ └─────────┘          └─────────┘ └─────────┘
-ضوضاء بصرية                       هدوء + تركيز على المحتوى
-```
-
-- خلفية البطاقة: `bg-card` موحّدة (أبيض/داكن حسب الثيم) + حد رفيع `border`.
-- الأيقونة فقط بلون **العلامة التجارية الأساسي** (`text-primary`) داخل دائرة `bg-primary/10`.
-- Hover: ارتفاع خفيف + حد `border-primary/40` + ظل ناعم.
-- حالة «نشط/مختار»: حد سميك `border-primary` + خلفية `bg-primary/5` + شارة العدد بلون primary.
-- شارة العدد: `bg-muted text-muted-foreground` (بدل خلفية بيضاء على ألوان متعددة).
-- إزالة `CATEGORY_COLORS` المتعددة من `AdminHelpPage.tsx` كلياً.
-
-النتيجة: شبكة هادئة، احترافية، تشبه مراكز مساعدة Intercom/Linear، والتركيز على العناوين والأرقام.
-
-### ب) تحسين صفحة `/admin/support-page`
-
-**1) RTL كامل وصحيح:**
-- إضافة `dir="rtl"` وفئة `text-right` للحاوية الجذرية لـ `SettingsTab`.
-- محاذاة كل `Label`, `Input`, `Textarea`, `Switch + Label`, وزر الحفظ إلى اليمين.
-- استبدال `flex items-center gap-2` في صف التبديل بـ `flex flex-row-reverse justify-end` (التبديل قبل النص بمنطق العربية).
-- توسعة عرض البطاقة من `max-w-2xl` إلى `max-w-3xl` مع padding أكبر `p-8`.
-
-**2) شريط تبويبات احترافي بلون موحّد (مثل تبويبات «الجمعية العمومية»):**
-
-استبدال الأسلوب الحالي (أزرق/بنفسجي/برتقالي) بنمط `AssemblyMembersEditor` الموحّد:
-
-```tsx
-<TabsList className="grid w-full grid-cols-4 h-auto p-1.5 bg-muted/70 
-  border-2 border-border rounded-xl shadow-sm gap-1.5">
-  <TabsTrigger className="gap-2 py-3 text-sm font-semibold rounded-lg 
-    transition-all
-    data-[state=active]:bg-primary 
-    data-[state=active]:text-primary-foreground 
-    data-[state=active]:font-bold 
-    data-[state=active]:shadow-md 
-    data-[state=active]:ring-2 
-    data-[state=active]:ring-primary/30">
-    <Icon /> العنوان <Badge>n</Badge>
-  </TabsTrigger>
-  ...
-</TabsList>
-```
-
-- **لون واحد فقط** (الأساسي) للتبويب النشط — اتساق مع باقي اللوحة.
-- شبكة `grid-cols-4` على الشاشات الكبيرة، `grid-cols-2` على الموبايل.
-- حد سميك، ظل، وحلقة `ring` حول النشط = تمييز قوي بدون فوضى ألوان.
-- شارات العدد بـ `variant="secondary"` محايدة.
+**الحل في `src/pages/admin/AdminSupportPage.tsx`:**
+- إضافة `dir="rtl"` صراحةً على `<Tabs ... dir="rtl">`.
+- التأكد أن أول `TabsTrigger` في الـ DOM هو "settings" (وهو كذلك بالفعل) — مع `dir="rtl"` على Radix، أول عنصر سيظهر في أقصى اليمين تلقائياً.
 
 ---
 
-## الملفات المتأثرة
+## 2) تحسين فهم المساعد العائم لجذور/سوابق الكلمات
 
-| الملف | التعديل |
-|---|---|
-| `src/pages/admin/AdminSupportPage.tsx` | RTL في `SettingsTab` + استبدال نمط `TabsList`/`TabsTrigger` بنمط Assembly الموحّد |
-| `src/pages/admin/AdminHelpPage.tsx` | حذف `CATEGORY_COLORS` متعدد الألوان + بطاقات بنمط محايد/primary |
-| `src/pages/Support.tsx` | نفس تحديث بطاقات التصنيفات للاتساق مع لوحة التحكم |
+**المشكلة:** "خبر" لا يُرجع نتائج بينما "الأخبار" يُرجع، و"حوكمة" مقابل "الحوكمة" نفس الشيء. السبب أن `normalizeArabic` لا يزيل أداة التعريف "ال" ولا اللواحق الشائعة، و Fuse يعتمد على threshold ثابت دون مطابقة جزئية (substring).
 
-— لا تغييرات في قاعدة البيانات. لا اعتماد على نماذج خارجية. لا تكاليف.
+**الحل في `src/lib/arabicNormalize.ts`:**
+
+أ) **إزالة السوابق العربية** من كل كلمة بعد التطبيع:
+- `ال` (أداة التعريف)
+- `وال` / `فال` / `بال` / `كال` / `لل`
+- حروف العطف/الجر المفردة في البداية: `و`، `ف`، `ب`، `ل`، `ك` (فقط إذا الكلمة > 3 أحرف بعد الإزالة)
+
+ب) **إزالة اللواحق الشائعة** (نهايات الجمع والتأنيث):
+- `ات`، `ون`، `ين`، `ها`، `هم`، `كم`، `نا`، `يه`، `يا`
+
+ج) دالة جديدة `stemArabic(word)` تطبّق (أ) + (ب) وتُستخدم داخل `normalizeArabic` على كل كلمة.
+
+د) إضافة `__search` يحوي النسخة المُجذّرة بالإضافة إلى النص الأصلي المطبّع (مضاعفة الفرص للمطابقة).
+
+**الحل في `src/components/admin/assistant/FloatingAssistant.tsx`:**
+
+- في `expandQuery`: تطبيق `stemArabic` على كل كلمة في الاستعلام قبل البحث في `SYNONYM_GROUPS`.
+- خفض `threshold` من 0.45 إلى 0.4، وإضافة fallback: إذا أعاد Fuse 0 نتيجة، نُجرب **substring match** يدوي على `__search` (يلتقط أي تطابق جزئي مثل "خبر" داخل "اخبار").
+- `minMatchCharLength` يبقى 2.
+
+**تأثيرات جانبية:**
+- لا تغييرات في قاعدة البيانات.
+- لا تغييرات في الواجهة (UI) للمساعد، فقط منطق البحث.
+
+**الملفات المعدّلة:**
+1. `src/pages/admin/AdminSupportPage.tsx` — إضافة `dir="rtl"` على `<Tabs>`.
+2. `src/lib/arabicNormalize.ts` — إضافة `stemArabic` وتحسين `normalizeArabic` و `expandQuery`.
+3. `src/components/admin/assistant/FloatingAssistant.tsx` — fallback substring match + خفض threshold.
+
+لا تكاليف، لا نماذج خارجية، لا تغييرات في الـ schema.
