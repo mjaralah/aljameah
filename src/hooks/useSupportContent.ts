@@ -8,6 +8,7 @@ export type SupportSettings = {
   contact_form_enabled: boolean;
   contact_form_title: string;
   quick_links_title: string;
+  quick_links_enabled: boolean;
 };
 
 export type SupportCategory = {

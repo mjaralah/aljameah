@@ -257,7 +257,7 @@ export default function Support() {
         )}
 
         {/* Quick links */}
-        {quickLinks.length > 0 && (
+        {settings?.quick_links_enabled !== false && quickLinks.length > 0 && (
           <Card className="p-6 md:p-8 space-y-5">
             <div>
               <Badge variant="secondary" className="mb-3">مصادر</Badge>
