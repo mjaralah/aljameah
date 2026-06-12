@@ -27,7 +27,10 @@ export const TopBar = () => {
             {t.brand.registration}: <span className="font-semibold">{regNumber}</span>
           </span>
         </div>
-        <LanguageToggle compact />
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          <LanguageToggle compact />
+        </div>
       </div>
     </div>
   );
