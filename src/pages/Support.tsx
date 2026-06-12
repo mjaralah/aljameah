@@ -240,6 +240,7 @@ export default function Support() {
             <form onSubmit={onContactSubmit} className="space-y-3">
               <Input name="name" placeholder="الاسم الكامل" required />
               <Input name="email" type="email" placeholder="البريد الإلكتروني" required />
+              <Input name="phone" type="tel" placeholder="رقم الجوال" required />
               <Input name="subject" placeholder="الموضوع (اختياري)" />
               <Textarea name="message" placeholder="اكتب رسالتك هنا..." rows={5} required />
               <Button type="submit" className="w-full gap-2">
