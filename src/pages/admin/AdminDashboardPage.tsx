@@ -122,6 +122,37 @@ export default function AdminDashboardPage() {
   return (
     <AdminLayout title="مرحباً بك" description="نظرة عامة على محتوى الموقع والطلبات">
       <div className="space-y-8">
+        {/* Help Center CTA — prominent for first-time / non-technical admins */}
+        <section>
+          <Card className="relative overflow-hidden border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10 hover:border-primary/40 transition-all">
+            <CardContent className="p-6 md:p-8">
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-5">
+                <div className="shrink-0 h-14 w-14 rounded-2xl bg-primary text-primary-foreground grid place-items-center shadow-lg">
+                  <HelpCircle className="h-7 w-7" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-lg md:text-xl font-bold text-primary mb-1">
+                    هل تحتاج مساعدة في إدارة الموقع؟
+                  </h2>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    مركز المساعدة للمدير يحتوي على دليل تفاعلي وإجابات لأهم الأسئلة. مثالي إذا كنت تدخل لوحة التحكم لأول مرة.
+                  </p>
+                </div>
+                <Button
+                  asChild
+                  size="lg"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-md shrink-0"
+                >
+                  <Link to="/admin/help" className="gap-2">
+                    <Lightbulb className="h-4 w-4" />
+                    اذهب إلى مركز المساعدة
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
         <section>
           <h2 className="text-sm font-semibold text-muted-foreground mb-3">الطلبات الواردة</h2>
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
