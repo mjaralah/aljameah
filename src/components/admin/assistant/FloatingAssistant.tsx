@@ -1,13 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Fuse from "fuse.js";
 import {
   Bot,
-  HelpCircle,
-  Search,
   Send,
   Sparkles,
-  X,
   RotateCcw,
   ArrowLeft,
   ExternalLink,
@@ -24,6 +21,9 @@ import {
   Settings,
   Info,
   LayoutDashboard,
+  Home,
+  Search,
+  BookOpen,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -31,8 +31,8 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { expandQuery, normalizeArabic, normalizeFields } from "@/lib/arabicNormalize";
 
 type Article = {
   id: string;
@@ -52,6 +52,7 @@ type ChatMessage =
   | { id: string; role: "assistant"; kind: "categories" }
   | { id: string; role: "assistant"; kind: "article"; article: Article }
   | { id: string; role: "assistant"; kind: "results"; results: Article[]; query: string }
+  | { id: string; role: "assistant"; kind: "actions" }
   | { id: string; role: "user"; kind: "text"; text: string };
 
 const CATEGORIES: { key: string; label: string; icon: any }[] = [
@@ -68,7 +69,7 @@ const CATEGORIES: { key: string; label: string; icon: any }[] = [
   { key: "footer", label: "التذييل", icon: PanelBottom },
   { key: "governance", label: "الحوكمة", icon: ScrollText },
   { key: "requests", label: "الطلبات والرسائل", icon: Inbox },
-  { key: "settings", label: "الإعدادات", icon: Settings },
+  { key: "settings", label: "الإعدادات والهوية", icon: Settings },
 ];
 
 const ROUTE_HINTS: Record<string, string> = {
@@ -98,12 +99,16 @@ const ROUTE_HINTS: Record<string, string> = {
 
 const uid = () => Math.random().toString(36).slice(2, 11);
 
+type IndexedArticle = Article & { __search: string };
+
 export function FloatingAssistant() {
   const [open, setOpen] = useState(false);
-  const [articles, setArticles] = useState<Article[]>([]);
+  const [articles, setArticles] = useState<IndexedArticle[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const lastMsgRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -117,7 +122,12 @@ export function FloatingAssistant() {
         .eq("is_published", true)
         .order("category")
         .order("sort_order");
-      if (data) setArticles(data as Article[]);
+      if (data) {
+        const indexed = (data as Article[]).map((a) =>
+          normalizeFields(a, ["title", "keywords", "content"]),
+        );
+        setArticles(indexed);
+      }
     })();
   }, [open, articles.length]);
 
@@ -140,25 +150,37 @@ export function FloatingAssistant() {
     ]);
   }, [open, location.pathname, messages.length]);
 
-  // Fuse instance
+  // Fuse instance — searches on normalized text + keywords
   const fuse = useMemo(
     () =>
       new Fuse(articles, {
         keys: [
-          { name: "title", weight: 0.5 },
+          { name: "__search", weight: 0.7 },
           { name: "keywords", weight: 0.3 },
-          { name: "content", weight: 0.2 },
         ],
-        threshold: 0.4,
+        threshold: 0.45,
         ignoreLocation: true,
+        minMatchCharLength: 2,
+        includeScore: true,
       }),
     [articles],
   );
 
-  // Auto scroll
+  // Auto-scroll to START of last assistant message (so user reads from top)
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+    const last = messages[messages.length - 1];
+    if (!last) return;
+    setTimeout(() => {
+      if (lastMsgRef.current) {
+        lastMsgRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 50);
   }, [messages]);
+
+  const pushActions = (msgs: ChatMessage[]): ChatMessage[] => [
+    ...msgs,
+    { id: uid(), role: "assistant", kind: "actions" },
+  ];
 
   const sendUserMessage = (text: string) => {
     const trimmed = text.trim();
@@ -167,22 +189,32 @@ export function FloatingAssistant() {
     setInput("");
 
     setTimeout(() => {
-      const results = fuse.search(trimmed).slice(0, 5).map((r) => r.item);
+      const expanded = expandQuery(trimmed);
+      const results = fuse.search(expanded).slice(0, 6).map((r) => r.item);
       if (results.length === 0) {
-        setMessages((m) => [
-          ...m,
-          {
-            id: uid(),
-            role: "assistant",
-            kind: "text",
-            text: "لم أجد إجابة مطابقة. جرّب كلمات أخرى أو اختر القسم من القائمة:",
-          },
-          { id: uid(), role: "assistant", kind: "categories" },
-        ]);
+        setMessages((m) =>
+          pushActions([
+            ...m,
+            {
+              id: uid(),
+              role: "assistant",
+              kind: "text",
+              text: "لم أجد إجابة مطابقة 🤔\nجرّب كلمات أخرى مثل: شعار، ألوان، خبر، نموذج، حوكمة... أو اختر القسم المناسب:",
+            },
+            { id: uid(), role: "assistant", kind: "categories" },
+          ]),
+        );
       } else if (results.length === 1) {
-        setMessages((m) => [...m, { id: uid(), role: "assistant", kind: "article", article: results[0] }]);
+        setMessages((m) =>
+          pushActions([...m, { id: uid(), role: "assistant", kind: "article", article: results[0] }]),
+        );
       } else {
-        setMessages((m) => [...m, { id: uid(), role: "assistant", kind: "results", results, query: trimmed }]);
+        setMessages((m) =>
+          pushActions([
+            ...m,
+            { id: uid(), role: "assistant", kind: "results", results, query: trimmed },
+          ]),
+        );
       }
     }, 120);
   };
@@ -195,25 +227,46 @@ export function FloatingAssistant() {
     ]);
     const items = articles.filter((a) => a.category === catKey);
     if (items.length === 0) {
-      setMessages((m) => [
-        ...m,
-        { id: uid(), role: "assistant", kind: "text", text: "لا توجد مواضيع منشورة بعد في هذا القسم." },
-      ]);
+      setMessages((m) =>
+        pushActions([
+          ...m,
+          { id: uid(), role: "assistant", kind: "text", text: "لا توجد مواضيع منشورة بعد في هذا القسم." },
+        ]),
+      );
       return;
     }
-    setMessages((m) => [
-      ...m,
-      { id: uid(), role: "assistant", kind: "results", results: items, query: catLabel },
-    ]);
+    setMessages((m) =>
+      pushActions([
+        ...m,
+        { id: uid(), role: "assistant", kind: "results", results: items, query: catLabel },
+      ]),
+    );
   };
 
   const openArticle = (article: Article) => {
-    setMessages((m) => [...m, { id: uid(), role: "assistant", kind: "article", article }]);
+    setMessages((m) => pushActions([...m, { id: uid(), role: "assistant", kind: "article", article }]));
   };
 
-  const reset = () => {
-    setMessages([]);
+  const goHome = () => {
+    setMessages((m) => [
+      ...m,
+      { id: uid(), role: "user", kind: "text", text: "العودة للقائمة الرئيسية" },
+      {
+        id: uid(),
+        role: "assistant",
+        kind: "text",
+        text: "اختر القسم الذي تريد المساعدة فيه:",
+      },
+      { id: uid(), role: "assistant", kind: "categories" },
+    ]);
   };
+
+  const newSearch = () => {
+    setInput("");
+    setTimeout(() => inputRef.current?.focus(), 100);
+  };
+
+  const reset = () => setMessages([]);
 
   return (
     <>
@@ -232,11 +285,7 @@ export function FloatingAssistant() {
       </button>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent
-          side="left"
-          dir="rtl"
-          className="w-full sm:max-w-md p-0 flex flex-col gap-0"
-        >
+        <SheetContent side="left" dir="rtl" className="w-full sm:max-w-md p-0 flex flex-col gap-0">
           <SheetHeader className="p-4 border-b bg-gradient-to-l from-primary to-primary/80 text-primary-foreground space-y-1">
             <SheetTitle className="text-primary-foreground flex items-center gap-2">
               <div className="h-9 w-9 rounded-xl bg-white/15 grid place-items-center">
@@ -246,6 +295,18 @@ export function FloatingAssistant() {
                 <p className="font-bold">المساعد الذكي</p>
                 <p className="text-xs font-normal opacity-90">دليلك التفاعلي لإدارة الموقع</p>
               </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-primary-foreground hover:bg-white/15"
+                onClick={() => {
+                  setOpen(false);
+                  navigate("/admin/help-center");
+                }}
+                title="فتح مركز المساعدة الكامل"
+              >
+                <BookOpen className="h-4 w-4" />
+              </Button>
               <Button
                 variant="ghost"
                 size="icon"
@@ -260,17 +321,23 @@ export function FloatingAssistant() {
 
           <ScrollArea className="flex-1 px-4 py-4" ref={scrollRef as any}>
             <div className="space-y-3">
-              {messages.map((msg) => (
-                <MessageRow
+              {messages.map((msg, idx) => (
+                <div
                   key={msg.id}
-                  msg={msg}
-                  onCategory={pickCategory}
-                  onArticle={openArticle}
-                  onNavigate={(url) => {
-                    setOpen(false);
-                    navigate(url);
-                  }}
-                />
+                  ref={idx === messages.length - 1 ? lastMsgRef : undefined}
+                >
+                  <MessageRow
+                    msg={msg}
+                    onCategory={pickCategory}
+                    onArticle={openArticle}
+                    onNavigate={(url) => {
+                      setOpen(false);
+                      navigate(url);
+                    }}
+                    onHome={goHome}
+                    onNewSearch={newSearch}
+                  />
+                </div>
               ))}
             </div>
           </ScrollArea>
@@ -283,6 +350,7 @@ export function FloatingAssistant() {
             className="border-t p-3 bg-background flex gap-2"
           >
             <Input
+              ref={inputRef}
               placeholder="اكتب سؤالك هنا..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -304,11 +372,15 @@ function MessageRow({
   onCategory,
   onArticle,
   onNavigate,
+  onHome,
+  onNewSearch,
 }: {
   msg: ChatMessage;
   onCategory: (key: string) => void;
   onArticle: (a: Article) => void;
   onNavigate: (url: string) => void;
+  onHome: () => void;
+  onNewSearch: () => void;
 }) {
   if (msg.role === "user") {
     return (
@@ -334,6 +406,21 @@ function MessageRow({
       <div className="rounded-2xl rounded-tl-sm bg-muted px-4 py-2 text-sm whitespace-pre-wrap leading-relaxed">
         {msg.text}
       </div>,
+    );
+  }
+
+  if (msg.kind === "actions") {
+    return (
+      <div className="flex flex-wrap gap-2 pr-10">
+        <Button size="sm" variant="outline" className="gap-1.5" onClick={onHome}>
+          <Home className="h-3.5 w-3.5" />
+          القائمة الرئيسية
+        </Button>
+        <Button size="sm" variant="outline" className="gap-1.5" onClick={onNewSearch}>
+          <Search className="h-3.5 w-3.5" />
+          بحث جديد
+        </Button>
+      </div>
     );
   }
 
@@ -394,11 +481,7 @@ function MessageRow({
         )}
         <div className="text-sm whitespace-pre-wrap leading-relaxed text-foreground">{a.content}</div>
         {a.action_label && a.action_url && (
-          <Button
-            size="sm"
-            className="w-full gap-2"
-            onClick={() => onNavigate(a.action_url!)}
-          >
+          <Button size="sm" className="w-full gap-2" onClick={() => onNavigate(a.action_url!)}>
             <ExternalLink className="h-4 w-4" />
             {a.action_label}
           </Button>
