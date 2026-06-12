@@ -52,6 +52,7 @@ import AdminMediaCenterPage from "./pages/admin/AdminMediaCenterPage.tsx";
 import AdminFormsPage from "./pages/admin/AdminFormsPage.tsx";
 import AdminEmailTemplatesPage from "./pages/admin/AdminEmailTemplatesPage.tsx";
 import AdminPageBuilderPage from "./pages/admin/AdminPageBuilderPage.tsx";
+import AdminHelpCenterPage from "./pages/admin/AdminHelpCenterPage.tsx";
 import CustomFormPage from "./pages/eservices/CustomFormPage.tsx";
 import CustomPage from "./pages/CustomPage.tsx";
 import { ProtectedAdminRoute } from "./components/admin/ProtectedAdminRoute.tsx";
@@ -310,6 +311,14 @@ const App = () => (
                 element={
                   <ProtectedAdminRoute>
                     <AdminPageBuilderPage />
+                  </ProtectedAdminRoute>
+                }
+              />
+              <Route
+                path="/admin/help-center"
+                element={
+                  <ProtectedAdminRoute requireAdmin>
+                    <AdminHelpCenterPage />
                   </ProtectedAdminRoute>
                 }
               />

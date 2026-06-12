@@ -514,6 +514,51 @@ export type Database = {
         }
         Relationships: []
       }
+      help_articles: {
+        Row: {
+          action_label: string | null
+          action_url: string | null
+          category: string
+          content: string
+          created_at: string
+          id: string
+          is_published: boolean
+          keywords: string[]
+          media_url: string | null
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          action_label?: string | null
+          action_url?: string | null
+          category: string
+          content: string
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          keywords?: string[]
+          media_url?: string | null
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          action_label?: string | null
+          action_url?: string | null
+          category?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          keywords?: string[]
+          media_url?: string | null
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       hero_slides: {
         Row: {
           created_at: string

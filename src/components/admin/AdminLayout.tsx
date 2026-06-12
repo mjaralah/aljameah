@@ -25,6 +25,7 @@ import {
   PanelBottom,
   Mail,
   ExternalLink,
+  HelpCircle,
 } from "lucide-react";
 import {
   Sidebar,
@@ -45,6 +46,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { cn } from "@/lib/utils";
+import { FloatingAssistant } from "@/components/admin/assistant/FloatingAssistant";
 
 type NavItem = {
   to: string;
@@ -81,6 +83,7 @@ const settingsItems: NavItem[] = [
   { to: "/admin/settings", label: "الإعدادات العامة", icon: Settings, adminOnly: true },
   { to: "/admin/users", label: "المستخدمون والأدوار", icon: UserCog, adminOnly: true },
   { to: "/admin/email-templates", label: "قوالب البريد", icon: Mail, adminOnly: true },
+  { to: "/admin/help-center", label: "مركز المساعدة (المساعد الذكي)", icon: HelpCircle, adminOnly: true },
 ];
 
 function AdminSidebar() {
@@ -239,6 +242,7 @@ export function AdminLayout({ children, title, description, actions }: {
           </header>
           <main className="flex-1 p-4 md:p-6 overflow-x-hidden">{children}</main>
         </div>
+        <FloatingAssistant />
       </div>
     </SidebarProvider>
   );
