@@ -53,6 +53,8 @@ import AdminFormsPage from "./pages/admin/AdminFormsPage.tsx";
 import AdminEmailTemplatesPage from "./pages/admin/AdminEmailTemplatesPage.tsx";
 import AdminPageBuilderPage from "./pages/admin/AdminPageBuilderPage.tsx";
 import AdminHelpCenterPage from "./pages/admin/AdminHelpCenterPage.tsx";
+import AdminSupportPage from "./pages/admin/AdminSupportPage.tsx";
+import Support from "./pages/Support.tsx";
 import CustomFormPage from "./pages/eservices/CustomFormPage.tsx";
 import CustomPage from "./pages/CustomPage.tsx";
 import { ProtectedAdminRoute } from "./components/admin/ProtectedAdminRoute.tsx";
@@ -98,6 +100,8 @@ const PublicRoutes = () => (
       <Route path="/surveys" element={<PublicRouteGuard pageKey="surveys"><SurveysPage /></PublicRouteGuard>} />
       <Route path="/surveys/:surveyId/results" element={<PublicRouteGuard pageKey="surveys"><SurveyResults /></PublicRouteGuard>} />
       <Route path="/contact" element={<PublicRouteGuard pageKey="contact"><Contact /></PublicRouteGuard>} />
+      <Route path="/support" element={<Support />} />
+      <Route path="/help" element={<Support />} />
       <Route path="/donate" element={<Stub titleKey="donate" pageKey="donate" />} />
       <Route path="/search" element={<Stub titleKey="search" pageKey="search" />} />
       <Route path="/privacy-policy" element={<Stub titleKey="privacy" pageKey="privacy" />} />
@@ -322,6 +326,15 @@ const App = () => (
                   </ProtectedAdminRoute>
                 }
               />
+              <Route
+                path="/admin/support-page"
+                element={
+                  <ProtectedAdminRoute requireAdmin>
+                    <AdminSupportPage />
+                  </ProtectedAdminRoute>
+                }
+              />
+
 
               {/* Public site (catch-all) */}
               <Route path="/*" element={<PublicRoutes />} />

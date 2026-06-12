@@ -1063,6 +1063,167 @@ export type Database = {
         }
         Relationships: []
       }
+      support_categories: {
+        Row: {
+          color: string
+          created_at: string
+          description: string | null
+          icon: string
+          id: string
+          is_published: boolean
+          label: string
+          link: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          is_published?: boolean
+          label: string
+          link?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          is_published?: boolean
+          label?: string
+          link?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      support_faqs: {
+        Row: {
+          answer: string
+          category_id: string | null
+          created_at: string
+          id: string
+          is_published: boolean
+          keywords: string[]
+          question: string
+          sort_order: number
+          updated_at: string
+          view_count: number
+        }
+        Insert: {
+          answer: string
+          category_id?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          keywords?: string[]
+          question: string
+          sort_order?: number
+          updated_at?: string
+          view_count?: number
+        }
+        Update: {
+          answer?: string
+          category_id?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          keywords?: string[]
+          question?: string
+          sort_order?: number
+          updated_at?: string
+          view_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_faqs_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "support_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_quick_links: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string
+          id: string
+          is_published: boolean
+          label: string
+          link_type: string
+          sort_order: number
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          is_published?: boolean
+          label: string
+          link_type?: string
+          sort_order?: number
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          is_published?: boolean
+          label?: string
+          link_type?: string
+          sort_order?: number
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
+      support_settings: {
+        Row: {
+          contact_form_enabled: boolean
+          contact_form_title: string
+          created_at: string
+          id: boolean
+          page_subtitle: string
+          page_title: string
+          quick_links_title: string
+          search_placeholder: string
+          updated_at: string
+        }
+        Insert: {
+          contact_form_enabled?: boolean
+          contact_form_title?: string
+          created_at?: string
+          id?: boolean
+          page_subtitle?: string
+          page_title?: string
+          quick_links_title?: string
+          search_placeholder?: string
+          updated_at?: string
+        }
+        Update: {
+          contact_form_enabled?: boolean
+          contact_form_title?: string
+          created_at?: string
+          id?: boolean
+          page_subtitle?: string
+          page_title?: string
+          quick_links_title?: string
+          search_placeholder?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       survey_questions: {
         Row: {
           created_at: string
