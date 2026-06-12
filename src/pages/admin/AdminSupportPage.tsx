@@ -151,15 +151,19 @@ function SettingsTab({
   if (loading) return <Loader2 className="animate-spin mx-auto mt-10" />;
 
   return (
-    <Card className="p-6 space-y-4 max-w-2xl">
+    <Card dir="rtl" className="p-6 md:p-8 space-y-5 max-w-3xl text-right">
       <Field label="عنوان الصفحة">
         <Input
+          dir="rtl"
+          className="text-right"
           value={form.page_title ?? ""}
           onChange={(e) => setForm({ ...form, page_title: e.target.value })}
         />
       </Field>
       <Field label="العنوان الفرعي">
         <Textarea
+          dir="rtl"
+          className="text-right"
           rows={2}
           value={form.page_subtitle ?? ""}
           onChange={(e) => setForm({ ...form, page_subtitle: e.target.value })}
@@ -167,33 +171,43 @@ function SettingsTab({
       </Field>
       <Field label="نص حقل البحث">
         <Input
+          dir="rtl"
+          className="text-right"
           value={form.search_placeholder ?? ""}
           onChange={(e) => setForm({ ...form, search_placeholder: e.target.value })}
         />
       </Field>
       <Field label="عنوان نموذج التواصل">
         <Input
+          dir="rtl"
+          className="text-right"
           value={form.contact_form_title ?? ""}
           onChange={(e) => setForm({ ...form, contact_form_title: e.target.value })}
         />
       </Field>
       <Field label="عنوان قسم الروابط السريعة">
         <Input
+          dir="rtl"
+          className="text-right"
           value={form.quick_links_title ?? ""}
           onChange={(e) => setForm({ ...form, quick_links_title: e.target.value })}
         />
       </Field>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-3 p-3 rounded-lg border bg-muted/30">
+        <Label className="text-sm font-semibold cursor-pointer">
+          تفعيل نموذج التواصل في الصفحة
+        </Label>
         <Switch
           checked={!!form.contact_form_enabled}
           onCheckedChange={(v) => setForm({ ...form, contact_form_enabled: v })}
         />
-        <Label>تفعيل نموذج التواصل في الصفحة</Label>
       </div>
-      <Button onClick={save} disabled={saving} className="gap-2">
-        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-        حفظ التغييرات
-      </Button>
+      <div className="flex justify-start pt-2">
+        <Button onClick={save} disabled={saving} className="gap-2">
+          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          حفظ التغييرات
+        </Button>
+      </div>
     </Card>
   );
 }
