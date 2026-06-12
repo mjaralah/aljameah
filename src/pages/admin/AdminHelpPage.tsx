@@ -225,26 +225,38 @@ export default function AdminHelpPage() {
               )}
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-              {categoriesWithCounts.map((c, idx) => {
-                const colors = CATEGORY_COLORS[idx % CATEGORY_COLORS.length];
+              {categoriesWithCounts.map((c) => {
                 const isActive = activeCategory === c.key;
                 return (
                   <button
                     key={c.key}
                     onClick={() => selectCategory(isActive ? null : c.key)}
                     className={cn(
-                      "group rounded-2xl border-2 p-4 text-right transition-all hover:shadow-md hover:-translate-y-0.5 bg-gradient-to-br",
-                      colors,
+                      "group rounded-2xl border p-4 text-right transition-all bg-card",
+                      "hover:shadow-md hover:-translate-y-0.5 hover:border-primary/40",
                       isActive
-                        ? "ring-2 ring-primary ring-offset-2 ring-offset-background border-primary"
-                        : "",
+                        ? "border-2 border-primary bg-primary/5 shadow-sm"
+                        : "border-border",
                     )}
                   >
                     <div className="flex items-start justify-between mb-2">
-                      <div className="h-10 w-10 rounded-xl bg-background/80 grid place-items-center shadow-sm">
+                      <div
+                        className={cn(
+                          "h-10 w-10 rounded-xl grid place-items-center transition-colors",
+                          isActive
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-primary/10 text-primary group-hover:bg-primary/15",
+                        )}
+                      >
                         <Icon name={c.icon} className="h-5 w-5" />
                       </div>
-                      <Badge variant="secondary" className="text-[10px] bg-background/80">
+                      <Badge
+                        variant="secondary"
+                        className={cn(
+                          "text-[10px]",
+                          isActive && "bg-primary/15 text-primary",
+                        )}
+                      >
                         {c.count}
                       </Badge>
                     </div>
