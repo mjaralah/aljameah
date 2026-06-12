@@ -301,9 +301,10 @@ export function FloatingAssistant() {
                 className="text-primary-foreground hover:bg-white/15"
                 onClick={() => {
                   setOpen(false);
-                  navigate("/admin/help-center");
+                  navigate("/admin/help");
                 }}
                 title="فتح مركز المساعدة الكامل"
+
               >
                 <BookOpen className="h-4 w-4" />
               </Button>
