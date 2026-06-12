@@ -4,7 +4,7 @@ import { Heart, Menu, Search, Gift, HandHeart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useMenuPages, useSiteSettings } from "@/hooks/usePublicContent";
+import { useMenuPages, useSiteSettings, useHeaderMenu } from "@/hooks/usePublicContent";
 import { cn } from "@/lib/utils";
 
 // رأس الصفحة بالشعار والتنقل الرئيسي
