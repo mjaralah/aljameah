@@ -160,7 +160,7 @@ export default function AdminHelpPage() {
 
   return (
     <AdminLayout
-      title="مركز المساعدة"
+      title="مركز المساعدة للمدير"
       description="دليلك التفاعلي لإدارة الموقع كمحترف"
     >
       <div className="space-y-8" dir="rtl">
