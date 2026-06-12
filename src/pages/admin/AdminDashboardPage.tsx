@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Newspaper,
   FolderKanban,
@@ -15,8 +16,11 @@ import {
   ThumbsUp,
   ArrowLeft,
   FileText,
+  HelpCircle,
+  Lightbulb,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+
 
 type StatCard = {
   label: string;
