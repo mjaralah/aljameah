@@ -281,19 +281,69 @@ export function FloatingAssistant() {
 
   return (
     <>
-      {/* Floating button */}
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        aria-label="فتح المساعد الذكي"
-        className="fixed bottom-6 left-6 z-50 group h-14 w-14 rounded-full bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-lg hover:shadow-xl hover:scale-105 transition-all grid place-items-center"
+      {/* Floating button — Sparkling Magic FAB */}
+      <div
+        dir="rtl"
+        className="fixed bottom-6 left-6 z-50 flex items-center gap-3"
       >
-        <Bot className="h-6 w-6" />
-        <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-accent text-accent-foreground text-[10px] font-bold grid place-items-center shadow">
-          ؟
-        </span>
-        <span className="sr-only">المساعد الذكي</span>
-      </button>
+        {/* Tooltip prompt (desktop only, dismissable) */}
+        {showAssistantTip && (
+          <div className="relative hidden sm:flex items-center animate-fade-in">
+            <div className="bg-background px-4 py-2.5 rounded-2xl shadow-xl shadow-primary/10 border border-primary/10 flex items-center gap-2.5">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary/60 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary" />
+              </span>
+              <p className="text-primary text-sm font-bold whitespace-nowrap">
+                أهلاً بك، كيف أساعدك؟
+              </p>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  dismissAssistantTip();
+                }}
+                aria-label="إغلاق التلميح"
+                className="ml-1 h-5 w-5 rounded-full hover:bg-muted grid place-items-center text-muted-foreground"
+              >
+                ×
+              </button>
+            </div>
+            <div className="absolute -left-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-background border-b border-l border-primary/10 rotate-[-45deg]" />
+          </div>
+        )}
+
+        {/* Main button with layered effects */}
+        <div className="relative group">
+          {/* Outer glow halo */}
+          <div className="absolute -inset-3 bg-primary/20 rounded-full blur-xl group-hover:bg-primary/40 transition-all duration-500" aria-hidden="true" />
+          {/* Rotating gradient ring */}
+          <div className="absolute -inset-1 rounded-full opacity-60 group-hover:opacity-100 transition-opacity animate-spin [animation-duration:8s] bg-[conic-gradient(from_0deg,hsl(var(--primary)),hsl(var(--accent)),hsl(var(--primary)))]" aria-hidden="true" />
+
+          <button
+            type="button"
+            onClick={() => {
+              setOpen(true);
+              dismissAssistantTip();
+            }}
+            aria-label="فتح المساعد الذكي"
+            className="relative h-16 w-16 rounded-full bg-gradient-to-br from-primary to-primary/60 text-primary-foreground flex items-center justify-center shadow-2xl border-2 border-white/30 transition-all duration-300 hover:scale-110 active:scale-95"
+          >
+            {/* Shine overlay */}
+            <span className="absolute inset-0 rounded-full bg-gradient-to-t from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+            <Sparkles className="h-7 w-7 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" />
+            {/* Status dot */}
+            <span className="absolute top-1 right-1 h-3.5 w-3.5 bg-accent rounded-full border-2 border-background grid place-items-center">
+              <span className="h-1 w-1 bg-white rounded-full" />
+            </span>
+            <span className="sr-only">المساعد الذكي</span>
+          </button>
+
+          {/* Floating orbital particles */}
+          <span className="absolute -top-2 -left-2 w-2 h-2 bg-accent rounded-full animate-ping" aria-hidden="true" />
+          <span className="absolute -bottom-1 -right-1 w-1.5 h-1.5 bg-primary/40 rounded-full animate-pulse" aria-hidden="true" />
+        </div>
+      </div>
 
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="left" dir="rtl" className="w-full sm:max-w-md p-0 flex flex-col gap-0">
