@@ -1,28 +1,37 @@
 ## الخطة
 
-تحديث ملف واحد فقط: `src/components/admin/assistant/FloatingAssistant.tsx`
+إضافة زر تبديل الوضع الليلي بتصميم Eclipse Morph في الـ TopBar.
 
-### التغييرات على الزر العائم
+### الملفات الجديدة
 
-استبدال الزر الحالي (دائري بسيط بأيقونة `Bot` وتدرج primary) بتصميم Sparkling Magic FAB:
+1. **`src/contexts/ThemeContext.tsx`** — Context يدير الوضع:
+   - state: `theme: "light" | "dark"`
+   - يحفظ في `localStorage` بمفتاح `site_theme`
+   - يحترم `prefers-color-scheme` كقيمة أولية
+   - يطبق/يزيل class `dark` على `<html>`
 
-1. **الأيقونة**: استبدال `Bot` بأيقونة `Sparkles` من lucide-react لإيحاء "السحر/الذكاء".
-2. **التأثيرات الطبقية**:
-   - هالة توهج خارجية (`blur-xl`) بلون teal تتوسع عند hover.
-   - حلقة دوارة بطيئة (8 ثوانٍ) بتدرج من teal إلى amber حول الزر.
-   - الزر الأساسي بتدرج `from-[#1b7a7a] to-[#0d4a4a]` مع حدود بيضاء شفافة وظل عميق.
-   - نقطة حالة ذهبية (`amber-400`) في الزاوية العلوية.
-   - جزيئات صغيرة عائمة (amber + teal) بتأثير ping/pulse حول الزر.
-3. **تلميح نصي عائم** (يظهر على الشاشات `sm` فما فوق، مخفي على الموبايل): بطاقة بيضاء بجوار الزر "أهلاً بك، كيف أساعدك؟" مع نقطة نبض. يختفي بعد فتح المساعد لأول مرة في الجلسة (sessionStorage key مثل `admin_assistant_tip_dismissed`).
-4. **الحركة**: `hover:scale-110` + `active:scale-95`.
-5. **الموضع**: نفس الموضع الحالي (`fixed bottom-6 left-6 z-50`).
-6. **إمكانية الوصول**: `aria-label="فتح المساعد الذكي"` يبقى كما هو.
+2. **`src/components/layout/ThemeToggle.tsx`** — الزر بتصميم Eclipse Morph:
+   - أيقونة دائرية بأشعة شمس + قمر منزلق (ظل دائري ينزلق ليكسف الشمس)
+   - الأشعة تتقلص وتختفي عند التحول للوضع الليلي
+   - الظل ينزلق من الزاوية ليغطي الشمس جزئياً مكوناً هلالاً
+   - يستخدم `aria-label="تبديل الوضع الليلي / النهاري"` و `aria-pressed`
+   - tooltip "المظهر" يظهر عند hover
+   - الحركة تشتغل عند **النقر** (state-based) وليس فقط hover
+
+### الملفات المعدّلة
+
+3. **`src/components/layout/TopBar.tsx`** — إضافة `<ThemeToggle />` بجانب `LanguageToggle`.
+
+4. **`src/main.tsx`** — لف التطبيق بـ `<ThemeProvider>`.
+
+5. **`src/index.css`** — مراجعة أن `.dark` معرّف ويحتوي على متغيرات HSL مناسبة (موجود مسبقاً حسب فحص الكود).
 
 ### ما لن يتغير
-- منطق المساعد الداخلي (المحادثة، الفئات، البحث، Sheet).
-- ألوان النظام في `index.css` أو `tailwind.config.ts`.
-- أي ملف آخر.
+- باقي مكونات TopBar وHeader.
+- نظام الألوان الأساسي — فقط نضمن أن `.dark` يعمل على كل المكونات التي تستخدم semantic tokens.
+- لوحة التحكم (الزر يظهر فقط في TopBar للموقع العام).
 
-### ملاحظات تقنية
-- الحلقة الدوارة تستخدم `animate-spin [animation-duration:8s]` المدعومة في Tailwind v3 عبر arbitrary values.
-- `h-18 w-18` غير قياسية في Tailwind — سأستخدم `h-16 w-16` أو `[h:4.5rem]` للحفاظ على القياسات.
+### السلوك
+- النقر يبدل الوضع فوراً مع animation 500ms للانكساف.
+- الاختيار يُحفظ ويستمر بين الجلسات.
+- لا flash عند تحميل الصفحة (يُطبق الوضع قبل render عبر inline script في `index.html` أو effect مبكر).

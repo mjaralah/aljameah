@@ -2,6 +2,7 @@ import { BadgeCheck } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAboutContent } from "@/hooks/usePublicContent";
 import { LanguageToggle } from "./LanguageToggle";
+import { ThemeToggle } from "./ThemeToggle";
 
 // شريط علوي ثابت يحوي شارة التوثيق ورقم السجل ومبدّل اللغة
 export const TopBar = () => {
@@ -26,7 +27,10 @@ export const TopBar = () => {
             {t.brand.registration}: <span className="font-semibold">{regNumber}</span>
           </span>
         </div>
-        <LanguageToggle compact />
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          <LanguageToggle compact />
+        </div>
       </div>
     </div>
   );

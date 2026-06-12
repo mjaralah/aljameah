@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider, useLanguage } from "@/contexts/LanguageContext";
 import { A11yProvider } from "@/contexts/A11yContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { SiteSettingsProvider } from "@/contexts/SiteSettingsContext";
 import { Layout } from "@/components/layout/Layout";
 import Index from "./pages/Index.tsx";
@@ -126,7 +127,8 @@ const RealtimeSync = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
-      <A11yProvider>
+      <ThemeProvider>
+        <A11yProvider>
         <SiteSettingsProvider>
         <TooltipProvider>
           <Toaster />
@@ -365,6 +367,7 @@ const App = () => (
         </TooltipProvider>
         </SiteSettingsProvider>
       </A11yProvider>
+      </ThemeProvider>
     </LanguageProvider>
   </QueryClientProvider>
 );
