@@ -127,7 +127,8 @@ const RealtimeSync = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
-      <A11yProvider>
+      <ThemeProvider>
+        <A11yProvider>
         <SiteSettingsProvider>
         <TooltipProvider>
           <Toaster />
