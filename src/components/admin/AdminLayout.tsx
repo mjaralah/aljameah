@@ -83,9 +83,11 @@ const settingsItems: NavItem[] = [
   { to: "/admin/settings", label: "الإعدادات العامة", icon: Settings, adminOnly: true },
   { to: "/admin/users", label: "المستخدمون والأدوار", icon: UserCog, adminOnly: true },
   { to: "/admin/email-templates", label: "قوالب البريد", icon: Mail, adminOnly: true },
-  { to: "/admin/help-center", label: "مركز المساعدة (المساعد الذكي)", icon: HelpCircle, adminOnly: true },
-  { to: "/admin/support-page", label: "صفحة الدعم العامة", icon: HelpCircle, adminOnly: true },
+  { to: "/admin/help", label: "مركز المساعدة", icon: HelpCircle, adminOnly: true },
+  { to: "/admin/help-center", label: "إدارة مقالات المساعد", icon: BookOpen, adminOnly: true },
+  { to: "/admin/support-page", label: "صفحة الدعم العامة", icon: LifeBuoy, adminOnly: true },
 ];
+
 
 function AdminSidebar() {
   const { state } = useSidebar();
