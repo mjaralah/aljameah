@@ -52,15 +52,7 @@ function Icon({ name, className }: { name: string; className?: string }) {
   return <Cmp className={className} />;
 }
 
-const CATEGORY_COLORS = [
-  "from-blue-500/15 to-blue-500/5 text-blue-600 dark:text-blue-400 border-blue-500/20",
-  "from-emerald-500/15 to-emerald-500/5 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-  "from-purple-500/15 to-purple-500/5 text-purple-600 dark:text-purple-400 border-purple-500/20",
-  "from-amber-500/15 to-amber-500/5 text-amber-600 dark:text-amber-400 border-amber-500/20",
-  "from-rose-500/15 to-rose-500/5 text-rose-600 dark:text-rose-400 border-rose-500/20",
-  "from-cyan-500/15 to-cyan-500/5 text-cyan-600 dark:text-cyan-400 border-cyan-500/20",
-  "from-indigo-500/15 to-indigo-500/5 text-indigo-600 dark:text-indigo-400 border-indigo-500/20",
-];
+// Unified neutral card styling — single brand accent on icon only.
 
 function getYoutubeEmbed(url: string): string | null {
   const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/);
@@ -233,26 +225,38 @@ export default function AdminHelpPage() {
               )}
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-              {categoriesWithCounts.map((c, idx) => {
-                const colors = CATEGORY_COLORS[idx % CATEGORY_COLORS.length];
+              {categoriesWithCounts.map((c) => {
                 const isActive = activeCategory === c.key;
                 return (
                   <button
                     key={c.key}
                     onClick={() => selectCategory(isActive ? null : c.key)}
                     className={cn(
-                      "group rounded-2xl border-2 p-4 text-right transition-all hover:shadow-md hover:-translate-y-0.5 bg-gradient-to-br",
-                      colors,
+                      "group rounded-2xl border p-4 text-right transition-all bg-card",
+                      "hover:shadow-md hover:-translate-y-0.5 hover:border-primary/40",
                       isActive
-                        ? "ring-2 ring-primary ring-offset-2 ring-offset-background border-primary"
-                        : "",
+                        ? "border-2 border-primary bg-primary/5 shadow-sm"
+                        : "border-border",
                     )}
                   >
                     <div className="flex items-start justify-between mb-2">
-                      <div className="h-10 w-10 rounded-xl bg-background/80 grid place-items-center shadow-sm">
+                      <div
+                        className={cn(
+                          "h-10 w-10 rounded-xl grid place-items-center transition-colors",
+                          isActive
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-primary/10 text-primary group-hover:bg-primary/15",
+                        )}
+                      >
                         <Icon name={c.icon} className="h-5 w-5" />
                       </div>
-                      <Badge variant="secondary" className="text-[10px] bg-background/80">
+                      <Badge
+                        variant="secondary"
+                        className={cn(
+                          "text-[10px]",
+                          isActive && "bg-primary/15 text-primary",
+                        )}
+                      >
                         {c.count}
                       </Badge>
                     </div>

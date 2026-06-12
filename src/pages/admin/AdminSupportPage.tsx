@@ -52,10 +52,11 @@ const ICONS = [
 ];
 const COLORS = ["primary", "blue", "green", "purple", "orange", "amber", "rose", "red"];
 
-const TAB_STYLE =
-  "flex-1 min-w-[140px] gap-2 h-12 rounded-lg font-semibold text-sm transition-all " +
-  "data-[state=active]:shadow-md data-[state=active]:scale-[1.02] " +
-  "hover:bg-muted/60";
+const TAB_TRIGGER =
+  "gap-2 py-3 text-sm font-semibold rounded-lg transition-all " +
+  "data-[state=active]:bg-primary data-[state=active]:text-primary-foreground " +
+  "data-[state=active]:font-bold data-[state=active]:shadow-md " +
+  "data-[state=active]:ring-2 data-[state=active]:ring-primary/30";
 
 export default function AdminSupportPage() {
   const { settings, categories, faqs, quickLinks, loading, reload } = useSupportContent({
@@ -66,56 +67,29 @@ export default function AdminSupportPage() {
     <AdminLayout title="صفحة الدعم والمساعدة" description="إدارة محتوى صفحة /support العامة">
       <div dir="rtl" className="space-y-4 text-right">
         <Tabs defaultValue="settings" className="space-y-5">
-          <TabsList className="w-full h-auto flex-wrap gap-2 bg-muted/40 p-2 rounded-xl">
-            <TabsTrigger
-              value="settings"
-              className={cn(
-                TAB_STYLE,
-                "data-[state=active]:bg-primary data-[state=active]:text-primary-foreground",
-              )}
-            >
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto p-1.5 bg-muted/70 border-2 border-border rounded-xl shadow-sm gap-1.5">
+            <TabsTrigger value="settings" className={TAB_TRIGGER}>
               <SettingsIcon className="h-4 w-4" />
               الإعدادات العامة
             </TabsTrigger>
-            <TabsTrigger
-              value="categories"
-              className={cn(
-                TAB_STYLE,
-                "data-[state=active]:bg-blue-600 data-[state=active]:text-white",
-              )}
-            >
+            <TabsTrigger value="categories" className={TAB_TRIGGER}>
               <LayoutGrid className="h-4 w-4" />
               التصنيفات
-              <Badge
-                variant="secondary"
-                className="ms-1 bg-background/70 text-foreground data-[state=active]:bg-white/20"
-              >
+              <Badge variant="secondary" className="ms-1">
                 {categories.length}
               </Badge>
             </TabsTrigger>
-            <TabsTrigger
-              value="faqs"
-              className={cn(
-                TAB_STYLE,
-                "data-[state=active]:bg-purple-600 data-[state=active]:text-white",
-              )}
-            >
+            <TabsTrigger value="faqs" className={TAB_TRIGGER}>
               <HelpCircle className="h-4 w-4" />
               الأسئلة الشائعة
-              <Badge variant="secondary" className="ms-1 bg-background/70 text-foreground">
+              <Badge variant="secondary" className="ms-1">
                 {faqs.length}
               </Badge>
             </TabsTrigger>
-            <TabsTrigger
-              value="links"
-              className={cn(
-                TAB_STYLE,
-                "data-[state=active]:bg-orange-600 data-[state=active]:text-white",
-              )}
-            >
+            <TabsTrigger value="links" className={TAB_TRIGGER}>
               <Link2 className="h-4 w-4" />
               الروابط السريعة
-              <Badge variant="secondary" className="ms-1 bg-background/70 text-foreground">
+              <Badge variant="secondary" className="ms-1">
                 {quickLinks.length}
               </Badge>
             </TabsTrigger>
@@ -177,15 +151,19 @@ function SettingsTab({
   if (loading) return <Loader2 className="animate-spin mx-auto mt-10" />;
 
   return (
-    <Card className="p-6 space-y-4 max-w-2xl">
+    <Card dir="rtl" className="p-6 md:p-8 space-y-5 max-w-3xl text-right">
       <Field label="عنوان الصفحة">
         <Input
+          dir="rtl"
+          className="text-right"
           value={form.page_title ?? ""}
           onChange={(e) => setForm({ ...form, page_title: e.target.value })}
         />
       </Field>
       <Field label="العنوان الفرعي">
         <Textarea
+          dir="rtl"
+          className="text-right"
           rows={2}
           value={form.page_subtitle ?? ""}
           onChange={(e) => setForm({ ...form, page_subtitle: e.target.value })}
@@ -193,33 +171,43 @@ function SettingsTab({
       </Field>
       <Field label="نص حقل البحث">
         <Input
+          dir="rtl"
+          className="text-right"
           value={form.search_placeholder ?? ""}
           onChange={(e) => setForm({ ...form, search_placeholder: e.target.value })}
         />
       </Field>
       <Field label="عنوان نموذج التواصل">
         <Input
+          dir="rtl"
+          className="text-right"
           value={form.contact_form_title ?? ""}
           onChange={(e) => setForm({ ...form, contact_form_title: e.target.value })}
         />
       </Field>
       <Field label="عنوان قسم الروابط السريعة">
         <Input
+          dir="rtl"
+          className="text-right"
           value={form.quick_links_title ?? ""}
           onChange={(e) => setForm({ ...form, quick_links_title: e.target.value })}
         />
       </Field>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-3 p-3 rounded-lg border bg-muted/30">
+        <Label className="text-sm font-semibold cursor-pointer">
+          تفعيل نموذج التواصل في الصفحة
+        </Label>
         <Switch
           checked={!!form.contact_form_enabled}
           onCheckedChange={(v) => setForm({ ...form, contact_form_enabled: v })}
         />
-        <Label>تفعيل نموذج التواصل في الصفحة</Label>
       </div>
-      <Button onClick={save} disabled={saving} className="gap-2">
-        {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-        حفظ التغييرات
-      </Button>
+      <div className="flex justify-start pt-2">
+        <Button onClick={save} disabled={saving} className="gap-2">
+          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          حفظ التغييرات
+        </Button>
+      </div>
     </Card>
   );
 }

@@ -146,18 +146,24 @@ export default function Support() {
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">تصفّح حسب الموضوع</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {categories.map((c) => {
-              const colors = ColorMap[c.color] ?? ColorMap.primary;
               const isActive = activeCategory === c.id;
               return (
                 <button
                   key={c.id}
                   onClick={() => selectCategory(isActive ? null : c.id)}
                   className={cn(
-                    "group rounded-2xl border-2 bg-card p-5 text-right transition-all hover:shadow-lg hover:-translate-y-1",
-                    isActive ? "border-primary shadow-lg" : "border-border hover:border-primary/40",
+                    "group rounded-2xl border bg-card p-5 text-right transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-primary/40",
+                    isActive ? "border-2 border-primary bg-primary/5 shadow-sm" : "border-border",
                   )}
                 >
-                  <div className={cn("h-12 w-12 rounded-xl grid place-items-center mb-3", colors)}>
+                  <div
+                    className={cn(
+                      "h-12 w-12 rounded-xl grid place-items-center mb-3 transition-colors",
+                      isActive
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-primary/10 text-primary group-hover:bg-primary/15",
+                    )}
+                  >
                     <Icon name={c.icon} className="h-6 w-6" />
                   </div>
                   <h3 className="font-bold text-sm mb-1">{c.label}</h3>
