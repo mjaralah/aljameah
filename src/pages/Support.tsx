@@ -1,6 +1,5 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Fuse from "fuse.js";
-import { Helmet } from "react-helmet-async";
 import * as LucideIcons from "lucide-react";
 import { LucideIcon, Search, ChevronDown, Send, ArrowLeft, ExternalLink, FileText, MessageSquare } from "lucide-react";
 import { Link } from "react-router-dom";
