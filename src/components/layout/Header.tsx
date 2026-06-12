@@ -157,22 +157,35 @@ export const Header = () => {
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[360px]">
               <div className="flex flex-col gap-1 mt-6">
-                {links.map((l) => (
-                  <NavLink
-                    key={l.to}
-                    to={l.to}
-                    end={l.to === "/"}
-                    onClick={() => setOpen(false)}
-                    className={({ isActive }) =>
-                      cn(
-                        "px-4 py-3 rounded-lg font-semibold transition-smooth",
-                        isActive ? "bg-primary text-primary-foreground" : "hover:bg-muted",
-                      )
-                    }
-                  >
-                    {l.label}
-                  </NavLink>
-                ))}
+                {links.map((l) =>
+                  l.external ? (
+                    <a
+                      key={l.to}
+                      href={l.to}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setOpen(false)}
+                      className="px-4 py-3 rounded-lg font-semibold hover:bg-muted"
+                    >
+                      {l.label}
+                    </a>
+                  ) : (
+                    <NavLink
+                      key={l.to}
+                      to={l.to}
+                      end={l.to === "/"}
+                      onClick={() => setOpen(false)}
+                      className={({ isActive }) =>
+                        cn(
+                          "px-4 py-3 rounded-lg font-semibold transition-smooth",
+                          isActive ? "bg-primary text-primary-foreground" : "hover:bg-muted",
+                        )
+                      }
+                    >
+                      {l.label}
+                    </NavLink>
+                  )
+                )}
 
                 {donateEnabled && (
                   <Button
