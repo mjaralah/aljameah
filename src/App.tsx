@@ -53,7 +53,9 @@ import AdminFormsPage from "./pages/admin/AdminFormsPage.tsx";
 import AdminEmailTemplatesPage from "./pages/admin/AdminEmailTemplatesPage.tsx";
 import AdminPageBuilderPage from "./pages/admin/AdminPageBuilderPage.tsx";
 import AdminHelpCenterPage from "./pages/admin/AdminHelpCenterPage.tsx";
+import AdminHelpPage from "./pages/admin/AdminHelpPage.tsx";
 import AdminSupportPage from "./pages/admin/AdminSupportPage.tsx";
+
 import Support from "./pages/Support.tsx";
 import CustomFormPage from "./pages/eservices/CustomFormPage.tsx";
 import CustomPage from "./pages/CustomPage.tsx";
