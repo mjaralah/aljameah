@@ -103,6 +103,17 @@ type IndexedArticle = Article & { __search: string };
 
 export function FloatingAssistant() {
   const [open, setOpen] = useState(false);
+  const [showAssistantTip, setShowAssistantTip] = useState(false);
+  const dismissAssistantTip = () => {
+    setShowAssistantTip(false);
+    try { sessionStorage.setItem("admin_assistant_tip_dismissed", "1"); } catch { /* ignore */ }
+  };
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (sessionStorage.getItem("admin_assistant_tip_dismissed")) return;
+    const t = setTimeout(() => setShowAssistantTip(true), 2500);
+    return () => clearTimeout(t);
+  }, []);
   const [articles, setArticles] = useState<IndexedArticle[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
