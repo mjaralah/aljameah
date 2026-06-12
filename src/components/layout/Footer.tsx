@@ -57,7 +57,7 @@ export const Footer = () => {
         <div className="lg:col-span-2">
           <div className="flex items-center gap-2.5 mb-4">
             {settings?.logo_url ? (
-              <div className="h-14 w-14 rounded-xl bg-white shadow-sm ring-1 ring-black/5 p-1.5 flex items-center justify-center shrink-0 overflow-hidden">
+              <div className="h-14 w-14 rounded-xl bg-card shadow-sm ring-1 ring-border p-1.5 flex items-center justify-center shrink-0 overflow-hidden">
                 <img src={settings.logo_url} alt="" className="block h-full w-full object-contain" />
               </div>
             ) : (
