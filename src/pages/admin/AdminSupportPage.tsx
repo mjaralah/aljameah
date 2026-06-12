@@ -66,7 +66,7 @@ export default function AdminSupportPage() {
   return (
     <AdminLayout title="صفحة الدعم والمساعدة" description="إدارة محتوى صفحة /support العامة">
       <div dir="rtl" className="space-y-4 text-right">
-        <Tabs defaultValue="settings" className="space-y-5">
+        <Tabs defaultValue="settings" dir="rtl" className="space-y-5">
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto p-1.5 bg-muted/70 border-2 border-border rounded-xl shadow-sm gap-1.5">
             <TabsTrigger value="settings" className={TAB_TRIGGER}>
               <SettingsIcon className="h-4 w-4" />
