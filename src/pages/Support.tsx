@@ -186,10 +186,9 @@ export default function Support() {
       )}
 
       {/* FAQ */}
-      <section ref={faqRef} className="bg-muted/30 py-12 md:py-16">
+      <section ref={faqRef} className="bg-muted/30 py-8 md:py-10">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center mb-8">
-            <Badge variant="secondary" className="mb-3">FAQ</Badge>
             <h2 className="text-2xl md:text-3xl font-bold">
               {activeCategory
                 ? categories.find((c) => c.id === activeCategory)?.label
