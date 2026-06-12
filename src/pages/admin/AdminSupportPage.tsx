@@ -22,7 +22,19 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, Trash2, Edit, Save, ArrowUp, ArrowDown } from "lucide-react";
+import {
+  Loader2,
+  Plus,
+  Trash2,
+  Edit,
+  Save,
+  ArrowUp,
+  ArrowDown,
+  Settings as SettingsIcon,
+  LayoutGrid,
+  HelpCircle,
+  Link2,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import {
@@ -31,6 +43,7 @@ import {
   SupportFaq,
   SupportQuickLink,
 } from "@/hooks/useSupportContent";
+import { cn } from "@/lib/utils";
 
 const ICONS = [
   "HelpCircle", "IdCard", "HandHeart", "ClipboardList", "FolderKanban",
@@ -39,6 +52,11 @@ const ICONS = [
 ];
 const COLORS = ["primary", "blue", "green", "purple", "orange", "amber", "rose", "red"];
 
+const TAB_STYLE =
+  "flex-1 min-w-[140px] gap-2 h-12 rounded-lg font-semibold text-sm transition-all " +
+  "data-[state=active]:shadow-md data-[state=active]:scale-[1.02] " +
+  "hover:bg-muted/60";
+
 export default function AdminSupportPage() {
   const { settings, categories, faqs, quickLinks, loading, reload } = useSupportContent({
     publishedOnly: false,
@@ -46,30 +64,81 @@ export default function AdminSupportPage() {
 
   return (
     <AdminLayout title="صفحة الدعم والمساعدة" description="إدارة محتوى صفحة /support العامة">
-      <Tabs defaultValue="settings" className="space-y-4">
-        <TabsList className="w-full justify-start overflow-auto">
-          <TabsTrigger value="settings">الإعدادات العامة</TabsTrigger>
-          <TabsTrigger value="categories">التصنيفات ({categories.length})</TabsTrigger>
-          <TabsTrigger value="faqs">الأسئلة الشائعة ({faqs.length})</TabsTrigger>
-          <TabsTrigger value="links">الروابط السريعة ({quickLinks.length})</TabsTrigger>
-        </TabsList>
+      <div dir="rtl" className="space-y-4 text-right">
+        <Tabs defaultValue="settings" className="space-y-5">
+          <TabsList className="w-full h-auto flex-wrap gap-2 bg-muted/40 p-2 rounded-xl">
+            <TabsTrigger
+              value="settings"
+              className={cn(
+                TAB_STYLE,
+                "data-[state=active]:bg-primary data-[state=active]:text-primary-foreground",
+              )}
+            >
+              <SettingsIcon className="h-4 w-4" />
+              الإعدادات العامة
+            </TabsTrigger>
+            <TabsTrigger
+              value="categories"
+              className={cn(
+                TAB_STYLE,
+                "data-[state=active]:bg-blue-600 data-[state=active]:text-white",
+              )}
+            >
+              <LayoutGrid className="h-4 w-4" />
+              التصنيفات
+              <Badge
+                variant="secondary"
+                className="ms-1 bg-background/70 text-foreground data-[state=active]:bg-white/20"
+              >
+                {categories.length}
+              </Badge>
+            </TabsTrigger>
+            <TabsTrigger
+              value="faqs"
+              className={cn(
+                TAB_STYLE,
+                "data-[state=active]:bg-purple-600 data-[state=active]:text-white",
+              )}
+            >
+              <HelpCircle className="h-4 w-4" />
+              الأسئلة الشائعة
+              <Badge variant="secondary" className="ms-1 bg-background/70 text-foreground">
+                {faqs.length}
+              </Badge>
+            </TabsTrigger>
+            <TabsTrigger
+              value="links"
+              className={cn(
+                TAB_STYLE,
+                "data-[state=active]:bg-orange-600 data-[state=active]:text-white",
+              )}
+            >
+              <Link2 className="h-4 w-4" />
+              الروابط السريعة
+              <Badge variant="secondary" className="ms-1 bg-background/70 text-foreground">
+                {quickLinks.length}
+              </Badge>
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="settings">
-          <SettingsTab settings={settings} onSaved={reload} loading={loading} />
-        </TabsContent>
-        <TabsContent value="categories">
-          <CategoriesTab items={categories} onChanged={reload} />
-        </TabsContent>
-        <TabsContent value="faqs">
-          <FaqsTab items={faqs} categories={categories} onChanged={reload} />
-        </TabsContent>
-        <TabsContent value="links">
-          <LinksTab items={quickLinks} onChanged={reload} />
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="settings">
+            <SettingsTab settings={settings} onSaved={reload} loading={loading} />
+          </TabsContent>
+          <TabsContent value="categories">
+            <CategoriesTab items={categories} onChanged={reload} />
+          </TabsContent>
+          <TabsContent value="faqs">
+            <FaqsTab items={faqs} categories={categories} onChanged={reload} />
+          </TabsContent>
+          <TabsContent value="links">
+            <LinksTab items={quickLinks} onChanged={reload} />
+          </TabsContent>
+        </Tabs>
+      </div>
     </AdminLayout>
   );
 }
+
 
 /* ---------- Settings ---------- */
 function SettingsTab({
