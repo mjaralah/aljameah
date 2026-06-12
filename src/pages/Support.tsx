@@ -82,12 +82,13 @@ export default function Support() {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const payload = {
-      name: String(fd.get("name") || ""),
+      full_name: String(fd.get("name") || ""),
       email: String(fd.get("email") || ""),
-      subject: String(fd.get("subject") || "استفسار من صفحة الدعم"),
+      phone: String(fd.get("phone") || ""),
+      purpose: String(fd.get("subject") || "استفسار من صفحة الدعم"),
       message: String(fd.get("message") || ""),
     };
-    if (!payload.name || !payload.email || !payload.message) {
+    if (!payload.full_name || !payload.email || !payload.phone || !payload.message) {
       toast.error("يرجى تعبئة جميع الحقول المطلوبة");
       return;
     }
@@ -103,12 +104,13 @@ export default function Support() {
   const title = settings?.page_title ?? "الدعم والمساعدة";
   const subtitle = settings?.page_subtitle ?? "كيف يمكننا مساعدتك اليوم؟";
 
+  useEffect(() => {
+    document.title = `${title} | مركز الدعم`;
+  }, [title]);
+
   return (
     <div className="min-h-screen bg-background" dir="rtl">
-      <Helmet>
-        <title>{title} | مركز الدعم</title>
-        <meta name="description" content={subtitle} />
-      </Helmet>
+
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-primary/70 text-primary-foreground py-16 md:py-24">
