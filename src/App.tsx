@@ -329,6 +329,15 @@ const App = () => (
                 }
               />
               <Route
+                path="/admin/help"
+                element={
+                  <ProtectedAdminRoute requireAdmin>
+                    <AdminHelpPage />
+                  </ProtectedAdminRoute>
+                }
+              />
+
+              <Route
                 path="/admin/support-page"
                 element={
                   <ProtectedAdminRoute requireAdmin>
