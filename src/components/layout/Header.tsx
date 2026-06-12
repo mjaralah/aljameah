@@ -14,6 +14,7 @@ export const Header = () => {
   const navigate = useNavigate();
   const { data: menuPages } = useMenuPages();
   const { data: settings } = useSiteSettings();
+  const { data: headerMenu } = useHeaderMenu();
 
   // إعدادات زر التبرع (قابلة للتحكم من لوحة التحكم)
   const donateEnabled = settings?.donate_button_enabled !== false;
