@@ -140,6 +140,7 @@ function SettingsTab({
         contact_form_enabled: !!form.contact_form_enabled,
         contact_form_title: form.contact_form_title,
         quick_links_title: form.quick_links_title,
+        quick_links_enabled: form.quick_links_enabled !== false,
       })
       .eq("id", true);
     setSaving(false);
@@ -201,6 +202,15 @@ function SettingsTab({
           <Switch
             checked={!!form.contact_form_enabled}
             onCheckedChange={(v) => setForm({ ...form, contact_form_enabled: v })}
+          />
+        </div>
+        <div dir="rtl" className="flex items-center justify-between gap-3 p-3 rounded-lg border bg-muted/30">
+          <Label className="text-sm font-semibold cursor-pointer text-right">
+            إظهار قسم الروابط السريعة في الصفحة
+          </Label>
+          <Switch
+            checked={form.quick_links_enabled !== false}
+            onCheckedChange={(v) => setForm({ ...form, quick_links_enabled: v })}
           />
         </div>
         <div className="flex justify-start pt-2">

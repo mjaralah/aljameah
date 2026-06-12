@@ -1196,6 +1196,7 @@ export type Database = {
           id: boolean
           page_subtitle: string
           page_title: string
+          quick_links_enabled: boolean
           quick_links_title: string
           search_placeholder: string
           updated_at: string
@@ -1207,6 +1208,7 @@ export type Database = {
           id?: boolean
           page_subtitle?: string
           page_title?: string
+          quick_links_enabled?: boolean
           quick_links_title?: string
           search_placeholder?: string
           updated_at?: string
@@ -1218,6 +1220,7 @@ export type Database = {
           id?: boolean
           page_subtitle?: string
           page_title?: string
+          quick_links_enabled?: boolean
           quick_links_title?: string
           search_placeholder?: string
           updated_at?: string
