@@ -321,7 +321,7 @@ function SettingsTab() {
       const { data, error } = await supabase.from("board_settings").select("*").maybeSingle();
       if (error) toast.error(error.message);
       setS(
-        data ?? {
+        (data as any) ?? {
           intro_text: "",
           term_duration_label: "",
           term_end_hijri: "",
