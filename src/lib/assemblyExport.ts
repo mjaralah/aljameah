@@ -5,6 +5,8 @@ export type MembershipType = {
   key: string;
   label_ar: string;
   label_en: string;
+  /** لون شارة العضوية (hex مثل #2563eb). إن لم يُحدَّد تُستخدم الأنماط الافتراضية. */
+  color?: string;
 };
 
 export type AssemblyMember = {
