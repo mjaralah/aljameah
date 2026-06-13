@@ -6,12 +6,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { MediaUpload } from "@/components/admin/MediaUpload";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Save, Users, Settings as SettingsIcon } from "lucide-react";
+import { Loader2, Save, Users, Settings as SettingsIcon, Plus, X } from "lucide-react";
 
+const DEFAULT_POSITIONS = [
+  "رئيس مجلس الإدارة",
+  "نائب رئيس مجلس الإدارة",
+  "عضو مجلس الإدارة",
+];
+
+const ADD_NEW = "__add_new__";
 
 type Member = {
   id: string;
@@ -34,9 +42,137 @@ type Settings = {
   show_gregorian: boolean;
   formation_decree_url: string | null;
   formation_decree_name: string | null;
+  positions?: string[] | null;
 };
 
+// قائمة المناصب المشتركة (تُجلب مرة واحدة من board_settings.positions)
+function usePositions() {
+  const [positions, setPositions] = useState<string[]>(DEFAULT_POSITIONS);
+  const [settingsId, setSettingsId] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("board_settings")
+        .select("id, positions")
+        .maybeSingle();
+      if (data) {
+        setSettingsId(data.id);
+        const list = Array.isArray((data as any).positions) ? ((data as any).positions as string[]) : [];
+        setPositions(list.length ? list : DEFAULT_POSITIONS);
+      }
+    })();
+  }, []);
+
+  async function addPosition(name: string) {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    if (positions.includes(trimmed)) return;
+    const next = [...positions, trimmed];
+    setPositions(next);
+    try {
+      if (settingsId) {
+        await supabase.from("board_settings").update({ positions: next } as any).eq("id", settingsId);
+      } else {
+        const { data } = await supabase
+          .from("board_settings")
+          .insert({ positions: next } as any)
+          .select("id")
+          .single();
+        if (data) setSettingsId(data.id);
+      }
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  }
+
+  return { positions, addPosition };
+}
+
+function PositionField({
+  value,
+  onChange,
+  positions,
+  onAdd,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  positions: string[];
+  onAdd: (name: string) => Promise<void> | void;
+}) {
+  const [adding, setAdding] = useState(false);
+  const [draft, setDraft] = useState("");
+
+  // أدرج القيمة الحالية إن كانت غير موجودة (توافق رجعي)
+  const options = value && !positions.includes(value) ? [value, ...positions] : positions;
+
+  return (
+    <div className="space-y-2">
+      <Select
+        value={value || undefined}
+        onValueChange={(v) => {
+          if (v === ADD_NEW) {
+            setAdding(true);
+            setDraft("");
+          } else {
+            onChange(v);
+          }
+        }}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="اختر المنصب" />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((p) => (
+            <SelectItem key={p} value={p}>{p}</SelectItem>
+          ))}
+          <SelectItem value={ADD_NEW}>
+            <span className="flex items-center gap-1 text-primary">
+              <Plus className="h-3.5 w-3.5" /> إضافة منصب جديد…
+            </span>
+          </SelectItem>
+        </SelectContent>
+      </Select>
+
+      {adding && (
+        <div className="flex items-center gap-2 border border-dashed border-border rounded-lg p-2">
+          <Input
+            autoFocus
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            placeholder="اسم المنصب الجديد"
+          />
+          <Button
+            type="button"
+            size="sm"
+            onClick={async () => {
+              const t = draft.trim();
+              if (!t) return;
+              await onAdd(t);
+              onChange(t);
+              setAdding(false);
+              setDraft("");
+            }}
+          >
+            إضافة
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            onClick={() => { setAdding(false); setDraft(""); }}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function MembersTab() {
+  const { positions, addPosition } = usePositions();
+
   return (
     <CrudPage<Member>
       noLayout
@@ -85,7 +221,12 @@ function MembersTab() {
             </div>
             <div>
               <Label>المنصب *</Label>
-              <Input value={v.position ?? ""} onChange={(e) => set("position", e.target.value)} placeholder="مثال: رئيس المجلس" />
+              <PositionField
+                value={v.position ?? ""}
+                onChange={(val) => set("position", val)}
+                positions={positions}
+                onAdd={addPosition}
+              />
             </div>
           </div>
           <div>
@@ -119,6 +260,57 @@ function MembersTab() {
   );
 }
 
+function PositionsManager({
+  value,
+  onChange,
+}: {
+  value: string[];
+  onChange: (next: string[]) => void;
+}) {
+  const [draft, setDraft] = useState("");
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2">
+        {value.map((p) => (
+          <span key={p} className="inline-flex items-center gap-1 bg-muted px-2.5 py-1 rounded-full text-sm">
+            {p}
+            <button
+              type="button"
+              onClick={() => onChange(value.filter((x) => x !== p))}
+              className="text-muted-foreground hover:text-destructive"
+              aria-label="حذف"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </span>
+        ))}
+        {value.length === 0 && (
+          <p className="text-xs text-muted-foreground">لا توجد مناصب — أضف أول منصب.</p>
+        )}
+      </div>
+      <div className="flex gap-2">
+        <Input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          placeholder="إضافة منصب جديد"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => {
+            const t = draft.trim();
+            if (!t || value.includes(t)) { setDraft(""); return; }
+            onChange([...value, t]);
+            setDraft("");
+          }}
+        >
+          <Plus className="h-4 w-4 ml-1" /> إضافة
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 function SettingsTab() {
   const [s, setS] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(true);
@@ -129,7 +321,7 @@ function SettingsTab() {
       const { data, error } = await supabase.from("board_settings").select("*").maybeSingle();
       if (error) toast.error(error.message);
       setS(
-        data ?? {
+        (data as any) ?? {
           intro_text: "",
           term_duration_label: "",
           term_end_hijri: "",
@@ -138,6 +330,7 @@ function SettingsTab() {
           show_gregorian: true,
           formation_decree_url: null,
           formation_decree_name: null,
+          positions: DEFAULT_POSITIONS,
         }
       );
       setLoading(false);
@@ -157,14 +350,15 @@ function SettingsTab() {
         show_gregorian: s.show_gregorian,
         formation_decree_url: s.formation_decree_url,
         formation_decree_name: s.formation_decree_name,
+        positions: s.positions ?? DEFAULT_POSITIONS,
       };
       if (s.id) {
-        const { error } = await supabase.from("board_settings").update(payload).eq("id", s.id);
+        const { error } = await supabase.from("board_settings").update(payload as any).eq("id", s.id);
         if (error) throw error;
       } else {
-        const { data, error } = await supabase.from("board_settings").insert(payload).select().single();
+        const { data, error } = await supabase.from("board_settings").insert(payload as any).select().single();
         if (error) throw error;
-        if (data) setS({ ...(data as Settings) });
+        if (data) setS({ ...(data as any) } as Settings);
       }
       toast.success("تم حفظ الإعدادات");
     } catch (e) {
@@ -202,6 +396,17 @@ function SettingsTab() {
           placeholder="مثال: 4 سنوات"
         />
         <p className="text-xs text-muted-foreground mt-1">يظهر في اللوحة الجانبية بصفحة "من نحن".</p>
+      </div>
+
+      <div className="border border-border rounded-xl p-4 space-y-3">
+        <h3 className="font-bold text-primary">قائمة المناصب</h3>
+        <p className="text-xs text-muted-foreground">
+          تظهر هذه القائمة في نموذج إضافة/تعديل العضو. يمكن إضافة منصب جديد من هنا أو مباشرة عند تحرير العضو.
+        </p>
+        <PositionsManager
+          value={s.positions && s.positions.length ? s.positions : DEFAULT_POSITIONS}
+          onChange={(next) => setS({ ...s, positions: next })}
+        />
       </div>
 
       <div className="border border-border rounded-xl p-4 space-y-4">
@@ -307,4 +512,3 @@ export default function AdminBoardPage() {
     </AdminLayout>
   );
 }
-
