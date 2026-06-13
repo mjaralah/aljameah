@@ -179,10 +179,12 @@ function MembersTab({
   members,
   types,
   onChange,
+  onTypesChange,
 }: {
   members: AssemblyMember[];
   types: MembershipType[];
   onChange: (m: AssemblyMember[]) => void;
+  onTypesChange: (t: MembershipType[]) => void;
 }) {
   const [query, setQuery] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
