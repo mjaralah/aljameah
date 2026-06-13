@@ -68,7 +68,7 @@ export function downloadTemplate() {
     {
       name_ar: "مثال: محمد عبدالله",
       name_en: "Example: Mohammed Abdullah",
-      membership_type: "working",
+      membership_type: "regular",
       join_date: "2024-01-15",
       phone: "+9665XXXXXXXX",
       email: "example@email.com",
