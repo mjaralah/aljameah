@@ -125,7 +125,7 @@ export async function parseImportFile(file: File): Promise<{
       id: crypto.randomUUID(),
       name_ar: nameAr,
       name_en: nameEn,
-      membership_type: String(r.membership_type ?? "").trim() || "working",
+      membership_type: normalizeMembershipKey(String(r.membership_type ?? "").trim() || "regular"),
       join_date: join,
       phone: String(r.phone ?? "").trim(),
       email: String(r.email ?? "").trim(),
