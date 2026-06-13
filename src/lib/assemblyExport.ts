@@ -84,7 +84,7 @@ export function downloadTemplate() {
     ["العمود", "الوصف", "ملاحظات"],
     ["name_ar", "الاسم بالعربية", "مطلوب"],
     ["name_en", "Name in English", "اختياري"],
-    ["membership_type", "مفتاح نوع العضوية", "مثل: working / honorary / supporter / affiliate"],
+    ["membership_type", "مفتاح نوع العضوية", "مثل: regular / honorary / supporter / affiliate"],
     ["join_date", "تاريخ الالتحاق", "YYYY-MM-DD"],
     ["phone", "رقم التواصل", "اختياري"],
     ["email", "البريد الإلكتروني", "اختياري"],
