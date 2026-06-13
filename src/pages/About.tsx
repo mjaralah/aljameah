@@ -569,7 +569,7 @@ const About = () => {
                                                     const uDesc = pick(u.desc, u.desc_en);
                                                     return (
                                                       <div key={ui} className="flex items-start gap-2 p-2 bg-background/70 rounded-md border border-border/60">
-                                                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
+                                                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-success shrink-0" />
                                                         <div className="min-w-0">
                                                           <div className="text-[11px] text-foreground font-medium leading-tight">{uTitle}</div>
                                                           {uDesc && <div className="text-[10px] text-muted-foreground mt-0.5">{uDesc}</div>}
