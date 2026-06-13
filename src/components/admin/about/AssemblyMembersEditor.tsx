@@ -262,7 +262,7 @@ function MembersTab({
               id: crypto.randomUUID(),
               name_ar: "",
               name_en: "",
-              membership_type: types[0]?.key ?? "working",
+              membership_type: types[0]?.key ?? "regular",
               join_date: new Date().toISOString().slice(0, 10),
               phone: "",
               email: "",
