@@ -392,6 +392,7 @@ function MembersTab({
           types={types}
           onCancel={() => setEditing(null)}
           onSave={saveMember}
+          onTypesChange={onTypesChange}
         />
       )}
     </div>
