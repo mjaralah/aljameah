@@ -399,19 +399,62 @@ function MembersTab({
   );
 }
 
+const NEW_TYPE_SENTINEL = "__add_new__";
+const SUGGESTED_COLORS = ["#2563eb", "#16a34a", "#d97706", "#dc2626", "#7c3aed", "#0891b2"];
+
 function MemberForm({
   member,
   types,
   onSave,
   onCancel,
+  onTypesChange,
 }: {
   member: AssemblyMember;
   types: MembershipType[];
   onSave: (m: AssemblyMember) => void;
   onCancel: () => void;
+  onTypesChange: (t: MembershipType[]) => void;
 }) {
   const [m, setM] = useState<AssemblyMember>(member);
   const set = (p: Partial<AssemblyMember>) => setM({ ...m, ...p });
+
+  const [creatingType, setCreatingType] = useState(false);
+  const [newTypeAr, setNewTypeAr] = useState("");
+  const [newTypeEn, setNewTypeEn] = useState("");
+  const [newTypeColor, setNewTypeColor] = useState(SUGGESTED_COLORS[0]);
+
+  function addNewType() {
+    const ar = newTypeAr.trim();
+    if (!ar) {
+      toast.error("اسم النوع بالعربية مطلوب");
+      return;
+    }
+    if (types.some((t) => t.label_ar === ar)) {
+      toast.error("هذا النوع موجود مسبقاً");
+      return;
+    }
+    const slug =
+      ar
+        .toLowerCase()
+        .replace(/[^a-z0-9\u0600-\u06FF]+/g, "_")
+        .replace(/^_+|_+$/g, "")
+        .slice(0, 24) || "type";
+    const key = `${slug}_${Date.now().toString(36).slice(-4)}`;
+    const newType: MembershipType = {
+      key,
+      label_ar: ar,
+      label_en: newTypeEn.trim() || ar,
+      color: newTypeColor,
+    };
+    onTypesChange([...types, newType]);
+    set({ membership_type: key });
+    setCreatingType(false);
+    setNewTypeAr("");
+    setNewTypeEn("");
+    setNewTypeColor(SUGGESTED_COLORS[0]);
+    toast.success("تمت إضافة النوع الجديد");
+  }
+
   return (
     <div className="border rounded-md p-3 bg-muted/30 space-y-3">
       <div className="text-sm font-medium">
@@ -429,21 +472,95 @@ function MemberForm({
           />
         </Field>
         <Field label="نوع العضوية">
-          <Select
-            value={m.membership_type ?? "working"}
-            onValueChange={(v) => set({ membership_type: v })}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {types.map((t) => (
-                <SelectItem key={t.key} value={t.key}>
-                  {t.label_ar}
+          <div className="space-y-2">
+            <Select
+              value={m.membership_type ?? "regular"}
+              onValueChange={(v) => {
+                if (v === NEW_TYPE_SENTINEL) {
+                  setCreatingType(true);
+                  return;
+                }
+                set({ membership_type: v });
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {types.map((t) => (
+                  <SelectItem key={t.key} value={t.key}>
+                    {t.label_ar}
+                  </SelectItem>
+                ))}
+                <SelectItem value={NEW_TYPE_SENTINEL} className="text-primary font-semibold">
+                  + إضافة نوع جديد…
                 </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+              </SelectContent>
+            </Select>
+
+            {creatingType && (
+              <div className="border border-primary/30 rounded-md p-2 bg-background space-y-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <Field label="الاسم (AR) *">
+                    <Input
+                      value={newTypeAr}
+                      onChange={(e) => setNewTypeAr(e.target.value)}
+                      placeholder="مثال: مؤسس"
+                      autoFocus
+                    />
+                  </Field>
+                  <Field label="Label (EN)">
+                    <Input
+                      value={newTypeEn}
+                      onChange={(e) => setNewTypeEn(e.target.value)}
+                      placeholder="Founder"
+                      dir="ltr"
+                    />
+                  </Field>
+                </div>
+                <Field label="لون الشارة">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <input
+                      type="color"
+                      value={newTypeColor}
+                      onChange={(e) => setNewTypeColor(e.target.value)}
+                      className="h-8 w-10 rounded border border-border cursor-pointer bg-transparent"
+                      aria-label="اختيار لون الشارة"
+                    />
+                    {SUGGESTED_COLORS.map((c) => (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => setNewTypeColor(c)}
+                        className="h-7 w-7 rounded-full border-2 transition"
+                        style={{
+                          backgroundColor: c,
+                          borderColor: newTypeColor === c ? "hsl(var(--foreground))" : "transparent",
+                        }}
+                        aria-label={`لون ${c}`}
+                      />
+                    ))}
+                  </div>
+                </Field>
+                <div className="flex gap-2 justify-end">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      setCreatingType(false);
+                      setNewTypeAr("");
+                      setNewTypeEn("");
+                    }}
+                  >
+                    إلغاء
+                  </Button>
+                  <Button size="sm" onClick={addNewType}>
+                    إضافة النوع
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
         </Field>
         <Field label="تاريخ الالتحاق">
           <Input
