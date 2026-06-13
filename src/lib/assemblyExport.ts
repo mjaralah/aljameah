@@ -39,11 +39,18 @@ export type AssemblyData = {
 };
 
 export const DEFAULT_TYPES: MembershipType[] = [
-  { key: "working", label_ar: "عامل", label_en: "Working" },
-  { key: "honorary", label_ar: "فخري", label_en: "Honorary" },
-  { key: "supporter", label_ar: "داعم", label_en: "Supporter" },
-  { key: "affiliate", label_ar: "منتسب", label_en: "Affiliate" },
+  { key: "regular", label_ar: "عادي", label_en: "Regular", color: "#2563eb" },
+  { key: "honorary", label_ar: "فخري", label_en: "Honorary", color: "#d97706" },
+  { key: "supporter", label_ar: "داعم", label_en: "Supporter", color: "#16a34a" },
+  { key: "affiliate", label_ar: "منتسب", label_en: "Affiliate", color: "#64748b" },
 ];
+
+/** تطبيع توافقي: حوّل المفاتيح القديمة إلى الجديدة. */
+export function normalizeMembershipKey(k?: string): string {
+  if (!k) return "regular";
+  if (k === "working") return "regular";
+  return k;
+}
 
 export const TEMPLATE_HEADERS = [
   "name_ar",
