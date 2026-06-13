@@ -41,10 +41,15 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
   const [filterType, setFilterType] = useState<string>("all");
   const [page, setPage] = useState(1);
 
+  const findType = (k?: string) => {
+    const key = k === "working" ? "regular" : k;
+    return types.find((x) => x.key === key) ?? types.find((x) => x.key === k);
+  };
   const typeLabel = (k?: string) => {
-    const t = types.find((x) => x.key === k);
+    const t = findType(k);
     return t ? (isAr ? t.label_ar : t.label_en) : k ?? "—";
   };
+  const typeColor = (k?: string) => findType(k)?.color;
 
   // قاطع عام + موافقة العضو
   const globalPhone = !!settings.show_phone_public;
@@ -115,7 +120,7 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
         </Card>
         {stats.map(([k, n]) => (
           <Card key={k} className="p-3 flex items-center justify-between gap-2">
-            <MembershipBadge typeKey={k} label={typeLabel(k)} />
+            <MembershipBadge typeKey={k} label={typeLabel(k)} color={typeColor(k)} />
             <span className="text-lg font-bold tabular-nums">{n}</span>
           </Card>
         ))}
@@ -207,6 +212,7 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
                         <MembershipBadge
                           typeKey={m.membership_type}
                           label={typeLabel(m.membership_type)}
+                          color={typeColor(m.membership_type)}
                         />
                       </div>
                     </TableCell>
@@ -256,6 +262,7 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
                 <MembershipBadge
                   typeKey={m.membership_type}
                   label={typeLabel(m.membership_type)}
+                  color={typeColor(m.membership_type)}
                 />
               </div>
               <div className="text-xs text-muted-foreground space-y-1">

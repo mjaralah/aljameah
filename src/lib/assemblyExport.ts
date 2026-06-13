@@ -5,6 +5,8 @@ export type MembershipType = {
   key: string;
   label_ar: string;
   label_en: string;
+  /** لون شارة العضوية (hex مثل #2563eb). إن لم يُحدَّد تُستخدم الأنماط الافتراضية. */
+  color?: string;
 };
 
 export type AssemblyMember = {
@@ -37,11 +39,18 @@ export type AssemblyData = {
 };
 
 export const DEFAULT_TYPES: MembershipType[] = [
-  { key: "working", label_ar: "عامل", label_en: "Working" },
-  { key: "honorary", label_ar: "فخري", label_en: "Honorary" },
-  { key: "supporter", label_ar: "داعم", label_en: "Supporter" },
-  { key: "affiliate", label_ar: "منتسب", label_en: "Affiliate" },
+  { key: "regular", label_ar: "عادي", label_en: "Regular", color: "#2563eb" },
+  { key: "honorary", label_ar: "فخري", label_en: "Honorary", color: "#d97706" },
+  { key: "supporter", label_ar: "داعم", label_en: "Supporter", color: "#16a34a" },
+  { key: "affiliate", label_ar: "منتسب", label_en: "Affiliate", color: "#64748b" },
 ];
+
+/** تطبيع توافقي: حوّل المفاتيح القديمة إلى الجديدة. */
+export function normalizeMembershipKey(k?: string): string {
+  if (!k) return "regular";
+  if (k === "working") return "regular";
+  return k;
+}
 
 export const TEMPLATE_HEADERS = [
   "name_ar",
@@ -59,7 +68,7 @@ export function downloadTemplate() {
     {
       name_ar: "مثال: محمد عبدالله",
       name_en: "Example: Mohammed Abdullah",
-      membership_type: "working",
+      membership_type: "regular",
       join_date: "2024-01-15",
       phone: "+9665XXXXXXXX",
       email: "example@email.com",
@@ -75,7 +84,7 @@ export function downloadTemplate() {
     ["العمود", "الوصف", "ملاحظات"],
     ["name_ar", "الاسم بالعربية", "مطلوب"],
     ["name_en", "Name in English", "اختياري"],
-    ["membership_type", "مفتاح نوع العضوية", "مثل: working / honorary / supporter / affiliate"],
+    ["membership_type", "مفتاح نوع العضوية", "مثل: regular / honorary / supporter / affiliate"],
     ["join_date", "تاريخ الالتحاق", "YYYY-MM-DD"],
     ["phone", "رقم التواصل", "اختياري"],
     ["email", "البريد الإلكتروني", "اختياري"],
@@ -116,7 +125,7 @@ export async function parseImportFile(file: File): Promise<{
       id: crypto.randomUUID(),
       name_ar: nameAr,
       name_en: nameEn,
-      membership_type: String(r.membership_type ?? "").trim() || "working",
+      membership_type: normalizeMembershipKey(String(r.membership_type ?? "").trim() || "regular"),
       join_date: join,
       phone: String(r.phone ?? "").trim(),
       email: String(r.email ?? "").trim(),
