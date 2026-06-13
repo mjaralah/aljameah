@@ -104,6 +104,7 @@ export default function AssemblyMembersEditor({
           members={members}
           types={types}
           onChange={(m) => update({ members: m })}
+          onTypesChange={(t) => update({ membership_types: t })}
         />
       </TabsContent>
 
