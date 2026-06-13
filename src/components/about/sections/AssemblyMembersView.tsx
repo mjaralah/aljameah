@@ -262,6 +262,7 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
                 <MembershipBadge
                   typeKey={m.membership_type}
                   label={typeLabel(m.membership_type)}
+                  color={typeColor(m.membership_type)}
                 />
               </div>
               <div className="text-xs text-muted-foreground space-y-1">
