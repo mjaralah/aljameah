@@ -80,7 +80,8 @@ const values = [
 ];
 
 const About = () => {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const pick = (ar?: string, en?: string) => (lang === "ar" ? (ar || en || "") : (en || ar || ""));
   const [active, setActive] = useState<string>("founding");
   const { data: dbBoard } = useBoardMembers();
   const { data: dbBoardSettings } = useBoardSettings();
