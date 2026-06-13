@@ -120,7 +120,7 @@ export function AssemblyMembersView({ data }: { data: AssemblyData }) {
         </Card>
         {stats.map(([k, n]) => (
           <Card key={k} className="p-3 flex items-center justify-between gap-2">
-            <MembershipBadge typeKey={k} label={typeLabel(k)} />
+            <MembershipBadge typeKey={k} label={typeLabel(k)} color={typeColor(k)} />
             <span className="text-lg font-bold tabular-nums">{n}</span>
           </Card>
         ))}
