@@ -654,7 +654,7 @@ function TypesTab({
   const add = () =>
     onChange([
       ...types,
-      { key: `type_${Date.now()}`, label_ar: "نوع جديد", label_en: "New type" },
+      { key: `type_${Date.now()}`, label_ar: "نوع جديد", label_en: "New type", color: "#2563eb" },
     ]);
   const remove = (i: number) => {
     if (!confirm("حذف هذا النوع؟")) return;
@@ -674,7 +674,7 @@ function TypesTab({
       {types.map((t, i) => (
         <div
           key={i}
-          className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-2 items-end border rounded-md p-2 bg-muted/30"
+          className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto_auto] gap-2 items-end border rounded-md p-2 bg-muted/30"
         >
           <Field label="المفتاح (key)">
             <Input
@@ -691,6 +691,15 @@ function TypesTab({
               value={t.label_en}
               onChange={(e) => update(i, { label_en: e.target.value })}
               dir="ltr"
+            />
+          </Field>
+          <Field label="اللون">
+            <input
+              type="color"
+              value={t.color ?? "#64748b"}
+              onChange={(e) => update(i, { color: e.target.value })}
+              className="h-9 w-12 rounded border border-border cursor-pointer bg-transparent"
+              aria-label="لون الشارة"
             />
           </Field>
           <Button
