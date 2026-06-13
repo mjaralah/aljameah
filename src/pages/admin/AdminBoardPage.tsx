@@ -358,7 +358,7 @@ function SettingsTab() {
       } else {
         const { data, error } = await supabase.from("board_settings").insert(payload as any).select().single();
         if (error) throw error;
-        if (data) setS({ ...(data as Settings) });
+        if (data) setS({ ...(data as any) } as Settings);
       }
       toast.success("تم حفظ الإعدادات");
     } catch (e) {
