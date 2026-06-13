@@ -416,25 +416,14 @@ export default function AdminAboutPage() {
                   <div className="flex items-center justify-between">
                     <label className="text-sm font-medium">الإدارات</label>
                     <Button type="button" size="sm" variant="outline"
-                      onClick={() => updateData(s.id, "departments", [...departments, { title: "", desc: "" }])}>
+                      onClick={() => updateData(s.id, "departments", [...departments, { title: "", desc: "", sections: [] }])}>
                       <Plus className="w-3.5 h-3.5 ml-1" /> إضافة إدارة
                     </Button>
                   </div>
-                  {departments.map((it, i) => (
-                    <RowFrame key={i} index={i}
-                      onRemove={() => updateData(s.id, "departments", departments.filter((_, j) => j !== i))}>
-                      <div className="grid grid-cols-2 gap-2">
-                        <Field label="اسم الإدارة">
-                          <Input value={it.title ?? ""}
-                            onChange={(e) => updateData(s.id, "departments", departments.map((x, j) => j === i ? { ...x, title: e.target.value } : x))} />
-                        </Field>
-                        <Field label="الوصف">
-                          <Input value={it.desc ?? ""}
-                            onChange={(e) => updateData(s.id, "departments", departments.map((x, j) => j === i ? { ...x, desc: e.target.value } : x))} />
-                        </Field>
-                      </div>
-                    </RowFrame>
-                  ))}
+                  <DepartmentsEditor
+                    departments={departments as DeptItem[]}
+                    onChange={(next) => updateData(s.id, "departments", next)}
+                  />
                 </div>
               </>
             )}
