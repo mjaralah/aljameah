@@ -114,8 +114,26 @@ export default function AdminLegalPagesPage() {
 
   return (
     <AdminLayout title="الصفحات القانونية" description="سياسة الخصوصية، شروط الاستخدام، ملفات الارتباط، إمكانية الوصول">
+      <AdminPageHeader
+        title="الصفحات القانونية"
+        description="إدارة المحتوى القانوني للموقع"
+        icon={FileText}
+        action={
+          <Button onClick={() => setCreating(true)}>
+            <Plus className="w-4 h-4 ml-1" /> صفحة جديدة
+          </Button>
+        }
+      />
       {loading ? (
         <div className="p-12 flex justify-center"><Loader2 className="w-6 h-6 animate-spin" /></div>
+      ) : pages.length === 0 ? (
+        <AdminEmptyState
+          icon={FileText}
+          title="لا توجد صفحات قانونية بعد"
+          description="ابدأ بإنشاء أول صفحة قانونية لموقعك."
+          actionLabel="صفحة جديدة"
+          onAction={() => setCreating(true)}
+        />
       ) : (
         <div className="space-y-6">
           {pages.map((p, idx) => (
@@ -167,6 +185,31 @@ export default function AdminLegalPagesPage() {
           ))}
         </div>
       )}
+
+      <Dialog open={creating} onOpenChange={(o) => { if (!o) { setCreating(false); setNewPage({ slug: "", title: "" }); } }}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>صفحة قانونية جديدة</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <label className="text-sm font-medium mb-1 block">العنوان</label>
+              <Input value={newPage.title} onChange={(e) => setNewPage((p) => ({ ...p, title: e.target.value }))} placeholder="مثال: سياسة الاسترداد" />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1 block">المعرّف (Slug)</label>
+              <Input value={newPage.slug} onChange={(e) => setNewPage((p) => ({ ...p, slug: e.target.value }))} placeholder="refund-policy" dir="ltr" />
+              <p className="text-xs text-muted-foreground mt-1">يستخدم في رابط الصفحة، أحرف إنجليزية وشرطات فقط.</p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setCreating(false); setNewPage({ slug: "", title: "" }); }}>إلغاء</Button>
+            <Button onClick={createPage} disabled={creatingBusy}>
+              {creatingBusy ? <Loader2 className="w-4 h-4 ml-1 animate-spin" /> : <Plus className="w-4 h-4 ml-1" />}
+              إنشاء
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
 
       <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && setDeleteId(null)}>
         <AlertDialogContent>
