@@ -548,8 +548,7 @@ const About = () => {
                                   {dDesc && <p className="text-xs text-muted-foreground">{dDesc}</p>}
                                 </div>
                                 {sections.length > 0 && (
-                                  <div className="mt-4 pt-4 border-t border-border/60 space-y-3 relative">
-                                    <div className="absolute end-[14px] top-4 bottom-4 w-px bg-gradient-to-b from-accent/40 via-accent/20 to-transparent" aria-hidden />
+                                  <div className="mt-4 pt-4 border-t border-border/60 space-y-3">
                                     {sections.map((sec, si) => {
                                       const sTitle = pick(sec.title, sec.title_en);
                                       const sDesc = pick(sec.desc, sec.desc_en);
