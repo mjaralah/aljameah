@@ -416,25 +416,14 @@ export default function AdminAboutPage() {
                   <div className="flex items-center justify-between">
                     <label className="text-sm font-medium">الإدارات</label>
                     <Button type="button" size="sm" variant="outline"
-                      onClick={() => updateData(s.id, "departments", [...departments, { title: "", desc: "" }])}>
+                      onClick={() => updateData(s.id, "departments", [...departments, { title: "", desc: "", sections: [] }])}>
                       <Plus className="w-3.5 h-3.5 ml-1" /> إضافة إدارة
                     </Button>
                   </div>
-                  {departments.map((it, i) => (
-                    <RowFrame key={i} index={i}
-                      onRemove={() => updateData(s.id, "departments", departments.filter((_, j) => j !== i))}>
-                      <div className="grid grid-cols-2 gap-2">
-                        <Field label="اسم الإدارة">
-                          <Input value={it.title ?? ""}
-                            onChange={(e) => updateData(s.id, "departments", departments.map((x, j) => j === i ? { ...x, title: e.target.value } : x))} />
-                        </Field>
-                        <Field label="الوصف">
-                          <Input value={it.desc ?? ""}
-                            onChange={(e) => updateData(s.id, "departments", departments.map((x, j) => j === i ? { ...x, desc: e.target.value } : x))} />
-                        </Field>
-                      </div>
-                    </RowFrame>
-                  ))}
+                  <DepartmentsEditor
+                    departments={departments as DeptItem[]}
+                    onChange={(next) => updateData(s.id, "departments", next)}
+                  />
                 </div>
               </>
             )}
@@ -625,3 +614,157 @@ export default function AdminAboutPage() {
     </AdminLayout>
   );
 }
+
+// ===== أنواع الهيكل التنظيمي المتفرّع =====
+type UnitItem = { title?: string; title_en?: string; desc?: string; desc_en?: string };
+type SectionItem = { title?: string; title_en?: string; desc?: string; desc_en?: string; units?: UnitItem[] };
+type DeptItem = { title?: string; title_en?: string; desc?: string; desc_en?: string; sections?: SectionItem[] };
+
+function move<T>(arr: T[], from: number, to: number): T[] {
+  if (to < 0 || to >= arr.length) return arr;
+  const next = arr.slice();
+  const [it] = next.splice(from, 1);
+  next.splice(to, 0, it);
+  return next;
+}
+
+function MoveButtons({ idx, total, onMove }: { idx: number; total: number; onMove: (to: number) => void }) {
+  return (
+    <div className="flex items-center gap-1">
+      <Button type="button" size="icon" variant="ghost" className="h-7 w-7"
+        disabled={idx === 0} onClick={() => onMove(idx - 1)} title="أعلى">↑</Button>
+      <Button type="button" size="icon" variant="ghost" className="h-7 w-7"
+        disabled={idx >= total - 1} onClick={() => onMove(idx + 1)} title="أسفل">↓</Button>
+    </div>
+  );
+}
+
+function BilingualFields({
+  item, onChange, labels,
+}: {
+  item: { title?: string; title_en?: string; desc?: string; desc_en?: string };
+  onChange: (patch: Partial<UnitItem>) => void;
+  labels: { title: string; desc: string };
+}) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+      <Field label={`${labels.title} (عربي)`}>
+        <Input value={item.title ?? ""} onChange={(e) => onChange({ title: e.target.value })} />
+      </Field>
+      <Field label={`${labels.title} (English)`}>
+        <Input value={item.title_en ?? ""} onChange={(e) => onChange({ title_en: e.target.value })} dir="ltr" />
+      </Field>
+      <Field label={`${labels.desc} (عربي)`}>
+        <Input value={item.desc ?? ""} onChange={(e) => onChange({ desc: e.target.value })} />
+      </Field>
+      <Field label={`${labels.desc} (English)`}>
+        <Input value={item.desc_en ?? ""} onChange={(e) => onChange({ desc_en: e.target.value })} dir="ltr" />
+      </Field>
+    </div>
+  );
+}
+
+function UnitsEditor({ units, onChange }: { units: UnitItem[]; onChange: (next: UnitItem[]) => void }) {
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <label className="text-xs font-semibold text-muted-foreground">الوحدات الفرعية</label>
+        <Button type="button" size="sm" variant="outline"
+          onClick={() => onChange([...(units ?? []), { title: "", desc: "" }])}>
+          <Plus className="w-3 h-3 ml-1" /> إضافة وحدة
+        </Button>
+      </div>
+      {(units ?? []).map((u, i) => (
+        <div key={i} className="rounded border border-border bg-background/60 p-2 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] text-muted-foreground">وحدة #{i + 1}</span>
+            <div className="flex items-center gap-1">
+              <MoveButtons idx={i} total={units.length} onMove={(to) => onChange(move(units, i, to))} />
+              <Button type="button" size="icon" variant="ghost" className="h-7 w-7 text-destructive"
+                onClick={() => onChange(units.filter((_, j) => j !== i))}>
+                <Trash2 className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+          </div>
+          <BilingualFields
+            item={u}
+            labels={{ title: "اسم الوحدة", desc: "وصف قصير" }}
+            onChange={(patch) => onChange(units.map((x, j) => j === i ? { ...x, ...patch } : x))}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SectionsEditor({ sections, onChange }: { sections: SectionItem[]; onChange: (next: SectionItem[]) => void }) {
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <label className="text-xs font-semibold text-muted-foreground">الأقسام الفرعية</label>
+        <Button type="button" size="sm" variant="outline"
+          onClick={() => onChange([...(sections ?? []), { title: "", desc: "", units: [] }])}>
+          <Plus className="w-3 h-3 ml-1" /> إضافة قسم
+        </Button>
+      </div>
+      {(sections ?? []).map((sec, i) => (
+        <div key={i} className="rounded-md border border-border bg-muted/30 p-3 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-muted-foreground">قسم #{i + 1}</span>
+            <div className="flex items-center gap-1">
+              <MoveButtons idx={i} total={sections.length} onMove={(to) => onChange(move(sections, i, to))} />
+              <Button type="button" size="icon" variant="ghost" className="h-7 w-7 text-destructive"
+                onClick={() => onChange(sections.filter((_, j) => j !== i))}>
+                <Trash2 className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+          </div>
+          <BilingualFields
+            item={sec}
+            labels={{ title: "اسم القسم", desc: "وصف قصير" }}
+            onChange={(patch) => onChange(sections.map((x, j) => j === i ? { ...x, ...patch } : x))}
+          />
+          <div className="pt-2 border-t border-border/50">
+            <UnitsEditor
+              units={sec.units ?? []}
+              onChange={(units) => onChange(sections.map((x, j) => j === i ? { ...x, units } : x))}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function DepartmentsEditor({ departments, onChange }: { departments: DeptItem[]; onChange: (next: DeptItem[]) => void }) {
+  return (
+    <div className="space-y-3">
+      {departments.map((d, i) => (
+        <div key={i} className="rounded-md border-2 border-border bg-card p-3 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold">إدارة #{i + 1}</span>
+            <div className="flex items-center gap-1">
+              <MoveButtons idx={i} total={departments.length} onMove={(to) => onChange(move(departments, i, to))} />
+              <Button type="button" size="icon" variant="ghost" className="h-8 w-8 text-destructive"
+                onClick={() => onChange(departments.filter((_, j) => j !== i))}>
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+          <BilingualFields
+            item={d}
+            labels={{ title: "اسم الإدارة", desc: "وصف قصير" }}
+            onChange={(patch) => onChange(departments.map((x, j) => j === i ? { ...x, ...patch } : x))}
+          />
+          <div className="pt-2 border-t">
+            <SectionsEditor
+              sections={d.sections ?? []}
+              onChange={(sections) => onChange(departments.map((x, j) => j === i ? { ...x, sections } : x))}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
