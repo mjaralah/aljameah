@@ -533,16 +533,63 @@ const About = () => {
                     {structureData.departments.length > 0 && (
                       <>
                         <OrgConnector />
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                          {structureData.departments.map((d) => (
-                            <div
-                              key={d.title}
-                              className="bg-card border border-border rounded-xl p-4 text-center hover:border-accent transition-smooth"
-                            >
-                              <h5 className="font-bold text-primary text-sm mb-1">{d.title}</h5>
-                              <p className="text-xs text-muted-foreground">{d.desc}</p>
-                            </div>
-                          ))}
+                        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 items-start">
+                          {structureData.departments.map((d, di) => {
+                            const dTitle = pick(d.title, d.title_en);
+                            const dDesc = pick(d.desc, d.desc_en);
+                            const sections = d.sections ?? [];
+                            return (
+                              <div
+                                key={di}
+                                className="bg-card border border-border rounded-xl p-4 hover:border-accent transition-smooth"
+                              >
+                                <div className="text-center">
+                                  <h5 className="font-bold text-primary text-sm mb-1">{dTitle}</h5>
+                                  {dDesc && <p className="text-xs text-muted-foreground">{dDesc}</p>}
+                                </div>
+                                {sections.length > 0 && (
+                                  <div className="mt-4 pt-4 border-t border-border/60 space-y-3 relative">
+                                    <div className="absolute end-[14px] top-4 bottom-4 w-px bg-gradient-to-b from-accent/40 via-accent/20 to-transparent" aria-hidden />
+                                    {sections.map((sec, si) => {
+                                      const sTitle = pick(sec.title, sec.title_en);
+                                      const sDesc = pick(sec.desc, sec.desc_en);
+                                      const units = sec.units ?? [];
+                                      return (
+                                        <div key={si} className="relative flex items-start gap-3">
+                                          <div className="relative z-10 shrink-0 w-5 h-5 rounded-full bg-card border-2 border-accent flex items-center justify-center mt-1">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-accent" />
+                                          </div>
+                                          <div className="flex-grow min-w-0">
+                                            <div className="bg-accent-soft/40 border border-border rounded-lg p-3 transition-colors hover:bg-accent-soft/60">
+                                              <h6 className="text-foreground font-semibold text-xs">{sTitle}</h6>
+                                              {sDesc && <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{sDesc}</p>}
+                                              {units.length > 0 && (
+                                                <div className="mt-3 grid grid-cols-1 gap-1.5">
+                                                  {units.map((u, ui) => {
+                                                    const uTitle = pick(u.title, u.title_en);
+                                                    const uDesc = pick(u.desc, u.desc_en);
+                                                    return (
+                                                      <div key={ui} className="flex items-start gap-2 p-2 bg-background/70 rounded-md border border-border/60">
+                                                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
+                                                        <div className="min-w-0">
+                                                          <div className="text-[11px] text-foreground font-medium leading-tight">{uTitle}</div>
+                                                          {uDesc && <div className="text-[10px] text-muted-foreground mt-0.5">{uDesc}</div>}
+                                                        </div>
+                                                      </div>
+                                                    );
+                                                  })}
+                                                </div>
+                                              )}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
                         </div>
                       </>
                     )}
