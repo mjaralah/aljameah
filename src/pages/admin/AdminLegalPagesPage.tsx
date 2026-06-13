@@ -34,6 +34,26 @@ export default function AdminLegalPagesPage() {
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [newPage, setNewPage] = useState<{ slug: string; title: string }>({ slug: "", title: "" });
+  const [creatingBusy, setCreatingBusy] = useState(false);
+
+  async function createPage() {
+    const slug = newPage.slug.trim().toLowerCase().replace(/\s+/g, "-");
+    const title = newPage.title.trim();
+    if (!slug || !title) { toast.error("العنوان والمعرّف مطلوبان"); return; }
+    setCreatingBusy(true);
+    const { error } = await supabase.from("legal_pages").insert({
+      slug, title, content: "", published: false, sort_order: pages.length,
+    });
+    setCreatingBusy(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("تم إنشاء الصفحة");
+    setCreating(false);
+    setNewPage({ slug: "", title: "" });
+    load();
+  }
+
 
   async function load() {
     setLoading(true);
