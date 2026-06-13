@@ -96,6 +96,7 @@ export type Database = {
           formation_decree_url: string | null
           id: string
           intro_text: string | null
+          positions: Json
           show_gregorian: boolean
           show_hijri: boolean
           term_duration_label: string | null
@@ -109,6 +110,7 @@ export type Database = {
           formation_decree_url?: string | null
           id?: string
           intro_text?: string | null
+          positions?: Json
           show_gregorian?: boolean
           show_hijri?: boolean
           term_duration_label?: string | null
@@ -122,6 +124,7 @@ export type Database = {
           formation_decree_url?: string | null
           id?: string
           intro_text?: string | null
+          positions?: Json
           show_gregorian?: boolean
           show_hijri?: boolean
           term_duration_label?: string | null
