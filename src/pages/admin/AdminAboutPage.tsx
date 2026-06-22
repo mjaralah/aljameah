@@ -17,6 +17,7 @@ import { moveToPosition, moveRelativeTo } from "@/lib/reorderHelpers";
 import CustomSectionsManager from "@/components/admin/about/CustomSectionsManager";
 import AssemblyMembersEditor, { defaultAssemblyData } from "@/components/admin/about/AssemblyMembersEditor";
 import type { AssemblyData } from "@/lib/assemblyExport";
+import { defaultStrategicGoals } from "@/data/about";
 
 type AnyData = Record<string, unknown> | null;
 
@@ -212,7 +213,7 @@ export default function AdminAboutPage() {
         );
       }
       case "strategic": {
-        const goals = (Array.isArray(data.goals) ? data.goals : []) as { title?: string; desc?: string }[];
+        const goals = (Array.isArray(data.goals) && data.goals.length ? data.goals : defaultStrategicGoals) as { title?: string; desc?: string }[];
         return (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
