@@ -99,9 +99,10 @@ const About = () => {
     return (d ?? fallback) as T;
   };
 
-  const dbStrategicGoals = getData<{ title: string; desc: string }[]>("strategic", []).length
-    ? getData<{ goals: { title: string; desc: string }[] }>("strategic", { goals: [] }).goals
-    : strategicGoals.map((g) => ({ title: g.t, desc: g.d }));
+  const dbStrategicGoalsRaw = getData<{ goals?: { title: string; desc: string }[] }>("strategic", {}).goals;
+  const dbStrategicGoals = (dbStrategicGoalsRaw && dbStrategicGoalsRaw.length)
+    ? dbStrategicGoalsRaw
+    : (aboutMap["strategic"] ? [] : strategicGoals.map((g) => ({ title: g.t, desc: g.d })));
   const dbOperationalGoals = getData<{ items: string[] }>("operational", { items: operationalGoals }).items;
   const dbValues = getData<{ values: { icon: string; title: string; desc: string }[] }>("mission", { values: [] }).values;
   const valuesIconMap: Record<string, React.ComponentType<{ className?: string }>> = { Heart, ShieldCheck, Handshake, Lightbulb };
