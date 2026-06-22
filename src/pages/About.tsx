@@ -34,6 +34,7 @@ import ceoPortrait from "@/assets/ceo-portrait.jpg";
 import { CustomAboutSection } from "@/components/about/CustomAboutSection";
 import { AssemblyMembersView } from "@/components/about/sections/AssemblyMembersView";
 import { defaultAssemblyData } from "@/components/admin/about/AssemblyMembersEditor";
+import { defaultStrategicGoals } from "@/data/about";
 
 type Section = {
   id: string;
@@ -52,15 +53,6 @@ const sections: Section[] = [
   { id: "ceo", label: "المدير التنفيذي", icon: UserCog },
   { id: "structure", label: "الهيكل التنظيمي", icon: Network },
   { id: "registration", label: "شهادة التسجيل", icon: BadgeCheck },
-];
-
-const strategicGoals = [
-  { t: "تعزيز الأثر المجتمعي", d: "توسيع نطاق برامجنا لتصل إلى شرائح أوسع من المستفيدين بجودة عالية." },
-  { t: "الاستدامة المالية", d: "تنويع مصادر الدخل وبناء أوقاف تضمن استمرارية العطاء." },
-  { t: "التحوّل الرقمي", d: "رقمنة الخدمات والإجراءات لتعزيز الكفاءة والشفافية." },
-  { t: "تمكين الكوادر البشرية", d: "تطوير قدرات الموظفين والمتطوعين عبر برامج تدريب نوعية." },
-  { t: "الشراكات الاستراتيجية", d: "بناء تحالفات مع القطاعين الحكومي والخاص لمضاعفة الأثر." },
-  { t: "الحوكمة", d: "تطبيق أعلى معايير الحوكمة وفق رؤية المملكة 2030." },
 ];
 
 const operationalGoals = [
@@ -102,7 +94,7 @@ const About = () => {
   const dbStrategicGoalsRaw = getData<{ goals?: { title: string; desc: string }[] }>("strategic", {}).goals;
   const dbStrategicGoals = (dbStrategicGoalsRaw && dbStrategicGoalsRaw.length)
     ? dbStrategicGoalsRaw
-    : (aboutMap["strategic"] ? [] : strategicGoals.map((g) => ({ title: g.t, desc: g.d })));
+    : (aboutMap["strategic"] ? [] : defaultStrategicGoals);
   const dbOperationalGoals = getData<{ items: string[] }>("operational", { items: operationalGoals }).items;
   const dbValues = getData<{ values: { icon: string; title: string; desc: string }[] }>("mission", { values: [] }).values;
   const valuesIconMap: Record<string, React.ComponentType<{ className?: string }>> = { Heart, ShieldCheck, Handshake, Lightbulb };
